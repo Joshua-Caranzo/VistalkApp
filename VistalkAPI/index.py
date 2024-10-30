@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
-from db import SECRET_KEY, DEBUG, HOST, PORT
 from flask_cors import CORS
-from Services import user, section, content, question, shop, emailService, feedback, report, dailytask,dashboard
+from Services import user, section, content, question, shop, emailService, feedback, report, dailytask,dashboard, db
 from functools import wraps
 import jwt
 
@@ -19,7 +18,7 @@ def token_required(f):
             return jsonify({'message': 'Unauthorized!'}), 401
         
         try:
-            data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            data = jwt.decode(token, db.SECRET_KEY, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             return jsonify({'message': 'Token has expired!'}), 401
         except jwt.InvalidTokenError:
