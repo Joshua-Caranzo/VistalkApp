@@ -1,4 +1,4 @@
-from db import get_db_connection, PronunciationDirectory, SyllableDirectory
+from Services import get_db_connection, PronunciationDirectory, SyllableDirectory
 from flask import request, jsonify, send_from_directory
 import os
 from datetime import datetime, timedelta, timezone, date
