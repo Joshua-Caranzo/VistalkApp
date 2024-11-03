@@ -22,6 +22,7 @@ import Unit from './src/routes/Unit';
 import UnitContent from './src/routes/UnitContent';
 import Loader from './src/components/Loader';
 import { updateScore } from './src/routes/repo';
+import Leaderboard from './src/routes/Leaderboard';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -29,7 +30,7 @@ const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); 
   const [loading, setLoading] = useState(true);
 
-  useEffect(() =>   {
+  /* useEffect(() =>   {
     const checkLoginStatus = async () => {
       const token = await AsyncStorage.getItem('userToken');
       const userID = await AsyncStorage.getItem('userID');
@@ -40,13 +41,13 @@ const App: React.FC = () => {
     };
 
     checkLoginStatus();
-  }, []);
+  }, []); */
 
-  if (loading) {
+  /* if (loading) {
     return (
       <Loader isVisible={loading} message='Loading... Please Wait!' />
     );
-  }
+  } */
 
   return (
     <NavigationContainer>
@@ -135,6 +136,11 @@ const App: React.FC = () => {
         <Stack.Screen
           name="UnitContent"
           component={UnitContent}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Leaderboard"
+          component={Leaderboard}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
