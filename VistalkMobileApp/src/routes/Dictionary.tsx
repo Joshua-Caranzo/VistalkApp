@@ -66,7 +66,7 @@ const Dictionary: React.FC = () => {
   return (
     <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center resize-cover">
       <View className="items-center mb-3 mt-8">
-        <Text className="text-4xl font-bold text-black">Dictionary</Text>
+        <Text className="text-4xl font-black text-white">Dictionary</Text>
       </View>
       <View className="flex flex-row items-center justify-start bg-white rounded-lg px-4 mb-5 w-4/5 h-10">
         <TextInput
@@ -78,9 +78,13 @@ const Dictionary: React.FC = () => {
         />
         <SearchIcon className="w-7 h-7" />
       </View>
-      <View className="flex flex-row items-center mb-4 gap-24">
-        <Text className="text-white text-2xl">Native</Text>
-        <Text className="text-white text-2xl">English</Text>
+      <View className="flex flex-row items-center mb-4 gap-16">
+        <Text className="text-white text-2xl px-4 py-2 rounded-2xl" style={{
+          backgroundColor: 'rgba(240, 240, 240, 0.4)'
+        }}>Native</Text>
+        <Text className="text-white text-2xl px-4 py-2 rounded-2xl" style={{
+          backgroundColor: 'rgba(240, 240, 240, 0.4)'
+        }}>English</Text>
       </View>
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 20 }}
@@ -100,15 +104,17 @@ const Dictionary: React.FC = () => {
         ) : contents.length > 0 ? (
           contents.map((c, index) => (
             <TouchableOpacity key={index} onPress={() => navigateToMeaning(c.contentID)}>
-              <View className=" rounded-lg py-3 px-5 mb-3  border border-[#FAF9F6]" style={{
-                backgroundColor: 'rgba(240, 240, 240, 0.4)'
-              }}>
-                <View className="flex flex-row items-center gap-x-4">
-                  <Text className="text-xl text-center text-black w-[30%] font-bold">{c.contentText}</Text>
-                  <ArrowIcon className="w-8 h-8 text-black" />
-                  <Text className="text-xl text-center text-black w-[30%] font-light italic">{c.englishTranslation}</Text>
-                </View>
-              </View>
+                <LinearGradient colors={['#f7c188', '#6addd0']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }} // Left to right gradient
+                  className="rounded-lg py-3 px-5 mb-3  border border-[#FAF9F6]"
+                >
+                  <View className="flex flex-row items-center gap-x-4">
+                    <Text className="text-xl text-center text-white w-[30%] font-bold">{c.contentText}</Text>
+                    <ArrowIcon className="w-8 h-8 text-white" />
+                    <Text className="text-xl text-center text-white w-[30%] font-bold italic">{c.englishTranslation}</Text>
+                  </View>
+                </LinearGradient>
             </TouchableOpacity>
           ))
         ) : (
