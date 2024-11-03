@@ -81,7 +81,7 @@
       role="dialog" 
       aria-modal="true">
       
-      <div class="flex items-end justify-center mt-20 px-4 text-center md:items-center sm:block sm:p-0">
+      <div class="flex items-end justify-center px-4 text-center md:items-center sm:block sm:p-0">
         
         <div 
           on:click={closeModal}
@@ -134,22 +134,34 @@
             <div class="mt-2">  
                 <label class="inline-flex items-center cursor-pointer">
                     <input bind:checked={powerUp.isPremium}  type="checkbox" class="sr-only peer">
-                    <div class="relative w-11 h-6 bg-gray-200  rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-800"></div>
-                    <span class="ms-3 text-sm font-medium text-black dark:text-black">Premium Item</span>
+                      <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 
+                      peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
+                      peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
+                      after:start-[2px] after:bg-white after:border-gray-300 after:border 
+                      after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 
+                      peer-checked:bg-gradient-to-r peer-checked:from-[#6addd0] peer-checked:to-[#f7c188]">
+                  </div>
+                      <span class="ms-3 text-sm font-medium text-black dark:text-black">Premium Item</span>
                   </label>
             </div>
 
             <div class="mt-2">  
               <label class="inline-flex items-center cursor-pointer">
                   <input bind:checked={powerUp.isImplemented}  type="checkbox" class="sr-only peer">
-                  <div class="relative w-11 h-6 bg-gray-200  rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-800"></div>
-                  <span class="ms-3 text-sm font-medium text-black dark:text-black">Already Implemented</span>
+                  <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 
+                    peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
+                    peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
+                    after:start-[2px] after:bg-white after:border-gray-300 after:border 
+                    after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 
+                    peer-checked:bg-gradient-to-r peer-checked:from-[#6addd0] peer-checked:to-[#f7c188]">
+                </div>
+                   <span class="ms-3 text-sm font-medium text-black dark:text-black">Already Implemented</span>
                 </label>
           </div>
 
             <div class="mt-2">
                 <div class="flex">
-                    <label for="powerUpFile" class="bg-black p-2 text-white text-sm rounded-md flex items-justify mr-2 cursor-pointer" >Upload file<svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg></label>
+                    <label for="powerUpFile" class="bg-[#f7c188] p-3 text-black text-sm rounded-md flex items-justify mr-2 cursor-pointer" >Upload file<svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg></label>
                     <input on:change={(event) => handleFile(event)} id="powerUpFile"
                         type="file" class="file-input" accept=".png"style="visibility: hidden"/>
                 </div>
@@ -180,14 +192,20 @@
           <div class="mt-2">  
               <label class="inline-flex items-center cursor-pointer">
                   <input bind:checked={backgroundMusic.isPremium} type="checkbox" class="sr-only peer">
-                  <div class="relative w-11 h-6 bg-gray-200  rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-800"></div>
-                  <span class="ms-3 text-sm font-medium text-black dark:text-black">Premium Item</span>
+                  <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 
+                  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
+                  peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
+                  after:start-[2px] after:bg-white after:border-gray-300 after:border 
+                  after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 
+                  peer-checked:bg-gradient-to-r peer-checked:from-[#6addd0] peer-checked:to-[#f7c188]">
+              </div>
+                                <span class="ms-3 text-sm font-medium text-black dark:text-black">Premium Item</span>
                 </label>
           </div>
 
           <div class="mt-2">
               <div class="flex">
-                  <label class="bg-black p-2 text-white text-sm rounded-md flex items-justify mr-2 cursor-pointer" for="file2">Upload file<svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg></label>
+                  <label class="bg-[#f7c188] p-3 text-black p-3 text-sm rounded-md flex items-justify mr-2 cursor-pointer" for="file2">Upload file<svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg></label>
                   <input type="file" class="file-input" on:change={(event) => handleFileAudio(event)} accept=".mp3"style="visibility: hidden" id="file2"/>
               </div>
               {#if backgroundMusic.file}
@@ -219,7 +237,8 @@
             </div>
         {/if}
             <div class="flex justify-end mt-6">
-              <button on:click={saveItem} type="button" class="px-3 py-2 text-sm tracking-wide text-white capitalize transition-colors duration-200 transform bg-black rounded-md dark:bg-black dark:hover:bg-black dark:focus:bg-black hover:bg-black focus:outline-none focus:bg-indigo-500 focus:ring focus:ring-indigo-300 focus:ring-opacity-50">
+              <button on:click={saveItem} type="button"style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
+              class={'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50'} >
                 Save Item
               </button>
             </div>

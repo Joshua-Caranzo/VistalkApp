@@ -90,7 +90,9 @@
                         <input autocomplete="off" bind:value={dailyTask.quantity} id="email" type="number" placeholder="Goal Number" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
                     </div>
                     <div class="flex justify-end mt-6">
-                        <button on:click={saveTask} type="button" class="px-3 py-2 text-sm tracking-wide text-white capitalize transition-colors duration-200 transform bg-black rounded-md dark:bg-black dark:hover:bg-black dark:focus:bg-black hover:bg-black focus:outline-none focus:bg-indigo-500 focus:ring focus:ring-indigo-300 focus:ring-opacity-50">
+                        <button on:click={saveTask} type="button"  style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
+
+                        class={'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50'} >
                             {isAdd ? "Save" : "Update"}
                         </button>
                     </div>

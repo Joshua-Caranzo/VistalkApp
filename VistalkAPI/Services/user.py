@@ -3,7 +3,8 @@ import jwt
 from datetime import datetime, timedelta, timezone, date
 from flask import request, jsonify, send_from_directory
 import hashlib
-from Services import emailService, get_db_connection, UserImages, SECRET_KEY
+from Services import emailService
+from db import SECRET_KEY , get_db_connection, UserImages
 import os
 
 def generate_token(user_name):

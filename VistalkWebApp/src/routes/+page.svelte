@@ -5,14 +5,22 @@
     import { loggedInUser } from '$lib/store';
     import { initAuth } from '$lib/auth/auth';
     import { goto } from '$app/navigation';
+    import { sendEmailToUs } from './repo';
     
     let user: LoggedInUser | null = null;
-    let isLoading = true; // Loading state to track authentication status
+    let isLoading = true;
+    let flipped1 = false;
+    let flipped2 = false;
+    let flipped3 = false;
+    let flipped4 = false;
+    let flipped5 = false;
+    let emailMessage:string = "";
+    let userEmail:string = "";
 
     async function getUser() {
         user = await getLoggedInUser();
         loggedInUser.set(user);
-        isLoading = false; // Update loading state after checking user
+        isLoading = false;
     }
 
     function scrollToSection(sectionId: string) {
@@ -24,8 +32,43 @@
 
     onMount(async () => {
         await initAuth();
-        await getUser(); // Call getUser on mount to check authentication
+        await getUser(); 
     });
+
+    function toggleFlip(index: number) {
+        console.log(index)
+        switch(index) {
+            case 1:
+                flipped1 = !flipped1;
+                break;
+            case 2:
+                flipped2 = !flipped2;
+                break;
+            case 3:
+                flipped3 = !flipped3;
+                break;
+            case 4:
+                flipped4 = !flipped4;
+                break;
+            case 5:
+                flipped5 = !flipped5;
+                break;
+            default:
+                return;
+            }
+    }
+
+    async function sendEmail()
+    {
+        if((userEmail != "" || userEmail != null) && (emailMessage != "" || emailMessage != null)){
+            let result = await sendEmailToUs(userEmail, emailMessage);
+            if(result.isSuccess){
+                userEmail = "";
+                emailMessage = "";
+                alert("Thank you for sharing your insights with us! Our team is committed to utilizing your feedback to enhance the Vistalk experience.");
+            }
+        }
+    }
 </script>
 
 {#if isLoading}
@@ -88,8 +131,8 @@
 <section id="about-us" class="bg-gradient-to-r from-[#6addd0] to-[#f7c188] py-32 px-4">
     <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-start bg-gray-200 bg-opacity-40 rounded-lg p-6">
         <div class="relative">
-            <div class="bg-[#E1F0DA] h-40 w-40 md:h-72 md:w-72 rounded-lg absolute top-1/2 -translate-y-1/2 right-4 mt-8"></div>
-            <img src="9 (1).png" alt="Team working together" class="relative w-full max-w-lg md:max-w-2xl h-auto mt-8 md:mt-8 right-16">
+            <div class="bg-[#E1F0DA] h-40 w-40 md:h-72 md:w-72 rounded-lg absolute top-32 -translate-y-1/2 right-4 mt-8"></div>
+            <img src="3.jpg" alt="Team working together" class="relative w-full max-w-lg md:max-w-2xl h-auto mt-8 md:mt-8 right-12 top-8">
         </div>
         <div class="ml-0 md:ml-9 mt-8 md:mt-0 text-center md:text-center">
             <h2 class="text-2xl md:text-3xl font-bold mb-4">ABOUT US</h2>
@@ -100,10 +143,10 @@
                 At Vistalk, we believe that language learning is more than just acquiring words and phrases; it's about embracing a new world of understanding and connection.
             </p>
             <p class="mb-4 text-justify">
-                Driven by a passion for linguistic diversity, we developed **Vistalk**—a comprehensive language learning app tailored specifically for Visayan language learners. Our goal is to create a user-friendly platform that simplifies the learning process while fostering a sense of community among learners.
+                Driven by a passion for linguistic diversity, we developed Vistalk —a comprehensive language learning app tailored specifically for Visayan language learners. Our goal is to create a user-friendly platform that simplifies the learning process while fostering a sense of community among learners.
             </p>
             <p class="text-justify">
-                Our team is comprised of language experts, educators, and technology enthusiasts united by a common goal: to empower individuals to connect, communicate, and thrive through the mastery of the Visayan language.
+                Our team combines our technical skills and enthusiasm for language to build a tool that helps people connect, communicate, and grow through learning Visayan language.
             </p>
         </div>
     </div>
@@ -127,9 +170,8 @@
             </p>
         </div>
         <div class="relative">
-            <div class="bg-[#E1F0DA] h-40 w-40 md:h-72 md:w-72 rounded-lg absolute top-1/2 -translate-y-1/2 left-8 mt-8"></div>
-            <img  src="9 (1).png" alt="Team working together" class="relative w-full max-w-lg md:max-w-2xl h-auto mt-8 md:mt-8 left-16">
-
+            <div class="bg-[#E1F0DA] h-40 w-40 md:h-72 md:w-72 rounded-lg absolute top-40 -translate-y-1/2 left-10 mt-8"></div>
+            <img  src="5.jpg" alt="Team working together" class="relative w-full max-w-lg md:max-w-2xl h-auto mt-8 md:mt-8 left-14 top-12">
         </div>
     </div>
 </section>
@@ -139,17 +181,17 @@
         <div>
             <ul class="list-none">
                 <li class="text-2xl md:text-3xl font-bold mb-4">Adventurous Gameplay</li>
-                <ul class="list-disc pl-4">
-                    <li>Explore sections with lessons to complete.</li>
-                    <li>Study before embarking on adventures.</li>
-                    <li>Buy Power-ups from shop.</li>
-                </ul>
-                <li class="text-2xl md:text-3xl font-bold mt-8 mb-4">Interactive Arena</li>
-                <ul class="list-disc pl-4">
-                    <li>Engage in 1v1 matches against other users.</li>
-                    <li>Matchmaking based on rank medals for fair competition.</li>
-                    <li>Receive awards and increase rank by winning games.</li>
-                </ul>
+                    <ul class="list-disc pl-4">
+                        <li>Explore various sections and complete engaging lessons.</li>
+                        <li>Purchase power-ups from the shop and use them strategically to enhance gameplay.</li>
+                        <li>Earn rewards as you progress.</li>
+                    </ul>
+                <li class="text-2xl md:text-3xl font-bold mt-8 mb-4">Pronunciation Practice</li>
+                    <ul class="list-disc pl-4">
+                        <li>Practice pronunciation for specific words and phrases.</li>
+                        <li>Record your voice and receive instant feedback on accuracy.</li>
+                        <li>Review your practice history for targeted content.</li>
+                    </ul>
                 <li class="text-2xl md:text-3xl font-bold mt-8 mb-4">Comprehensive Dictionary</li>
                 <ul class="list-disc pl-4">
                     <li>Quick search for translations or word meanings.</li>
@@ -173,25 +215,100 @@
     <div class="max-w-4xl mx-auto text-center">
         <h2 class="text-2xl md:text-3xl font-bold mb-8">The Developers</h2>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
-            <div>
-                <img src="dota2.png" alt="Joshua Caranzo" class="h-36 w-36 rounded-lg mx-auto">
-                <p class="mt-2 text-lg italic">Joshua Caranzo</p>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+            <div class="group perspective">
+                <div class="w-36 mx-auto">
+                    <div class="relative w-36 h-36 transition-transform transform duration-500" tabindex="0" on:click={() => toggleFlip(1)} on:blur={() => flipped1 = false}>
+                        {#if flipped1}
+                        <div class="absolute inset-0 bg-white rounded-full flex items-center justify-center transform rotate-y-180 cursor-pointer z-10 p-4 text-center">
+                            <p class="text-lg italic">Project Manager / Lead Developer</p>
+                            </div>
+                        {:else}
+                            <div class="absolute inset-0">
+                                <img src="caranzo.jpg" alt="Joshua Caranzo" class="h-36 w-36 rounded-full object-cover cursor-pointer">
+                            </div>
+                        {/if}
+                    </div>
+                    <p class="mt-2 text-lg italic text-center">Joshua Caranzo</p>
+                </div>     
             </div>
-            <div>
-                <img src="dota2.png" alt="Beatrice Abigail Alindao" class="h-36 w-36 rounded-lg mx-auto">
-                <p class="mt-2 text-lg italic">Beatrice Abigail Alindao</p>
+             <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+            <div class="group perspective">
+                <div class="w-36 mx-auto">
+                    <div class="relative w-36 h-36 transition-transform transform duration-500" tabindex="0" on:click={() => toggleFlip(2)} on:blur={() => flipped2 = false}>
+                        {#if flipped2}
+                        <div class="absolute inset-0 bg-white rounded-full flex items-center justify-center transform rotate-y-180 cursor-pointer z-10 p-4 text-center">
+                            <p class="text-lg italic">Technical Writer / Front-End Developer</p>
+                            </div>
+                        {:else}
+                            <div class="absolute inset-0">
+                                <img src="aby.jpg" alt="aby" class="h-36 w-36 rounded-full object-cover cursor-pointer">
+                            </div>
+                        {/if}
+                    </div>
+                    <p class="mt-2 text-lg italic text-center">Beatrice Abigail Alindao</p>
+                </div>     
             </div>
-            <div>
-                <img src="dota2.png" alt="Aldrich Batisla-on" class="h-36 w-36 rounded-lg mx-auto">
-                <p class="mt-2 text-lg italic">Aldrich Batisla-on</p>
+               <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+            <div class="group perspective">
+                <div class="w-36 mx-auto">
+                    <div class="relative w-36 h-36 transition-transform transform duration-500" tabindex="0" on:click={() => toggleFlip(3)} on:focus={() => toggleFlip(3)} on:blur={() => flipped3 = false}>
+                        {#if flipped3}
+                        <div class="absolute inset-0 bg-white rounded-full flex items-center justify-center transform rotate-y-180 cursor-pointer z-10 p-4 text-center">
+                            <p class="text-lg italic">QA Analyst / Back-End Developer</p>
+                            </div>
+                        {:else}
+                            <div class="absolute inset-0">
+                                <img src="aldrich.jpg" alt="drich" class="h-36 w-36 rounded-full object-cover cursor-pointer">
+                            </div>
+                        {/if}
+                    </div>
+                    <p class="mt-2 text-lg italic text-center">Aldrich Batisla-on</p>
+                </div>     
             </div>
-            <div>
-                <img src="dota2.png" alt="Justin Louise Cañada" class="h-36 w-36 rounded-lg mx-auto">
-                <p class="mt-2 text-lg italic">Justin Louise Cañada</p>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+            <div class="group perspective">
+                <div class="w-36 mx-auto">
+                    <div class="relative w-36 h-36 transition-transform transform duration-500" tabindex="0" on:click={() => toggleFlip(4)} on:focus={() => toggleFlip(4)} on:blur={() => flipped4 = false}>
+                        {#if flipped4}
+                        <div class="absolute inset-0 bg-white rounded-full flex items-center justify-center transform rotate-y-180 cursor-pointer z-10 p-4 text-center">
+                            <p class="text-lg italic">UI/UX Designer / Front-End Developer</p>
+                            </div>
+                        {:else}
+                            <div class="absolute inset-0">
+                                <img src="canada.jpg" alt="justin" class="h-36 w-36 rounded-full object-cover cursor-pointer">
+                            </div>
+                        {/if}
+                    </div>
+                    <p class="mt-2 text-lg italic text-center">Justin Louise Cañada</p>
+                </div>     
             </div>
-            <div>
-                <img src="dota2.png" alt="Cesar Ian Sacare" class="h-36 w-36 rounded-lg mx-auto">
-                <p class="mt-2 text-lg italic">Cesar Ian Sacare</p>
+               <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+            <div class="group perspective">
+                <div class="w-36 mx-auto">
+                    <div class="relative w-36 h-36 transition-transform transform duration-500" tabindex="0" on:click={() => toggleFlip(5)} on:focus={() => toggleFlip(5)} on:blur={() => flipped5 = false}>
+                        {#if flipped5}
+                        <div class="absolute inset-0 bg-white rounded-full flex items-center justify-center transform rotate-y-180 cursor-pointer z-10 p-4 text-center">
+                            <p class="text-lg italic">Database Manager / Front-End Developer</p>
+                            </div>
+                        {:else}
+                            <div class="absolute inset-0">
+                                <img src="sacare.jpg" alt="sacare" class="h-36 w-36 rounded-full object-cover cursor-pointer">
+                            </div>
+                        {/if}
+                    </div>
+                    <p class="mt-2 text-lg italic text-center">Cesar Ian Sacare</p>
+                </div>     
             </div>
         </div>
     </div>
@@ -200,20 +317,14 @@
 <section class="bg-white py-8 px-4">
     <div class="max-w-4xl mx-auto text-center">
         <h3 class="text-lg font-semibold mb-2">Stay Connected</h3>
-        <p class="text-gray-600 mb-4">Subscribe to our newsletter for updates and offers.</p>
-        <form class="mb-4">
-            <input type="email" placeholder="Your Email" class="border border-gray-300 rounded-lg px-4 py-2 w-64" required>
-            <button type="submit" class="bg-[#6addd0] text-white font-semibold rounded-lg px-4 py-2 ml-2">Subscribe</button>
-        </form>
-        <div class="flex justify-center space-x-4">
-            <a href="#" class="text-gray-600 hover:text-[#6addd0]">Privacy Policy</a>
-            <a href="#" class="text-gray-600 hover:text-[#6addd0]">Terms of Service</a>
-            <a href="#" class="text-gray-600 hover:text-[#6addd0]">Contact Us</a>
-        </div>
+        <p class="text-gray-600 mb-4">Have any questions or feedback? Reach out—we’d love to hear from you!</p>
+            <input bind:value={userEmail} type="email" placeholder="Your Email" class="mb-2 border border-gray-300 rounded-lg px-4 py-2 w-full max-w-md" required>
+            <textarea bind:value={emailMessage} placeholder="Your Message" class="border border-gray-300 rounded-lg px-4 py-2 w-full max-w-md h-24 mb-2" required></textarea>
+            <button on:click={sendEmail} class="bg-[#6addd0] text-white font-semibold rounded-lg px-4 py-2 w-full max-w-md">Send Message</button>
         <p class="mt-4 text-gray-500 text-sm">&copy; 2024 Vistalk. All rights reserved.</p>
     </div>
 </section>
-
-
 {/if}
+
+
 

@@ -238,47 +238,48 @@
 {/if}
 
 <div class="flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
-    <p class="font-['Helvetica'] text-[#99BC85] text-xl sm:text-lg font-bold">Content List</p>
+    <p class="font-['Helvetica'] text-black text-xl sm:text-lg font-bold">Content List</p>
     <div class="flex gap-4 mt-4 sm:mt-0">
-        <div class="flex items-center border border-[#B9B9B9] rounded-xl px-4 py-1 sm:px-12 bg-white">
-            <input type="text" bind:value={searchString} placeholder="Search" class="outline-none text-gray-600 placeholder-[#99BC85] text-sm sm:text-base">
+        <div class="flex items-center border border-black rounded-xl px-12 py-1 bg-white">
+            <input type="text" bind:value={searchString} placeholder="Search" class="outline-none text-gray-600 placeholder-gray text-sm sm:text-base">
             <button>
-                <svg xmlns="http://www.w3.org/2000/svg" class="text-[#99BC85]" width="1.5em" height="1.5em" viewBox="0 0 12 12" fill="none">
-                    <path d="M8.46342 8.52L10.2 10.2M5.69999 3.6C6.6941 3.6 7.49999 4.40589 7.49999 5.4M9.63999 5.72C9.63999 7.88496 7.88494 9.64 5.71999 9.64C3.55503 9.64 1.79999 7.88496 1.79999 5.72C1.79999 3.55505 3.55503 1.8 5.71999 1.8C7.88494 1.8 9.63999 3.55505 9.63999 5.72Z" stroke="#99BC85" stroke-linecap="round"/>
+                <svg xmlns="http://www.w3.org/2000/svg" class="text-black" width="1.5em" height="1.5em" viewBox="0 0 12 12" fill="none">
+                    <path d="M8.46342 8.52L10.2 10.2M5.69999 3.6C6.6941 3.6 7.49999 4.40589 7.49999 5.4M9.63999 5.72C9.63999 7.88496 7.88494 9.64 5.71999 9.64C3.55503 9.64 1.79999 7.88496 1.79999 5.72C1.79999 3.55505 3.55503 1.8 5.71999 1.8C7.88494 1.8 9.63999 3.55505 9.63999 5.72Z" stroke="black" stroke-linecap="round"/>
                 </svg>
             </button>
         </div>
     </div>
     <div class="flex flex-col sm:flex-row gap-4 mt-4 sm:mt-0">
         <!-- Language Select -->
-        <select bind:value={currentValue} on:change={refresh} class="w-full sm:w-auto font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg">
+        <select bind:value={currentValue} on:change={refresh} class="w-full sm:w-auto font-['Helvetica'] bg-white text-black py-2 px-3 rounded-xl text-sm shadow-lg">
             {#each languages as lang}
-                <option class="py-2" value={lang.languageID}>{lang.name}</option>
+                <option class="py-2 hover:bg-[#f7c188]" value={lang.languageID}>{lang.name}</option>
             {/each}
         </select>
         
         <!-- Content Type Select -->
-        <select bind:value={currentType} on:change={refresh} class="w-full sm:w-auto font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg">
+        <select bind:value={currentType} on:change={refresh} class="w-full sm:w-auto font-['Helvetica'] bg-white text-black py-2 px-3 rounded-xl text-sm shadow-lg">
             <option class="py-2" value={null}>Select Content Type</option>
             {#each contentTypes as conts}
                 <option class="py-2" value={conts.contentTypeID}>{conts.typeName}</option>
             {/each}
         </select>
     
-        <!-- Add Section Button -->
-        <button on:click={openAddSection} class="w-full sm:w-auto flex items-center justify-center font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="text-white mr-2" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+        <div class="flex gap-4">
+            <button on:click={openAddSection} class="flex items-center font-['Helvetica'] bg-white text-black py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#6addd0] transform hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="text-black mr-2" width="1.5em" height="1.5em" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M13 6.5V11h4.5v2H13v4.5h-2V13H6.5v-2H11V6.5z"/>
             </svg>
             Add Content
         </button>
+        </div>
     </div>
     
 </div>
 
 <div class="mt-6 overflow-x-auto">
     <table class="bg-white w-full shadow-lg rounded-xl min-w-[640px]">
-        <thead class="font-['Cambria'] bg-[#99BC85] text-white text-center">
+        <thead class="font-['Cambria'] bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white text-center">
             <tr class="first:rounded-tl-xl last:rounded-b-xl">
                 <th class="py-3 px-4 first:rounded-tl-xl last:rounded-tr-xl">Content</th>
                 <th class="py-3 px-4">English Translation</th>
@@ -288,7 +289,7 @@
         </thead>
         <tbody class="text-center text-sm ">
             {#if isloading}
-            <Loader isVisible={isloading} message= {"Loading..."}></Loader> 
+            <Loader isVisible={isloading} message= {"Loading..."} colspan = {4}></Loader> 
             {:else if contents && contents.length > 2}
                 {#each contents as c}
                     <tr class="border-t-2 mx-4">
@@ -296,14 +297,14 @@
                         <td class="py-3 px-4">{c.englishTranslation}</td>
                         <td class="py-3 px-4">
                             {#if c.audio}
-                                <button on:click={() => togglePlay(c)} class="bg-[#99BC85] text-white py-1 px-2 rounded-xl">
+                                <button on:click={() => togglePlay(c)} class="bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white py-1 px-2 rounded-xl">
                                     {#if c.isPlaying}
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 24 24">
                                             <path fill="white" d="M6 19h4V5H6zm8-14v14h4V5z"/>
                                         </svg>
                                     {:else}
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 256 256">
-                                            <g fill="black">
+                                            <g fill="white">
                                                 <path d="M228.23 134.69L84.15 222.81A8 8 0 0 1 72 216.12V39.88a8 8 0 0 1 12.15-6.69l144.08 88.12a7.82 7.82 0 0 1 0 13.38" opacity="0.2"/>
                                                 <path d="M232.4 114.49L88.32 26.35a16 16 0 0 0-16.2-.3A15.86 15.86 0 0 0 64 39.87v176.26A15.94 15.94 0 0 0 80 232a16.07 16.07 0 0 0 8.36-2.35l144.04-88.14a15.81 15.81 0 0 0 0-27ZM80 215.94V40l143.83 88Z"/>
                                             </g>
@@ -341,8 +342,8 @@
 <Pagination totalCount = {contentListCallResult.totalCount} {pageNo} on:handlePageChange={handlePageChange}></Pagination>
 {/if}  
 
-<style>
-tbody tr:hover{
-    background-color: #e0e0e0;
-}
+    <style>
+    tbody tr:hover{
+        background-color: #e0e0e0;
+    }
 </style>

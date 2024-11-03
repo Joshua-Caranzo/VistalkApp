@@ -42,10 +42,10 @@
   }
 
   function selectChoice(choice: Content, index: number) {
-    if(selectedChoices)
+    if(choice.contentText != "" || choice.contentText != undefined){
       selectedChoices[index] = choice;
       searchQueries[index] = choice.contentText;
-      
+    }
   }
 
   function handleFileUpload(event: Event) {
@@ -188,17 +188,17 @@ function togglePlayPause() {
                         <div class="flex space-x-4">
                           <button type="button"
                                   on:click={() => selectFileType('image')}
-                                  class="px-3 py-2 text-sm text-white bg-black rounded-md focus:outline-none hover:bg-gray-800">Image</button>
+                                  class="px-3 py-2 text-sm text-black bg-[#f7c188] rounded-md focus:outline-none hover:bg-[#6addd0]">Image</button>
                           <button type="button"
                                   on:click={() => selectFileType('audio')}
-                                  class="px-3 py-2 text-sm text-white bg-black rounded-md focus:outline-none hover:bg-gray-800">Audio</button>
+                                  class="px-3 py-2 text-sm text-black bg-[#f7c188]  rounded-md focus:outline-none  hover:bg-[#6addd0]">Audio</button>
                         </div>
                       </div>
                   
                       {#if fileType}
                         <div class="mt-5">
                           <div class="flex items-justify">
-                            <label for="file" class="flex mr-2 bg-black text-white text-sm p-1 rounded-md cursor-pointer">Upload File
+                            <label for="file" class="flex mr-2 bg-[#f7c188] text-black text-sm p-3 rounded-md cursor-pointer">Upload File
                               <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg>
                             </label>
                             <input 
@@ -259,7 +259,7 @@ function togglePlayPause() {
                           on:input={() => handleInputChange(i-1)}
                           autocomplete="off"
                           class= "block w-full px-3 py-2 mt-2 ml-2 text-gray placeholder-gray bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40"
-                          style="background-color: {mainQuestion.correctChoice === (selectedChoices[i-1]?.contentID ?? 0) && mainQuestion.correctChoice !== 0 ? 'darkseagreen' : 'white'};"
+                          style="background-color: {mainQuestion.correctChoice === (selectedChoices[i-1]?.contentID ?? 0) && mainQuestion.correctChoice !== 0 ? 'orange' : 'white'};"
                           />
                         
                         {#if searchQueries[i-1].length > 0 && !selectedChoices[i-1]}
@@ -282,7 +282,8 @@ function togglePlayPause() {
                       <button 
                           on:click={saveContent}
                           type="button" 
-                          class="px-3 py-2 text-sm tracking-wide text-white capitalize transition-colors duration-200 transform bg-black rounded-md dark:bg-black dark:hover:bg-black dark:focus:bg-black hover:bg-black focus:outline-none focus:bg-indigo-500 focus:ring focus:ring-indigo-300 focus:ring-opacity-50"
+                          style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
+                          class={'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50'} 
                       >
                           Save Question
                       </button>

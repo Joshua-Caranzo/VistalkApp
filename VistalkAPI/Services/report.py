@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from datetime import datetime
-from Services import get_db_connection 
+from db import get_db_connection 
 
 def get_report():
     searchString = request.args.get('searchString')

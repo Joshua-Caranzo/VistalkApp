@@ -50,7 +50,7 @@
 
 {#if modelOpen && userDetail}
   <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center mt-24 px-4 text-center md:items-center sm:block sm:p-0">
+    <div class="flex items-end justify-center px-4 text-center md:items-center sm:block sm:p-0">
       <div 
         on:click={closeModal}
         class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-40" 

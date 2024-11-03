@@ -2,8 +2,8 @@
     import LineChart from "$lib/components/LineChart.svelte";
     import Piechart from "$lib/components/Piechart.svelte";
     import { onMount } from "svelte";
-    import type { LeaderBoardDto, StatusDto, UserLanguage } from "./types";
-    import { getLeaderBoards, getStatusVista, getSubscriptionData, getUserLanguage, resetLeaderBoard } from "./repo";
+    import type { LeaderBoardDto, SalesDto, StatusDto, UserLanguage } from "./types";
+    import { getLeaderBoards, getStatusVista, getSubscriptionData, getTotalSales, getUserLanguage, salesReport, salesReportCoinBags, salesReportSusbcription } from "./repo";
 
     let leaderboardData: LeaderBoardDto[] = [];
     let inActiveData: StatusDto | undefined;
@@ -12,114 +12,256 @@
     let languageUsageData: { name: string; y: number }[] = [];
     const subscriptionCategories = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const subscriptionData: { name: string; data: number[] }[] = [];
+    let totalAmountPaid: number = 0;
+    let granularOptions = ["Daily", "Weekly", "Monthly", "Yearly", "All Time"];
+    let selectedGranular = granularOptions[0];
+    let selectedGranularLeaderBoard = granularOptions[0];
+    let selectedGranularCoinBag = granularOptions[0];
+    let selectedGranularSubscription = granularOptions[0];
+    let subscriptionSalesTotal:number = 0;
+    let coinBagSales:number = 0;
+    let types = ["Coin bag", "Subscription", "All Items"];
+    let selectedType = types[2];
+    let selectedTableGranular = granularOptions[0];
+    let isOpen = false;
+    let totalSales:SalesDto[]=[];
 
     onMount(loadData);
 
     async function loadData() {
-        try {
-            const result = await getLeaderBoards();
-            leaderboardData = result.data || [];  
+        const leaderboardResult = await getLeaderBoards(selectedGranularLeaderBoard);
+        leaderboardData = leaderboardResult.data || [];  
 
-            const result2 = await getStatusVista();
-            inActiveData = result2.data;
-            activeInactiveData = inActiveData ? [
-                { name: 'Active Users', y: inActiveData.active },
-                { name: 'Inactive Users', y: inActiveData.inactive },
-            ] : [];
+        const statusResult = await getStatusVista();
+        inActiveData = statusResult.data;
+        activeInactiveData = inActiveData ? [
+            { name: 'Active Users', y: inActiveData.active },
+            { name: 'Inactive Users', y: inActiveData.inactive },
+        ] : [];
 
-            const result3 = await getUserLanguage();
-            userLanguage = result3.data || [];
-            languageUsageData = userLanguage.map((language) => ({
-                name: language.languageName,
-                y: language.userCount,
-            }));
+        const languageResult = await getUserLanguage();
+        userLanguage = languageResult.data || [];
+        languageUsageData = userLanguage.map(language => ({
+            name: language.languageName,
+            y: language.userCount,
+        }));
 
-            const results = await getSubscriptionData(); 
+        const subscriptionResults = await getSubscriptionData();
+        subscriptionData.length = 0;
 
-            subscriptionData.length = 0; 
+        subscriptionResults.data.forEach(row => {
+            const monthIndex = row.month - 1;
+            const typeName = row.type;
 
-            results.data.forEach(row => {
-                const monthIndex = row.month - 1; 
-                const typeName = row.type; 
+            let typeEntry = subscriptionData.find(item => item.name === typeName);
+            if (!typeEntry) {
+                typeEntry = { name: typeName, data: Array(12).fill(0) };
+                subscriptionData.push(typeEntry);
+            }
+            typeEntry.data[monthIndex] = row.subscriptionCount || 0;
+        });
 
-                const typeIndex = subscriptionData.findIndex(item => item.name === typeName);
+        const totalPaidResult = await salesReport(selectedGranular);
+        totalAmountPaid = totalPaidResult.data;
 
-                if (typeIndex === -1) {
-                    subscriptionData.push({ name: typeName, data: Array(12).fill(0) });
-                }
+        const coinBagResult = await salesReportCoinBags(selectedGranularCoinBag);
+        coinBagSales = coinBagResult.data;
 
-                subscriptionData.find(item => item.name === typeName)!.data[monthIndex] = row.subscriptionCount || 0; 
-            });
+        const subscriptionResult = await salesReportSusbcription(selectedGranularSubscription);
+        subscriptionSalesTotal = subscriptionResult.data;
 
-            console.log(subscriptionData);
-        } catch (error) {
-            console.error("Error loading data:", error);
-        }
+        const totalSalesResult = await getTotalSales(selectedTableGranular, selectedType);
+        totalSales = totalSalesResult.data;
     }
 
-    async function reset() {
-        const userConfirmed = confirm("Resetting the leaderboard will cause deletion of vistas' data scores. Are you sure you want to continue?");
+    function formatDate(dateString: string): string {
+        const date = new Date(dateString);
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const year = date.getFullYear();
+
+        let hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
         
-        if (userConfirmed) {
-            await resetLeaderBoard();
-            alert("Leaderboard has been reset successfully.");
-            await loadData(); 
-        } else {
-            alert("Reset canceled.");
-        }
+        hours = hours % 12; 
+        hours = hours ? hours : 12; 
+        
+        return `${month}-${day}-${year} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
     }
-</script>
 
+</script>
 
 <div>
     <div class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
         <p class="font-['Helvetica'] text-black text-xl font-bold">Dashboard</p>
     </div>
 
-    <div class="flex mt-4">
-        <div class="w-[70%] pr-4">
+    <div class="flex flex-col lg:flex-row mt-4">
+        <div class="flex-1 pr-4 space-y-4">
             <div class="flex flex-col sm:flex-row justify-between gap-4">
-                <div class="bg-[rgba(0,0,0,0.2)] rounded-lg p-4 w-full shadow-lg">
+                <div class="bg-white rounded-lg p-4 shadow-lg flex-1">
                     {#if activeInactiveData.length > 0} 
                     <Piechart chartTitle="Active vs Inactive Users" data={activeInactiveData} />
                     {/if}
                 </div>
-                <div class="bg-[rgba(0,0,0,0.2)] rounded-lg p-4 w-full shadow-lg">
+                <div class="bg-white rounded-lg p-4 shadow-lg flex-1">
                     {#if languageUsageData.length > 0} 
                     <Piechart chartTitle="Language Usage" data={languageUsageData} />
                     {/if}
                 </div>
             </div>
-            
-            <div class="mt-4">
-                <div class="bg-[rgba(0,0,0,0.2)] rounded-lg p-4 w-full shadow-lg mt-6">
+
+            <div class="bg-white rounded-lg p-4 shadow-lg mt-6">
                 {#if subscriptionData.length > 0 && subscriptionCategories.length > 0 }
-                    <LineChart 
-                        chartTitle="Monthly Subscription Types" 
-                        categories={subscriptionCategories} 
-                        seriesData={subscriptionData}
-                    />
+                <LineChart 
+                    chartTitle="Monthly Subscription Types" 
+                    categories={subscriptionCategories} 
+                    seriesData={subscriptionData}
+                />
                 {/if}
-                </div>    
             </div>
         </div>
 
-        <div class="w-[30%] bg-white rounded-xl py-4 px-4 shadow-lg"> 
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-['Helvetica'] text-black text-xl font-bold">Weekly Leaderboard</h3>
-                <button class="font-['Helvetica'] text-black text-sm bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition duration-200" on:click={reset}>
-                    Reset Leaderboard
-                </button>
+        <div class="w-full lg:w-[35%] bg-gradient-to-r from-[#6addd0] to-[#f7c188] rounded-xl py-4 px-4 shadow-lg mt-4 lg:mt-0"> 
+            <div class="flex justify-between items-center mb-4"> 
+                <div class="flex-grow">
+                    <p class="text-xl font-bold">Leaderboard</p>
+                </div>
+                <select id="granular" bind:value={selectedGranularLeaderBoard} on:change={loadData} class="select bg-transparent">
+                    {#each granularOptions as option}
+                        <option value={option}>{option}</option>
+                    {/each}
+                </select>
             </div>
             <ul class="space-y-2">
                 {#each leaderboardData as user, index} 
-                    <li class="flex justify-between items-center bg-gray-100 rounded-lg p-2 hover:bg-gray-200 transition duration-200">
+                    <li class={`flex justify-between items-center rounded-lg p-2 transition duration-200 
+                        ${index === 0 ? 'bg-gradient-to-r from-[#FFD43B] to-[#FF8800]' : 
+                          index === 1 ? 'bg-gradient-to-r from-[#F8F6F4] to-[#4B4C4B]' : 
+                          index === 2 ? 'bg-gradient-to-r from-[#F9931F] to-[#AE5129]' : 
+                          'bg-white'}`}>
                         <span class="font-semibold text-black">{index + 1}. {user.name}</span>
-                        <span class="text-blue-600 font-bold">{user.totalScoreWeekly || 0}</span>
+                        <span class="text-white font-bold">{user.totalScore || 0}</span>
                     </li>
                 {/each}
             </ul>
+        </div>        
+    </div>
+
+    <div class="flex flex-col sm:flex-row flex-wrap mt-4 gap-4">
+        <div class="w-full sm:w-[33%] pr-4">
+            <div class="bg-white rounded-lg p-4 shadow-lg flex flex-col">
+                <div class="flex justify-between items-center mb-4"> 
+                    <div class="flex-grow">
+                        <p class="text-xl font-bold"> 
+                            Total Sales
+                        </p>
+                    </div>
+                    <select id="granular" bind:value={selectedGranular} on:change={loadData} class="select">
+                        {#each granularOptions as option}
+                            <option value={option}>{option}</option>
+                        {/each}
+                    </select>
+                </div>
+                <p class="mt-4 text-xl font-bold text-center"> 
+                   <span>₱ {totalAmountPaid}</span>
+                </p>
+            </div>
         </div>
-        
+
+        <div class="w-full sm:w-[33%] pr-4">
+            <div class="bg-white rounded-lg p-4 shadow-lg flex flex-col">
+                <div class="flex justify-between items-center mb-4"> 
+                    <div class="flex-grow">
+                        <p class="text-xl font-bold"> 
+                            Total Coin Bag Sales
+                        </p>
+                    </div>
+                    <select id="granular" bind:value={selectedGranularCoinBag} on:change={loadData} class="select">
+                        {#each granularOptions as option}
+                            <option value={option}>{option}</option>
+                        {/each}
+                    </select>
+                </div>
+                <p class="mt-4 text-xl font-bold text-center"> 
+                   <span>₱ {coinBagSales}</span>
+                </p>
+            </div>
+        </div>
+        <div class="w-full sm:w-[32%] pr-4">
+            <div class="bg-white rounded-lg p-4 shadow-lg flex flex-col">
+                <div class="flex justify-between items-center mb-4"> 
+                    <div class="flex-grow">
+                        <p class="text-xl font-bold"> 
+                            Total Subscription Sales
+                        </p>
+                    </div>
+                    <select id="granular" bind:value={selectedGranularSubscription} on:change={loadData} class="select">
+                        {#each granularOptions as option}
+                            <option value={option}>{option}</option>
+                        {/each}
+                    </select>
+                </div>
+                <p class="mt-4 text-xl font-bold text-center"> 
+                   <span>₱ {subscriptionSalesTotal}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg p-4 shadow-lg mt-4">
+        <div class="flex justify-between items-center">
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+            <p class="text-xl font-bold cursor-pointer" on:click={() => isOpen = !isOpen}>
+                {#if isOpen} ▼ Transactions {:else} ▲ Transactions {/if}
+            </p>
+            {#if isOpen}
+                <div class="flex gap-2">
+                    <select bind:value={selectedType} on:change={loadData} class="select">
+                        {#each types as type}
+                            <option value={type}>{type}</option>
+                        {/each}
+                    </select>
+                    <select bind:value={selectedTableGranular} on:change={loadData} class="select">
+                        {#each granularOptions as option}
+                            <option value={option}>{option}</option>
+                        {/each}
+                    </select>
+                </div>
+            {/if}
+        </div>
+        {#if isOpen}
+        <div class="overflow-x-auto mt-4">
+            <table class="w-full shadow-lg rounded-xl min-w-[640px]">
+                <thead class="font-['Cambria'] bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white text-center">
+                    <tr>
+                        <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Vista</th>
+                        <th class="px-4 py-2">Amount Paid</th>
+                        <th class="px-4 py-2">Item Name</th>
+                        <th class="px-4 py-2">Item Type</th>
+                        <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Transaction Date</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center text-sm">
+                    {#if totalSales.length}
+                        {#each totalSales as u}
+                            <tr class="border-t-2">
+                                <td class="px-4 py-2">{u.name}</td>
+                                <td class="px-4 py-2">₱ {u.amountPaid}</td>
+                                <td class="px-4 py-2">{u.itemName}</td>
+                                <td class="px-4 py-2">{u.itemType}</td>
+                                <td class="px-4 py-2">{formatDate(u.transactionDate)}</td>
+                            </tr>
+                        {/each}
+                    {:else}
+                        <tr><td colspan="5" class="text-gray-500 py-4">No data available</td></tr>
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+        {/if}
     </div>
 </div>
+

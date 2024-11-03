@@ -1,7 +1,7 @@
 # user.py
 from flask import request, jsonify, send_from_directory
 import os
-from Services import get_db_connection, PronunciationDirectory, SyllableDirectory
+from db import get_db_connection, PronunciationDirectory, SyllableDirectory
 
 PronunciationFolder = PronunciationDirectory
 Syllables =  SyllableDirectory

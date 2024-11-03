@@ -13,12 +13,18 @@
     function toggleSidebar() {
         isExpanded = !isExpanded;
         dispatch("toggleSidebar", isExpanded);
+        updateLayout();
     }
 
     // Logout function
     async function handleLogout() {
         dispatch("logout");
         goto("/"); // Redirect to login after logout
+    }
+
+    function updateLayout() {
+        // Force a reflow (optional)
+        document.body.offsetHeight; // This line is just to force a reflow
     }
 </script>
 
