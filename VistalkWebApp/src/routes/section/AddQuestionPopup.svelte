@@ -110,7 +110,7 @@
         showAudioType = false;
         showMatchingType = false;
         showModal=false;
-        dispatch('refresh')
+        dispatch('close')
     }
 
 </script>
@@ -176,8 +176,10 @@
             </div>
             
             <button 
-                on:click={clickContinue} 
-                class="mt-4 bg-black text-white p-2 rounded">
+                on:click={clickContinue} style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
+
+                class={'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50'} 
+            >
                 Continue
             </button>
         </div>

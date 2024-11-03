@@ -1,30 +1,46 @@
-from Services import get_db_connection, PronunciationDirectory, SyllableDirectory
+from db import get_db_connection, PronunciationDirectory, SyllableDirectory
 from flask import request, jsonify, send_from_directory
 import os
 from datetime import datetime, timedelta, timezone, date
 
 def getLeaderBoards():
+    granularity = request.args.get('granularity')  
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    print('here')
     today = date.today()
-    start_of_week = today - timedelta(days=today.weekday())  
-    end_of_week = start_of_week + timedelta(days=6)
     
+    if granularity == "Daily":
+        start_date = today
+        end_date = today
+    elif granularity == "Weekly":
+        start_date = today - timedelta(days=today.weekday())  
+        end_date = start_date + timedelta(days=6)  
+    elif granularity == "Monthly":
+        start_date = today.replace(day=1)  
+        end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)  
+    elif granularity == "Yearly":
+        start_date = today.replace(month=1, day=1)  
+        end_date = today.replace(month=12, day=31)  
+    else:  
+        start_date = date(2000, 1, 1)  
+        end_date = today
+
     query = """
         SELECT u.name, u.imagePath, 
                (SELECT SUM(score) FROM dailyScore ds 
                 WHERE ds.userPlayerId = v.userPlayerID 
-                AND ds.dateDaily BETWEEN %s AND %s) as totalScoreWeekly 
+                AND ds.dateDaily BETWEEN %s AND %s) as totalScore 
         FROM vista v 
         INNER JOIN user u ON u.UserID = v.userPlayerID 
         WHERE u.isPlayer = 1 AND u.isActive = 1 
-        ORDER BY totalScoreWeekly DESC
+        GROUP BY u.name, u.imagePath, totalScore
+        ORDER BY totalScore DESC
         LIMIT 10
     """
-    cursor.execute(query, (start_of_week, end_of_week))
+    
+    cursor.execute(query, (start_date, end_date))
     vistas = cursor.fetchall()
-
+    print(vistas)
     if not vistas:
         return jsonify({
             'isSuccess': True,
@@ -38,29 +54,6 @@ def getLeaderBoards():
         'isSuccess': True,
         'message': 'Successfully Retrieved',
         'data': vistas,
-        'data2': None,
-        'totalCount': None 
-    }), 200
-
-def resetLeaderBoard():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    today = date.today()
-    start_of_week = today - timedelta(days=today.weekday())  
-    end_of_week = start_of_week + timedelta(days=6)
-    
-    delete_query = """
-        DELETE FROM dailyScore 
-        WHERE dateDaily >= %s AND dateDaily <= %s;
-    """
-    cursor.execute(delete_query, (start_of_week, end_of_week))
-    conn.commit()
-
-    return jsonify({
-        'isSuccess': True,
-        'message': 'Successfully Retrieved',
-        'data': None,
         'data2': None,
         'totalCount': None 
     }), 200
@@ -168,3 +161,279 @@ def getSubscriptionData():
         'data2': None,
         'totalCount': None 
     }), 200
+
+from flask import request, jsonify
+from datetime import datetime, timedelta
+
+def salesReport():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    granular = request.args.get('granular')
+
+    
+    granular_mapping = {
+        "Daily": "daily",
+        "Weekly": "weekly",
+        "Monthly": "monthly",
+        "Yearly": "yearly",
+        "All Time": "all_time"
+    }
+
+    
+    granular_value = granular_mapping.get(granular, None)
+
+    
+    today = datetime.now()
+    start_of_week = today - timedelta(days=today.weekday())  
+    end_of_week = start_of_week + timedelta(days=6)  
+
+    query = """
+        SELECT 
+            SUM(amountPaid) AS totalAmountPaid
+        FROM cointransaction
+        WHERE 
+    """
+    
+    if granular_value == 'daily':
+        query += "DATE(transactionDate) = DATE(NOW())"  
+    elif granular_value == 'weekly':
+        query += "transactionDate BETWEEN DATE(%s) AND DATE(%s)"  
+        query_params = (start_of_week.strftime('%Y-%m-%d'), end_of_week.strftime('%Y-%m-%d'))
+    elif granular_value == 'monthly':
+        query += "MONTH(transactionDate) = MONTH(NOW()) AND YEAR(transactionDate) = YEAR(NOW())"  
+    elif granular_value == 'yearly':
+        query += "YEAR(transactionDate) = YEAR(NOW())"  
+    else:
+        query += "1"  
+
+    cursor.execute(query, locals().get('query_params', ()))
+    sales = cursor.fetchone()  
+    total_amount_paid = sales['totalAmountPaid'] if sales and sales['totalAmountPaid'] is not None else 0
+
+    if not sales or total_amount_paid is None:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sales data found',
+            'data': total_amount_paid,
+            'totalAmountPaid': 0,  
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': total_amount_paid,
+        'data2': None,
+        'totalCount': 1  
+    }), 200
+
+def salesReportCoinBags():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    granular = request.args.get('granular')
+
+    
+    granular_mapping = {
+        "Daily": "daily",
+        "Weekly": "weekly",
+        "Monthly": "monthly",
+        "Yearly": "yearly",
+        "All Time": "all_time"
+    }
+
+    
+    granular_value = granular_mapping.get(granular, None)
+
+    
+    today = datetime.now()
+    start_of_week = today - timedelta(days=today.weekday())  
+    end_of_week = start_of_week + timedelta(days=6)  
+
+    query = """
+        SELECT 
+            SUM(amountPaid) AS totalAmountPaid
+        FROM cointransaction
+        WHERE coinBagId is not null AND
+    """
+    
+    if granular_value == 'daily':
+        query += "DATE(transactionDate) = DATE(NOW())"  
+    elif granular_value == 'weekly':
+        query += "transactionDate BETWEEN DATE(%s) AND DATE(%s)"  
+        query_params = (start_of_week.strftime('%Y-%m-%d'), end_of_week.strftime('%Y-%m-%d'))
+    elif granular_value == 'monthly':
+        query += "MONTH(transactionDate) = MONTH(NOW()) AND YEAR(transactionDate) = YEAR(NOW())"  
+    elif granular_value == 'yearly':
+        query += "YEAR(transactionDate) = YEAR(NOW())"  
+    else:
+        query += "1"  
+
+    cursor.execute(query, locals().get('query_params', ()))
+    sales = cursor.fetchone()  
+    total_amount_paid = sales['totalAmountPaid'] if sales and sales['totalAmountPaid'] is not None else 0
+
+    if not sales or total_amount_paid is None:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sales data found',
+            'data': total_amount_paid,
+            'totalAmountPaid': 0,  
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': total_amount_paid,
+        'data2': None,
+        'totalCount': 1  
+    }), 200
+
+def salesSubscriptions():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    granular = request.args.get('granular')
+    
+    granular_mapping = {
+        "Daily": "daily",
+        "Weekly": "weekly",
+        "Monthly": "monthly",
+        "Yearly": "yearly",
+        "All Time": "all_time"
+    }
+    
+    granular_value = granular_mapping.get(granular, None)
+    
+    today = datetime.now()
+    start_of_week = today - timedelta(days=today.weekday())  
+    end_of_week = start_of_week + timedelta(days=6)  
+
+    query = """
+        SELECT 
+            SUM(amountPaid) AS totalAmountPaid
+        FROM cointransaction
+        WHERE subscriptionId is not null AND
+    """
+    
+    if granular_value == 'daily':
+        query += "DATE(transactionDate) = DATE(NOW())"  
+    elif granular_value == 'weekly':
+        query += "transactionDate BETWEEN DATE(%s) AND DATE(%s)"  
+        query_params = (start_of_week.strftime('%Y-%m-%d'), end_of_week.strftime('%Y-%m-%d'))
+    elif granular_value == 'monthly':
+        query += "MONTH(transactionDate) = MONTH(NOW()) AND YEAR(transactionDate) = YEAR(NOW())"  
+    elif granular_value == 'yearly':
+        query += "YEAR(transactionDate) = YEAR(NOW())"  
+    else:
+        query += "1"  
+
+    cursor.execute(query, locals().get('query_params', ()))
+    sales = cursor.fetchone()  
+    total_amount_paid = sales['totalAmountPaid'] if sales and sales['totalAmountPaid'] is not None else 0
+
+    if not sales or total_amount_paid is None:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sales data found',
+            'data': total_amount_paid,
+            'totalAmountPaid': 0,  
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': total_amount_paid,
+        'data2': None,
+        'totalCount': 1  
+    }), 200
+
+def getTotalSales():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    granular = request.args.get('granular')
+    item = request.args.get('item')  
+
+    granular_mapping = {
+        "Daily": "daily",
+        "Weekly": "weekly",
+        "Monthly": "monthly",
+        "Yearly": "yearly",
+        "All Time": "all_time"
+    }
+
+    granular_value = granular_mapping.get(granular, None)
+
+    today = datetime.now()
+    start_of_week = today - timedelta(days=today.weekday())  
+    end_of_week = start_of_week + timedelta(days=6)
+
+    query = """
+        SELECT 
+            ct.*, u.name, 
+            CASE
+                WHEN cb.coinBagName IS NOT NULL THEN cb.coinBagName 
+                ELSE s.subscriptionName 
+            END AS itemName,
+            CASE 
+                WHEN ct.coinBagID IS NOT NULL THEN 'Coin Bag' 
+                ELSE 'Subscription' 
+            END AS itemType 
+        FROM 
+            cointransaction ct 
+        LEFT JOIN 
+            coinbag cb ON cb.coinbagId = ct.coinbagID 
+        LEFT JOIN 
+            subscription s ON s.id = ct.subscriptionID
+        INNER JOIN 
+            user u ON u.userID = ct.userPlayerId
+        WHERE 
+    """
+    
+    if granular_value == 'daily':
+        query += "DATE(transactionDate) = DATE(NOW())"
+    elif granular_value == 'weekly':
+        query += "transactionDate BETWEEN %s AND %s"
+        query_params = (start_of_week.strftime('%Y-%m-%d'), end_of_week.strftime('%Y-%m-%d'))
+    elif granular_value == 'monthly':
+        query += "MONTH(transactionDate) = MONTH(NOW()) AND YEAR(transactionDate) = YEAR(NOW())"
+    elif granular_value == 'yearly':
+        query += "YEAR(transactionDate) = YEAR(NOW())"
+    elif granular_value == 'all_time':
+        query += "1"  
+    else:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Invalid granularity specified',
+            'data': None,
+            'totalCount': 0
+        }), 400
+
+    
+    if item == "Subscription":
+        query += " AND ct.subscriptionID IS NOT NULL"
+    elif item == "Coin bag":
+        query += " AND ct.coinBagID IS NOT NULL"
+    
+    cursor.execute(query, locals().get('query_params', ()))
+    sales = cursor.fetchall()  
+
+    if not sales:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sales data found',
+            'data': sales,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': sales,
+        'totalCount': len(sales)  
+    }), 200
+
+

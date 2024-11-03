@@ -2,7 +2,7 @@ export type LeaderBoardDto =
 {
     id:number;
     name: string;
-    totalScoreWeekly: number;
+    totalScore: number;
     imagePath: string;
 }
 
@@ -23,4 +23,17 @@ export type SubscriptionDto =
     type:string;
     month: number;
     subscriptionCount:number;
+}
+
+export type SalesDto = 
+{
+    transactionID:number;
+    userPlayerID: number;
+    coinBagID:number | null;
+    subscriptionID : number | null;
+    transactionDate: string;
+    amountPaid: number;
+    name:string;
+    itemName:string;
+    itemType:string;
 }

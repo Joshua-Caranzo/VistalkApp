@@ -1,4 +1,4 @@
-#emailService.py
+
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -6,7 +6,7 @@ from flask import request, jsonify
 import random
 import string
 from datetime import datetime, timedelta
-from Services import get_db_connection
+from db import get_db_connection
 import re
 
 
@@ -50,12 +50,12 @@ def send_email(recipient_email, subject, message):
     
 def store_verification_code(email):
     confirmation_code = generate_confirmation_code()
-    expiration_time = datetime.now() + timedelta(minutes=10)  # Code expires in 10 minutes
+    expiration_time = datetime.now() + timedelta(minutes=10)  
     conn = get_db_connection()
 
     cursor = conn.cursor()
 
-    # Insert the verification details into the table
+    
     cursor.execute("""
         INSERT INTO email_verifications (email, confirmation_code, expiration_time)
         VALUES (%s, %s, %s)
@@ -177,6 +177,31 @@ def is_email_used():
         return jsonify({
             'isSuccess': True,
             'message': 'Email is available to be used.',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200
+    
+def sendEmailToUs():
+    sender = request.args.get('email')
+    message = request.args.get('message')
+    if not sender or not message:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Email and message are required.',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 400
+    
+    subject = "New Message from Contact Us" 
+    email_message = f"Message from: {sender}\n\n{message}"  
+
+    send_email("vistalk101@gmail.com", subject, email_message)
+
+    return jsonify({
+            'isSuccess': True,
+            'message': 'Successfully sent the message.',
             'data': None,
             'data2': None,
             'totalCount': None

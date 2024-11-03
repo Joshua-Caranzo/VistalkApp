@@ -181,34 +181,36 @@
     }
 
     async function saveContent() {
-        content.syllables = syllables;
+      if(content.content.contentText !== "" && content.content.contentTypeId !== 0){
+          content.syllables = syllables;
 
-        content.examples = examples;
-        content.definitions = definitions;
-        if (content.content.contentID == 0) {
+          content.examples = examples;
+          content.definitions = definitions;
+          if (content.content.contentID == 0) {
+            await saveMainContent(content);
+          }
+          else {
+            content.syllables.forEach((syllable) => {
+              syllable.contentId = content.content.contentID
+          });
+          content.examples.forEach((examples) => {
+              examples.contentId = content.content.contentID
+          });
+          content.definitions.forEach((definitions) => {
+              definitions.contentID = content.content.contentID
+          });
           await saveMainContent(content);
-        }
-        else {
-          content.syllables.forEach((syllable) => {
-            syllable.contentId = content.content.contentID
-        });
-        content.examples.forEach((examples) => {
-            examples.contentId = content.content.contentID
-        });
-        content.definitions.forEach((definitions) => {
-            definitions.contentID = content.content.contentID
-        });
-        await saveMainContent(content);
-    }
+      }
 
-    dispatch('refresh');
-    dispatch('close');
-}
+      dispatch('refresh');
+      dispatch('close');
+    }
+  }
   </script>
   
 {#if modelOpen}
 <div 
-  class="mt-20 fixed inset-0 z-50 overflow-y-auto" 
+  class=" fixed inset-0 z-50 overflow-y-auto" 
   aria-labelledby="modal-title" 
   role="dialog" 
   aria-modal="true">
@@ -221,7 +223,7 @@
       ></div>
 
       <div 
-          class="inline-block w-full max-w-4xl p-6 my-20 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl 2xl:max-w-6xl"
+          class="inline-block max-w-lg p-6 my-20 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl 2xl:max-w-6xl"
           style="opacity: {modelOpen ? 1 : 0}; transform: {modelOpen ? 'translateY(0)' : 'translateY(4rem)'};"
       >
           <div class="flex items-center justify-between space-x-4">
@@ -238,11 +240,10 @@
           
           <div class="gap-6">
               <!-- Column 1 -->
-              <div>
-                  <div class="grid grid-cols-2 flex flex-wrap items-center justify-center gap-6">
+                <div>
                       <div class="flex flex-col items-left gap-6 mt-16">
                         <div class="flex gap-4">
-                          <select bind:value={content.content.contentTypeId} class="w-full font-['Helvetica'] bg-white text-black py-2 px-3 rounded-lg text-sm border border-gray-300">
+                          <select bind:value={content.content.contentTypeId} class="w-full font-['Helvetica'] bg-white text-black py-2 px-3 rounded-lg text-sm border border-gray-300" required>
                             <option class="py-2" value={0}>--Select Content Type--</option>
                             {#each contentTypes as content}
                               <option class="py-2" value={content.contentTypeID}>{content.typeName}</option>
@@ -256,7 +257,8 @@
                                   id="contentText"
                                   bind:value={content.content.contentText}
                                   placeholder="Content Text" 
-                                  type="text" 
+                                  type="text"
+                                  required
                                   class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-300 rounded-md "/>
                           </div>
               
@@ -266,69 +268,89 @@
                                 bind:value={content.content.englishTranslation}
                                   id="translation"
                                   placeholder="Translation" 
-                                  type="text" 
+                                  type="text"
+                                  required
                                   class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-300 rounded-md"/>
                           </div>
                           
                           <div class="mt-2">  
                             <label class="inline-flex items-center cursor-pointer">
                                 <input bind:checked={content.content.isInDictionary} type="checkbox" class="sr-only peer">
-                                <div class="relative w-11 h-6 bg-gray-200  rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-800"></div>
-                                <span class="ms-3 text-sm font-medium text-black dark:text-black">Dictionary</span>
+                                <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 
+                                  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
+                                  peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
+                                  after:start-[2px] after:bg-white after:border-gray-300 after:border 
+                                  after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 
+                                  peer-checked:bg-gradient-to-r peer-checked:from-[#6addd0] peer-checked:to-[#f7c188]">
+                              </div>
+                                <span class="ms-3 text-sm font-medium text-black dark:text-black">Include in Dictionary</span>
                             </label>
                           </div>
 
                           <!-- File Input Section -->
                           <div class="mt-2">
                             
-                              <label for="fileInput" class="block text-sm text-black font-bold">Pronunciation File</label>
+                              <label for="fileInput" class="block text-sm text-black font-bold mb-2">Pronunciation File</label>
 
                             <!-- Play/Pause Button -->
                             {#if content.content.audio != null}
-                            <div class="flex items-justify">
-                              <button 
-                                  on:click={togglePlayPause} 
-                                  class=" mr-2 text-gray-600 focus:outline-none hover:text-gray-700">
-                                  {#if content.content.isPlaying}
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 32 32"><path fill="black" d="M14 10h-2v12h2zm6 0h-2v12h2z"/><path fill="black" d="M16 4A12 12 0 1 1 4 16A12 12 0 0 1 16 4m0-2a14 14 0 1 0 14 14A14 14 0 0 0 16 2"/></svg>      
-                                  {:else}
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 20 20"><path fill="black" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07m12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32M7 6l8 4l-8 4z"/></svg>
-                                  {/if}
-                              </button>
-                            <div class="mt-2.5 text-sm text-gray-700">
-                            {content.content.audioPath}
-                            </div>
-                            <div class="flex items-justify">
-                              <label for="file" class="py-2 px-3 cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg>
-                              </label>
-                              <input 
-                              type="file" class="file-input" accept=".wav" style="visibility: hidden;" id="file"
-                            on:change={(event) => handleFile(event)}/>
-                            </div>
-                            </div>
-                            {:else}
-                            <div class="flex items-justify">
-                              <label for="file" class="flex mr-2 bg-black text-white text-sm p-1 rounded-md cursor-pointer">Upload File
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg>
-                              </label>
-                              <input 
-                              type="file" class="file-input" accept=".wav" style="visibility: hidden;" id="file"
-                            on:change={(event) => handleFile(event)}/>
-                            </div>
-                            {/if}
+                              <div class="flex items-center gap-4">
+                                  <button 
+                                      on:click={togglePlayPause} 
+                                      class="text-gray-600 focus:outline-none hover:text-gray-700">
+                                      {#if content.content.isPlaying}
+                                          <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 32 32">
+                                              <path fill="black" d="M14 10h-2v12h2zm6 0h-2v12h2z"/>
+                                              <path fill="black" d="M16 4A12 12 0 1 1 4 16A12 12 0 0 1 16 4m0-2a14 14 0 1 0 14 14A14 14 0 0 0 16 2"/>
+                                          </svg>      
+                                      {:else}
+                                          <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 20 20">
+                                              <path fill="black" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07m12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32M7 6l8 4l-8 4z"/>
+                                          </svg>
+                                      {/if}
+                                  </button>
+                                  <div class="text-sm text-gray-700">
+                                      {content.content.audioPath}
+                                  </div>
+                                  <div class="inline-flex items-center gap-2">
+                                      <label for="file" class="flex items-center bg-[#f7c188] text-black text-sm p-2 rounded-md cursor-pointer ml-4">
+                                          Upload
+                                          <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24" class="ml-1">
+                                              <path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/>
+                                          </svg>
+                                      </label>
+                                      <input 
+                                          type="file" class="file-input" accept=".wav" style="visibility: hidden;" id="file"
+                                          on:change={(event) => handleFile(event)}
+                                      />
+                                  </div>
+                              </div>
+                          {:else}
+                              <div class="flex items-center gap-2">
+                                  <label for="file" class="flex items-center bg-[#f7c188] text-black text-sm p-3 rounded-md cursor-pointer">
+                                      Upload File
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24" class="ml-1">
+                                          <path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/>
+                                      </svg>
+                                  </label>
+                                  <input 
+                                      type="file" class="file-input" accept=".wav" style="visibility: hidden;" id="file"
+                                      on:change={(event) => handleFile(event)}
+                                  />
+                              </div>
+                          {/if}
                         </div>
                       </div>
-                  </div>
+                 
               </div>
 
               <!-- Column 2 -->
               <div>
-                  <div class="flex flex-col items-start gap-6 mt-16">
+                  <div class="flex flex-col items-start gap-6 mt-4">
                       <!-- Accordion 1 -->
                       <div class="w-full">
                           <button
-                              class="w-full bg-[#99BC85] text-white py-3 px-4 rounded-xl font-bold text-left flex justify-between items-center"
+                              class="w-full bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white py-3 px-4 rounded-xl font-bold text-left flex justify-between items-center"
                               on:click={() => isAccordionOpen1.set(!$isAccordionOpen1)}
                           >
                               Syllables
@@ -340,16 +362,16 @@
       
                           {#if $isAccordionOpen1}
                           <div class="mt-2 bg-white rounded-xl shadow-lg overflow-x-auto">
-                            <table class="min-w-full leading-normal">
+                            <table class="min-w-full leading-normal ">
                               <thead>
                                 <tr>
-                                  <th class="px-5 py-3 bg-[#99BC85] text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                  <th class="px-5 py-3 bg-[#6addd0] text-left text-xs font-semibold text-white uppercase tracking-wider">
                                     Syllable
                                   </th>
-                                  <th class="px-5 py-3 bg-[#99BC85] text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                  <th class="px-5 py-3 bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-left text-xs font-semibold text-white uppercase tracking-wider">
                                     Audio Path
                                   </th>
-                                  <th class="px-1 py-3 bg-[#99BC85] text-xs font-semibold text-white uppercase tracking-wider">
+                                  <th class="px-1 py-3 bg-[#f7c188] text-xs font-semibold text-white uppercase tracking-wider">
                                     Action
                                   </th>
                                 </tr>
@@ -358,7 +380,7 @@
                                 {#if syllables.length <= 0}
                                   <tr>
                                     <td colspan="3" class="text-center px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                      No syllables found. <button on:click={addSyllable} class="ml-2 bg-[#99BC85] text-white px-3 py-1 rounded">Add</button>
+                                      No syllables found. <button on:click={addSyllable} class="ml-2 bg-gradient-to-r from-[#6addd0] to-[#f7c188]  text-white px-3 py-1 rounded">Add</button>
                                     </td>
                                   </tr>
                                 {:else}
@@ -396,7 +418,7 @@
                                         </div>
                                         {:else}
                                         <div class="flex items-center">
-                                          <label for="filesylla{sylla.orderNumber}" class="flex mr-2 bg-black text-white text-sm p-1 rounded-md cursor-pointer">Upload File
+                                          <label for="filesylla{sylla.orderNumber}" class="flex mr-2 bg-[#f7c188] text-black text-sm p-2 rounded-md cursor-pointer">Upload File
                                             <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg>
                                           </label>
                                           <input 
@@ -414,7 +436,7 @@
                                   {/each}
                                   <tr>
                                     <td colspan="3" class="text-center px-5 py-2 border-b border-gray-200 bg-white text-sm">
-                                      <button on:click={addSyllable} class="bg-[#99BC85] text-white px-3 py-1 rounded">Add</button>
+                                      <button on:click={addSyllable} class="bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white px-3 py-1 rounded">Add</button>
                                     </td>
                                   </tr>
                                 {/if}
@@ -428,7 +450,7 @@
                       <!-- Accordion 2 -->
                       <div class="w-full">
                           <button
-                              class="w-full bg-[#99BC85] text-white py-3 px-4 rounded-xl font-bold text-left flex justify-between items-center"
+                              class="w-full bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white py-3 px-4 rounded-xl font-bold text-left flex justify-between items-center"
                               on:click={() => isAccordionOpen2.set(!$isAccordionOpen2)}
                           >
                               Definition
@@ -443,13 +465,13 @@
                                   <table class="min-w-full leading-normal">
                                       <thead>
                                           <tr>
-                                              <th class="px-5 py-3 bg-[#99BC85] text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                              <th class="px-5 py-3 bg-[#6addd0] text-left text-xs font-semibold text-white uppercase tracking-wider">
                                                   NATIVE DEFINITION
                                               </th>
-                                              <th class="px-5 py-3 bg-[#99BC85] text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                              <th class="px-5 py-3 bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-left text-xs font-semibold text-white uppercase tracking-wider">
                                                   ENGLISH DEFINITION
                                               </th>
-                                              <th class="px-1 py-3 bg-[#99BC85] text-xs font-semibold text-white uppercase tracking-wider">
+                                              <th class="px-1 py-3 bg-[#f7c188] text-xs font-semibold text-white uppercase tracking-wider">
                                                 Action
                                               </th>
                                           </tr>
@@ -457,7 +479,7 @@
                                       <tbody>
                                         {#if definitions.length <= 0}
                                         <td colspan="3" class="text-center px-5 py-2 border-b border-gray-200 bg-white text-sm">
-                                          No definitions found. <button on:click={addDefinition} class="bg-[#99BC85] text-white px-3 py-1 rounded">Add</button>
+                                          No definitions found. <button on:click={addDefinition} class="bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white px-3 py-1 rounded">Add</button>
                                          </td>
                                        {:else}
                                          {#each definitions as def, index}
@@ -476,7 +498,7 @@
                                            </tr>
                                          {/each}
                                          <td colspan="3" class="text-center px-5 py-2 border-b border-gray-200 bg-white text-sm">
-                                           <button on:click={addDefinition} class="bg-[#99BC85] text-white px-3 py-1 rounded">Add</button>
+                                           <button on:click={addDefinition} class="bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white px-3 py-1 rounded">Add</button>
                                          </td>
                                        {/if}
                                       </tbody>
@@ -488,7 +510,7 @@
                       <!-- Accordion 3 -->
                       <div class="w-full">
                           <button
-                              class="w-full bg-[#99BC85] text-white py-3 px-4 rounded-xl font-bold text-left flex justify-between items-center"
+                              class="w-full bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white py-3 px-4 rounded-xl font-bold text-left flex justify-between items-center"
                               on:click={() => isAccordionOpen3.set(!$isAccordionOpen3)}
                           >
                               Example
@@ -503,13 +525,13 @@
                                   <table class="min-w-full leading-normal">
                                       <thead>
                                           <tr>
-                                              <th class="px-5 py-3 bg-[#99BC85] text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                              <th class="px-5 py-3 bg-[#6addd0] text-left text-xs font-semibold text-white uppercase tracking-wider">
                                                   Native
                                               </th>
-                                              <th class="px-5 py-3 bg-[#99BC85] text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                              <th class="px-5 py-3 bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-left text-xs font-semibold text-white uppercase tracking-wider">
                                                   English
                                               </th>
-                                              <th class="px-1 py-3 bg-[#99BC85] text-xs font-semibold text-white uppercase tracking-wider">
+                                              <th class="px-1 py-3 bg-[#f7c188] text-xs font-semibold text-white uppercase tracking-wider">
                                                 Action
                                               </th>
                                           </tr>
@@ -517,7 +539,7 @@
                                       <tbody>
                                         {#if examples.length <= 0}
                                         <td colspan="3" class="text-center px-5 py-2 border-b border-gray-200 bg-white text-sm">
-                                           No examples found. <button on:click={addExample} class="bg-[#99BC85] text-white px-3 py-1 rounded">Add</button>
+                                           No examples found. <button on:click={addExample} class="bg-gradient-to-r from-[#6addd0] to-[#f7c188]  text-white px-3 py-1 rounded">Add</button>
                                          </td>
                                        {:else}
                                          {#each examples as ex, index}
@@ -536,7 +558,7 @@
                                            </tr>
                                          {/each}
                                          <td colspan="3" class="text-center px-5 py-2 border-b border-gray-200 bg-white text-sm">
-                                           <button on:click={addExample} class="bg-[#99BC85] text-white px-3 py-1 rounded">Add</button>
+                                           <button on:click={addExample} class="bg-gradient-to-r from-[#6addd0] to-[#f7c188]  text-white px-3 py-1 rounded">Add</button>
                                          </td>
                                        {/if}
                                       </tbody>
@@ -548,16 +570,16 @@
               </div>
           </div>
 
-          <!-- Buttons -->
           <div class="flex justify-end gap-4 mt-6">
-              <button 
-                  class="px-4 py-2 text-sm tracking-wide text-white capitalize transition-colors duration-200 transform bg-black rounded-md dark:bg-black dark:hover:bg-black dark:focus:bg-black hover:bg-black focus:outline-none focus:bg-indigo-500 focus:ring focus:ring-indigo-300 focus:ring-opacity-50"
-                  on:click={saveContent}
-              >
-                  {isAdd ? "Save" : "Update"}
-              </button>
+            <button 
+                disabled={content.content.contentTypeId === 0 || content.content.contentText === ""}
+                class={`relative border-2 ${content.content.contentTypeId === 0 || content.content.contentText === "" ? 'border-gray-300 bg-gray-200 text-gray-400 cursor-not-allowed' : 'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white'} px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50`} 
+                style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
+                on:click={saveContent}>
+                {isAdd ? "Save" : "Update"}
+            </button>
+        </div>
         
-          </div>
       </div>
   </div>
 </div>

@@ -43,6 +43,9 @@
                 tooltip: {
                     valueSuffix: ' pts',
                 },
+                credits: {
+                    enabled: false, // Disable the Highcharts watermark
+                    },
             });
         }
     }

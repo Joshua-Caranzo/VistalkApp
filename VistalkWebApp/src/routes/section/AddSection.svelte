@@ -93,13 +93,21 @@
             <div class="mt-4">  
                 <label class="inline-flex items-center cursor-pointer">
                     <input type="checkbox" bind:checked={section.isPremium} class="sr-only peer">
-                    <div class="relative w-11 h-6 bg-gray-200  rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-800"></div>
+                      <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 
+                      peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
+                      peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
+                      after:start-[2px] after:bg-white after:border-gray-300 after:border 
+                      after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 
+                      peer-checked:bg-gradient-to-r peer-checked:from-[#6addd0] peer-checked:to-[#f7c188]">
+                  </div>
                     <span class="ms-3 text-sm font-medium text-black dark:text-black">Premium Section</span>
                   </label>
             </div>
             
             <div class="flex justify-end mt-6">
-              <button on:click={addSection} type="button" class="px-3 py-2 text-sm tracking-wide text-white capitalize transition-colors duration-200 transform bg-black rounded-md dark:bg-black dark:hover:bg-black dark:focus:bg-black hover:bg-black focus:outline-none focus:bg-indigo-500 focus:ring focus:ring-indigo-300 focus:ring-opacity-50">
+              <button on:click={addSection} type="button"  style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
+
+              class={'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50'}>
                 Save Section
               </button>
             </div>

@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from Services import user, section, content, question, shop, emailService, feedback, report, dailytask,dashboard, SECRET_KEY
+from Services import user, section, content, question, shop, emailService, feedback, report, dailytask,dashboard
+import db
 from functools import wraps
 import jwt
 
@@ -18,7 +19,7 @@ def token_required(f):
             return jsonify({'message': 'Unauthorized!'}), 401
         
         try:
-            data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            data = jwt.decode(token, db.SECRET_KEY, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             return jsonify({'message': 'Token has expired!'}), 401
         except jwt.InvalidTokenError:
@@ -269,10 +270,6 @@ def getUserImage():
 def reActivateVista():
     return user.reActivateVista()
 
-@app.route('/resetLeaderBoard', methods=['PUT'])
-def resetLeaderBoard():
-    return dashboard.resetLeaderBoard()
-
 @app.route('/getLeaderBoard', methods=['GET'])
 def getLeaderBoard():
     return dashboard.getLeaderBoards()
@@ -293,6 +290,26 @@ def getSubscriptionData():
 def deleteDailyTask():
     return dailytask.deleteDailyTask()
 
+@app.route('/sendEmailToUs', methods=['POST'])
+def sendEmailToUs():
+    return emailService.sendEmailToUs()
+
+@app.route('/salesReport', methods=['GET'])
+def salesReport():
+    return dashboard.salesReport()
+
+@app.route('/salesReportCoinBags', methods=['GET'])
+def salesReportCoinBags():
+    return dashboard.salesReportCoinBags()
+
+@app.route('/salesSubscriptions', methods=['GET'])
+def salesSubscriptions():
+    return dashboard.salesSubscriptions()
+
+@app.route('/getTotalSales', methods=['GET'])
+def getTotalSales():
+    return dashboard.getTotalSales()
+
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
 

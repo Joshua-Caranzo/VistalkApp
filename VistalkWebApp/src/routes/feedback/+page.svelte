@@ -5,6 +5,7 @@
     import { getFeedbackList } from './repo';
     import type { CallResultDto } from '../../types/types';
     import Pagination from '$lib/components/Pagination.svelte';
+    import Loader from '$lib/components/Loader.svelte';
 
     let feedbackList: FeedbackDto[] = [];
     let pageNo: number = 1;
@@ -12,7 +13,7 @@
     let searchString: string | null = null;
     let startDate: string;
     let endDate: string;
-
+    let isloading = false;
     let openModal: boolean = false;
 
     let feedbackListCallResult: CallResultDto<FeedbackDto[]> = {
@@ -44,8 +45,10 @@
     }
 
     async function refresh() {
+        isloading = true;
         feedbackListCallResult = await getFeedbackList(pageNo, startDate, endDate, searchString);
         feedbackList = feedbackListCallResult.data;
+        isloading = false;
     }
 
     $: {
@@ -79,13 +82,13 @@
 {/if}
 
 <div class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
-    <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Feedback List</p>
+    <p class="font-['Helvetica'] text-black text-xl font-bold">Feedback List</p>
     <div class="flex-grow flex justify-center">
-        <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 py-1 bg-white">
-            <input type="text" bind:value={searchString} placeholder="Search" class="outline-none text-gray-600 placeholder-[#99BC85]">
+        <div class="flex items-center border border-black rounded-xl px-12 py-1 bg-white">
+            <input type="text" bind:value={searchString} placeholder="Search" class="outline-none text-gray-600 placeholder-gray">
             <button>
-                <svg xmlns="http://www.w3.org/2000/svg" class="text-[#99BC85]" width="1.5em" height="1.5em" viewBox="0 0 12 12" fill="none">
-                    <path d="M8.46342 8.52L10.2 10.2M5.69999 3.6C6.6941 3.6 7.49999 4.40589 7.49999 5.4M9.63999 5.72C9.63999 7.88496 7.88494 9.64 5.71999 9.64C3.55503 9.64 1.79999 7.88496 1.79999 5.72C1.79999 3.55505 3.55503 1.8 5.71999 1.8C7.88494 1.8 9.63999 3.55505 9.63999 5.72Z" stroke="#99BC85" stroke-linecap="round"/>
+                <svg xmlns="http://www.w3.org/2000/svg" class="text-black" width="1.5em" height="1.5em" viewBox="0 0 12 12" fill="none">
+                    <path d="M8.46342 8.52L10.2 10.2M5.69999 3.6C6.6941 3.6 7.49999 4.40589 7.49999 5.4M9.63999 5.72C9.63999 7.88496 7.88494 9.64 5.71999 9.64C3.55503 9.64 1.79999 7.88496 1.79999 5.72C1.79999 3.55505 3.55503 1.8 5.71999 1.8C7.88494 1.8 9.63999 3.55505 9.63999 5.72Z" stroke="#000000" stroke-linecap="round"/>
                 </svg> 
             </button>
         </div>
@@ -100,17 +103,19 @@
     </div>
 </div>
 
-<div class="flex mt-6">
-    <table class="bg-white w-full shadow-lg rounded-xl">
-        <thead class="font-['Cambria'] bg-[#99BC85] text-white text-center">
+<div class="mt-6 overflow-x-auto">
+    <table class="bg-white w-full shadow-lg rounded-xl min-w-[640px]">
+        <thead class="font-['Cambria'] bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white text-center">
             <tr class="first:rounded-t-xl last:rounded-b-xl">
-                <th class="px-4 py-2">User Name</th>
+                <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">User Name</th>
                 <th class="px-4 py-2">Feedback</th>
-                <th class="px-4 py-2">Date</th>
+                <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Date</th>
             </tr>
         </thead>
         <tbody class="text-center text-sm">
-            {#if feedbackList != null}
+            {#if isloading}
+            <Loader isVisible={isloading} message= {"Loading..."} colspan = {4}></Loader> 
+            {:else if feedbackList.length != 0}
                 {#each feedbackList as feedback}
                     <tr class="border-t-2 mx-4">
                         <td class="px-4 py-2">{feedback.name}</td>
@@ -120,7 +125,7 @@
                 {/each}
             {:else}
                 <tr class="border-t-2 mx-4">
-                    <td class="px-4 py-2" colspan="4">No Feedback Found</td>
+                    <td class="px-4 py-2" colspan="4">No Feedbacks Found</td>
                 </tr>
             {/if}
         </tbody>

@@ -8,7 +8,7 @@
     let chartContainer: HTMLDivElement;
   
     onMount(() => {
-      // Options object for Highcharts
+      const customColors = ['#6addd0', '#f7c188'];
       const options: Highcharts.Options = {
         chart: {
           type: 'pie',
@@ -24,6 +24,7 @@
           type: 'pie',  // Specify the type here
           name: 'Users',
           data: data,
+          colors: customColors,
         }],
         plotOptions: {
           pie: {
@@ -34,6 +35,9 @@
               format: '<b>{point.name}</b>: {point.y}',
             },
           },
+        },
+        credits: {
+          enabled: false, // Disable the Highcharts watermark
         },
       };
   

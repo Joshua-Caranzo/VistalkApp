@@ -30,7 +30,6 @@
     });
 </script>
 
-
 {#if $loggedInUser}
     <div class="layout">
         <SideBar on:logout={logout} on:toggleSidebar={handleSidebarToggle} />
@@ -41,7 +40,7 @@
         </main>
     </div>
 
-    <div class="mobile-layout h-screen flex flex-col">
+    <div class="mobile-layout h-full flex flex-col">
         <MobileNavbar on:logout={logout} on:toggleSidebar={handleSidebarToggle} />
         <main class="mobile-content flex-1 pt-16 overflow-auto">
             <div class="content-inner w-full h-full">
@@ -54,12 +53,12 @@
     <slot/>
 {/if}
 
-
 <style>
     /* General styles */
     .layout {
         display: flex;
-        height: 100vh;
+        min-height: 100vh; /* Ensure the layout fills the viewport height */
+        background-color: #f4f4f4; /* Set a default background color */
     }
 
     .content {
@@ -103,10 +102,11 @@
 
         .mobile-layout {
             display: flex; /* Show mobile layout */
+            min-height: 100vh; /* Ensure mobile layout fills the viewport height */
         }
 
         .mobile-content {
-            margin-top: 100px; /* Adjust based on the mobile navbar height */
+            margin-top: 60px; /* Adjust based on the mobile navbar height */
         }
     }
 </style>

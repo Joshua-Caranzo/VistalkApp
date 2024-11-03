@@ -3,11 +3,11 @@
     import { createEventDispatcher, onMount } from 'svelte';
     import type { CallResultDto } from '../../types/types';
     import type { QuestionType, Unit } from './type';
-    import { getQuestionTypes, getUnits, unitInactive } from './repo';
+    import { getUnits, unitInactive } from './repo';
     import AddUnit from './AddUnit.svelte';
-    import { page } from '$app/stores';
     import Pagination from '$lib/components/Pagination.svelte';
     import QuestionList from './QuestionList.svelte';
+    import Loader from '$lib/components/Loader.svelte';
 
     export let sectionId:number;
     export let languageId:number;
@@ -31,16 +31,17 @@
     let pageNo:number =1;
     let questionTypes:QuestionType[]=[];
     let unitId:number = 0
-
+    let isloading = false;
     onMount(async () => {
         await redirectIfLoggedIn('');
         await refresh();
     });
 
     async function refresh()
-    {
+    {   isloading = true
         unitCallResult = await getUnits(sectionId, pageNo, searchString);
         units = unitCallResult.data;
+        isloading = false;
     }
 
     function initalizeUnit(){
@@ -109,29 +110,30 @@
 {#if showQuestion}
     <QuestionList {languageId} {unitId} on:back={closeQuestion}></QuestionList>
 {:else}
-<button class="bg-[#99BC85] rounded-lg p-1 " on:click={goBackToSection}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 512 512"><path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M244 400L100 256l144-144M120 256h292"/></svg></button>
+<button class="bg-black rounded-lg p-1 " on:click={goBackToSection}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 512 512"><path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M244 400L100 256l144-144M120 256h292"/></svg></button>
 <div class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
-    <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Unit List</p>
+    <p class="font-['Helvetica'] text-black text-xl font-bold">Unit List</p>
     <div class="flex-grow flex justify-center">
-        <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 py-1 bg-white">
-            <input type="text" bind:value={searchString} placeholder="Search" class="outline-none text-gray-600 placeholder-[#99BC85]">
+        <div class="flex items-center border border-black rounded-xl px-12 py-1 bg-white">
+            <input type="text" bind:value={searchString} placeholder="Search" class="outline-none text-gray-600 placeholder-gray">
             <button>
-                <svg xmlns="http://www.w3.org/2000/svg" class="text-[#99BC85]" width="1.5em" height="1.5em" viewBox="0 0 12 12" fill="none">
-                    <path d="M8.46342 8.52L10.2 10.2M5.69999 3.6C6.6941 3.6 7.49999 4.40589 7.49999 5.4M9.63999 5.72C9.63999 7.88496 7.88494 9.64 5.71999 9.64C3.55503 9.64 1.79999 7.88496 1.79999 5.72C1.79999 3.55505 3.55503 1.8 5.71999 1.8C7.88494 1.8 9.63999 3.55505 9.63999 5.72Z" stroke="#99BC85" stroke-linecap="round"/>
+                <svg xmlns="http://www.w3.org/2000/svg" class="text-black" width="1.5em" height="1.5em" viewBox="0 0 12 12" fill="none">
+                    <path d="M8.46342 8.52L10.2 10.2M5.69999 3.6C6.6941 3.6 7.49999 4.40589 7.49999 5.4M9.63999 5.72C9.63999 7.88496 7.88494 9.64 5.71999 9.64C3.55503 9.64 1.79999 7.88496 1.79999 5.72C1.79999 3.55505 3.55503 1.8 5.71999 1.8C7.88494 1.8 9.63999 3.55505 9.63999 5.72Z" stroke="#000000" stroke-linecap="round"/>
                 </svg> 
             </button>
         </div>
     </div>
     <div class="flex gap-4">
-        <button on:click={() => toggleModal(true,null)} class="font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
+        <button on:click={() => toggleModal(true, null)} class="flex items-center font-['Helvetica'] bg-white text-black py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#6addd0] transform hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="text-white mr-2" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="black" d="M13 6.5V11h4.5v2H13v4.5h-2V13H6.5v-2H11V6.5z"/></svg>
             Add Unit
         </button>
     </div>
 </div>
 
-<div class="flex mt-6">
-    <table class="bg-white w-full shadow-lg rounded-xl">
-        <thead class="font-['Cambria'] bg-[#99BC85] text-white  text-center">
+<div class="mt-6 overflow-x-auto">
+    <table class="bg-white w-full shadow-lg rounded-xl min-w-[640px]">
+        <thead class="font-['Cambria'] bg-gradient-to-r from-[#6addd0] to-[#f7c188] text-white text-center">
             <tr class="first:rounded-t-xl last:rounded-b-xl">
                 <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Unit Number</th>
                 <th class="px-4 py-2">Title</th>
@@ -141,7 +143,9 @@
             </tr>
         </thead>
         <tbody class="text-center text-sm">
-                {#if unitCallResult.totalCount != null && unitCallResult.totalCount > 0}
+            {#if isloading}
+            <Loader isVisible={isloading} message= {"Loading..."} colspan = {4}></Loader> 
+            {:else if unitCallResult.totalCount != null && unitCallResult.totalCount > 0}
                 {#each units as u}
                 <tr class="border-t-2 mx-4" on:click={() => openQuestionList(u.unitID)}>
                     <td class="px-4 py-2">{u.unitNumber}</td>
