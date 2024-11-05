@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
-from Services import language, pronunciation, user, content, shop, payment,section
+from Services import language, dailyTask, user, content, shop, payment,section
 
 app = Flask(__name__)
 CORS(app)
@@ -143,13 +143,38 @@ def getLeaderBoards():
 def updateDailyScore():
     return user.updateDailyScore()
 
+@app.route('/claimReward', methods=['PUT'])
+def claimReward():
+    return user.claim_reward()
+
+
 @app.route('/getSelfRank', methods=['GET'])
 def getSelfRank():
     return user.getSelfRank()
 
+@app.route('/getSelfRankAllTime', methods=['GET'])
+def getSelfRankAllTime():
+    return user.getSelfRankAllTime()
+
+@app.route('/getLeaderBoardsAllTime', methods=['GET'])
+def getLeaderBoardsAllTime():
+    return user.getLeaderBoardsAllTime()
+
 @app.route('/addRating', methods=['POST'])
 def addRating():
     return user.addRating()
+
+@app.route('/getDailyTasks', methods=['GET'])
+def getDailyTasks():
+    return dailyTask.getDailyTasks()
+
+@app.route('/getNotifications', methods=['GET'])
+def getNotifications():
+    return user.get_notifications()
+
+@app.route('/updateNotifications', methods=['PUT'])
+def updateNotifications():
+    return user.updateNotifications()
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

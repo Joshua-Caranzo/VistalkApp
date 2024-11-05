@@ -1,9 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import type { CallResultDto } from "../../types/types";
-    import type { DailyTaskDto } from "./type";
+    import type { DailyTaskDto, PowerUp } from "./type";
     import { redirectIfLoggedIn } from "$lib/shortcuts";
-    import { deleteDailyTask, getDailyTask } from "./repo";
+    import { deleteDailyTask, getDailyTask, getPowerUps } from "./repo";
     import Pagination from "$lib/components/Pagination.svelte";
     import AddDailyTask from "./AddDailyTask.svelte";
     import Loader from "$lib/components/Loader.svelte";
@@ -11,6 +11,7 @@
     let openModal: boolean = false;
     let isAdd: boolean = false;
     let dailyTaskList: DailyTaskDto[] = [];
+    let powerUps : PowerUp[] = []
     let pageNo: number = 1;
     let searchString: string | null = null;
     let startDate: string;
@@ -22,7 +23,8 @@
         taskDate: '',
         typeName: '',
         taskTypeId: 0,
-        quantity: 0
+        quantity: 0,
+        powerUpId: null
     };
 
     let dailyTaskListCallResult: CallResultDto<DailyTaskDto[]> = {
@@ -60,6 +62,9 @@
         );
         dailyTaskList = dailyTaskListCallResult.data;
         isloading = false;
+
+        const powerUpsResult = await getPowerUps();
+        powerUps = powerUpsResult.data;
     }
 
     $: {
@@ -110,7 +115,8 @@
             taskDate: '',
             typeName: '',
             taskTypeId: 0,
-            quantity: 0
+            quantity: 0,
+            powerUpId:null
         };
     }
 
@@ -129,7 +135,7 @@
 </script>
 
 {#if openModal == true}
-    <AddDailyTask modalOpen={openModal} {isAdd} {dailyTask} on:close={modalClose} on:refresh={refresh}></AddDailyTask>
+    <AddDailyTask modalOpen={openModal} {isAdd} {dailyTask} {powerUps} on:close={modalClose} on:refresh={refresh}></AddDailyTask>
 {/if}
 
 <div

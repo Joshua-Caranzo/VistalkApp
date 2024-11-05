@@ -1,4 +1,5 @@
 from flask import request, jsonify, send_from_directory
+import json
 from db import UserImages, get_db_connection
 from datetime import datetime,date, timedelta
 import numpy as np
@@ -80,7 +81,6 @@ def add_feedback():
     data = request.json
     user_player_id = data.get('userId') 
     feedback_text = data.get('feedback')
-    print(user_player_id)
     conn = get_db_connection()
     cursor = conn.cursor()
     feedback_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -184,6 +184,9 @@ def saveGamePlay():
     unitId = int(data.get('unitId'))
     totalCorrectAnswer = int(data.get('totalCorrectAnswer'))
     totalScore = int(data.get('totalScore')) 
+    powerUps = request.form.get('powerUps')
+    powerUps = json.loads(powerUps) if powerUps else [] 
+    print(powerUps)
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -205,6 +208,8 @@ def saveGamePlay():
         }), 404
 
     existing_total_score = current_total_score[0]
+    print(existing_total_score)
+    print(totalScore)
 
     if totalScore > existing_total_score:
         dailyScore(userId, totalScore)
@@ -242,6 +247,18 @@ def saveGamePlay():
         """
         cursor.execute(query_update2, (vCoin, userId))
 
+        update_event_logs(userId, powerUps, totalScore)
+
+        for powerUp in powerUps:
+            itemId = powerUp.get('itemId')
+            quantity = powerUp.get('quantity')
+            query_update_powerup = """
+                UPDATE userItem 
+                SET quantity = quantity - %s 
+                WHERE userPlayerID = %s AND itemId = %s
+            """
+            cursor.execute(query_update_powerup, (quantity, userId, itemId))
+
         conn.commit()
         return jsonify({
             'isSuccess': True,
@@ -268,7 +285,7 @@ def getLeaderBoards():
     end_of_week = start_of_week + timedelta(days=6)
     
     query = """
-        SELECT u.name, u.imagePath, 
+        SELECT u.userId as id, u.name, u.imagePath, 
                (SELECT SUM(score) FROM dailyScore ds 
                 WHERE ds.userPlayerId = v.userPlayerID 
                 AND ds.dateDaily BETWEEN %s AND %s) as totalScoreWeekly 
@@ -281,7 +298,6 @@ def getLeaderBoards():
     
     cursor.execute(query, (start_of_week, end_of_week))
     vistas = cursor.fetchall()
-
     if not vistas:
         return jsonify({
             'isSuccess': True,
@@ -348,22 +364,31 @@ def getSelfRank():
     cursor = conn.cursor(dictionary=True)
     userId = request.args.get('userId')
     today = date.today()
-    start_of_week = today - timedelta(days=today.weekday())  
+    start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
     
     query = """
-        SELECT RANK() OVER (ORDER BY SUM(ds.score) DESC) AS userRank
-            FROM vista v 
-            INNER JOIN user u ON u.UserID = v.userPlayerID 
-            INNER JOIN dailyScore ds ON ds.userPlayerId = v.userPlayerID 
-            WHERE u.userId = %s 
-            AND ds.dateDaily BETWEEN %s AND %s;
+        SELECT RANK() OVER (ORDER BY totalScoreWeekly DESC) AS userRank,
+               v.userPlayerId AS id,
+               u.name,
+               u.imagePath,
+               totalScoreWeekly
+        FROM vista v 
+        INNER JOIN user u ON u.UserID = v.userPlayerId 
+        LEFT JOIN (
+            SELECT userPlayerId,
+                   SUM(score) AS totalScoreWeekly
+            FROM dailyScore
+            WHERE dateDaily BETWEEN %s AND %s
+            GROUP BY userPlayerId
+        ) ds ON ds.userPlayerId = v.userPlayerId
+        WHERE u.userId = %s;
     """
     
-    cursor.execute(query, (userId, start_of_week, end_of_week))
-    rank = cursor.fetchall()
+    cursor.execute(query, (start_of_week, end_of_week, userId))
+    vista = cursor.fetchone()
 
-    if not rank:
+    if not vista:
         return jsonify({
             'isSuccess': True,
             'message': 'No sections found',
@@ -375,10 +400,11 @@ def getSelfRank():
     return jsonify({
         'isSuccess': True,
         'message': 'Successfully Retrieved',
-        'data': rank,
+        'data': vista,
         'data2': None,
         'totalCount': None 
     }), 200
+
 
 def addRating():
     data = request.json
@@ -402,3 +428,330 @@ def addRating():
             'data2': None,
             'totalCount': 0
         }), 200
+
+def getLeaderBoardsAllTime():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = """
+        SELECT u.userId as id, u.name, u.imagePath, 
+               (SELECT SUM(score) FROM dailyScore ds 
+                WHERE ds.userPlayerId = v.userPlayerID) as totalScoreWeekly 
+        FROM vista v 
+        INNER JOIN user u ON u.UserID = v.userPlayerID 
+        WHERE u.isPlayer = 1 AND u.isActive = 1 
+        GROUP BY u.userId, u.name, u.imagePath
+        ORDER BY totalScoreWeekly DESC
+        LIMIT 10
+    """
+    
+    cursor.execute(query)
+    vistas = cursor.fetchall()
+    if not vistas:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': vistas,
+        'data2': None,
+        'totalCount': None 
+    }), 200
+
+def getSelfRankAllTime():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    userId = request.args.get('userId')
+    
+    query = """
+        SELECT RANK() OVER (ORDER BY totalScoreWeekly DESC) AS userRank,
+               v.userPlayerId AS id,
+               u.name,
+               u.imagePath,
+               totalScoreWeekly
+        FROM vista v 
+        INNER JOIN user u ON u.UserID = v.userPlayerId 
+        LEFT JOIN (
+            SELECT userPlayerId,
+                   SUM(score) AS totalScoreWeekly
+            FROM dailyScore
+            GROUP BY userPlayerId
+        ) ds ON ds.userPlayerId = v.userPlayerId
+        WHERE u.userId = %s;
+    """
+    
+    cursor.execute(query, (userId,))
+    vista = cursor.fetchone()
+
+    if not vista:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': vista,
+        'data2': None,
+        'totalCount': None 
+    }), 200
+
+def update_event_logs(userId, powerUps, totalScore):
+    today = date.today()
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    
+    query_fetch_event_logs = """
+        SELECT dt.powerUpId, dt.taskTypeId, dt.taskId, el.currentValue
+        FROM eventlogs el
+        INNER JOIN dailyTask dt ON el.dailyTaskId = dt.taskId
+        inner join playerdailytask pdt on pdt.taskID = dt.taskId
+        WHERE el.eventDate = %s AND el.userPlayerId = %s and pdt.isCompleted = 0
+    """
+    cursor.execute(query_fetch_event_logs, (today, userId))
+    event_logs = cursor.fetchall()
+
+    
+    query_fetch_daily_tasks = """
+        SELECT pdt.taskId, dt.quantity as requiredQuantity 
+        FROM playerDailyTask pdt
+        INNER JOIN dailyTask dt ON pdt.taskId = dt.taskId
+        WHERE pdt.userPlayerId = %s AND dt.taskDate = %s
+    """
+    cursor.execute(query_fetch_daily_tasks, (userId, today))
+    daily_tasks = cursor.fetchall()  
+
+    
+    for event_log in event_logs:
+        powerUpId = event_log[0]
+        taskTypeId = event_log[1]
+        taskId = event_log[2]
+        currentValue = event_log[3]
+
+        if taskTypeId == 1:
+            
+            query_update_task_type_1 = """
+                UPDATE eventlogs
+                SET currentValue = currentValue + 1
+                WHERE userPlayerId = %s AND dailyTaskId = %s AND eventDate = %s
+            """
+            cursor.execute(query_update_task_type_1, (userId, taskId, today))
+
+        elif taskTypeId == 2:
+            current_quantity_query = """
+                SELECT quantity FROM userItem WHERE userPlayerID = %s AND itemId = %s
+            """
+            cursor.execute(current_quantity_query, (userId, powerUpId))
+            current_quantity = cursor.fetchone()
+            print(current_quantity)
+            if current_quantity is not None:
+                current_quantity = current_quantity[0]
+                print(powerUps)
+
+                for powerUp in powerUps:
+                    if powerUp['itemId'] == powerUpId:
+                        usage_to_subtract = powerUp['quantity']
+                        
+                        new_quantity = current_quantity - usage_to_subtract
+                        print(new_quantity)
+                        
+                        query_update_task_type_2 = """
+                            UPDATE eventlogs
+                            SET currentValue = currentValue + %s
+                            WHERE userPlayerId = %s AND dailyTaskId = %s AND eventDate = %s
+                        """
+                        cursor.execute(query_update_task_type_2, (new_quantity, userId, taskId, today))
+
+        elif taskTypeId == 5:
+            
+            query_update_task_type_5 = """
+                UPDATE eventlogs
+                SET currentValue = currentValue + %s
+                WHERE userPlayerId = %s AND dailyTaskId = %s AND eventDate = %s
+            """
+            cursor.execute(query_update_task_type_5, (totalScore, userId, taskId, today))
+
+        
+        query_refetch_current_value = """
+            SELECT currentValue FROM eventlogs
+            WHERE userPlayerId = %s AND dailyTaskId = %s AND eventDate = %s
+        """
+        cursor.execute(query_refetch_current_value, (userId, taskId, today))
+        updated_current_value = cursor.fetchone()
+        if updated_current_value is not None:
+            currentValue = updated_current_value[0]
+
+        
+        for daily_task in daily_tasks:
+            daily_task_id = daily_task[0]
+            required_quantity = daily_task[1]
+
+            
+            if taskId == daily_task_id and currentValue >= required_quantity:
+                
+                query_update_daily_task = """
+                    UPDATE playerDailyTask
+                    SET isCompleted = 1
+                    WHERE userPlayerId = %s AND taskId = %s
+                """
+                cursor.execute(query_update_daily_task, (userId, daily_task_id))
+
+                
+                query_insert_message = """
+                    INSERT INTO notifications (userPlayerId, message, isOpened)
+                    VALUES (%s, %s, %s)
+                """
+                notification_message = f"Task {daily_task_id} completed!"
+                cursor.execute(query_insert_message, (userId, notification_message, 0))
+
+    conn.commit()
+    cursor.close()
+
+def get_notifications():
+    userId = request.args.get('userId')
+    print(userId)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query_fetch_notifications = """
+        SELECT id, message, isOpened
+        FROM notifications
+        WHERE userPlayerId = %s
+        ORDER BY (CASE WHEN isOpened = 0 THEN 0 ELSE 1 END), id DESC
+        LIMIT 5
+    """
+    cursor.execute(query_fetch_notifications, (userId,))
+    notifications = cursor.fetchall()
+
+    query_count_unopened = """
+        SELECT COUNT(*) AS unopened_count
+        FROM notifications
+        WHERE userPlayerId = %s AND isOpened = 0
+    """
+    cursor.execute(query_count_unopened, (userId,))
+    count_unopened = cursor.fetchone().get('unopened_count', 0)
+
+    return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': notifications,
+            'data2': None,
+            'totalCount': count_unopened
+    }), 200
+
+def claim_reward():
+    userId = request.json.get('userId')  
+    taskId = request.json.get('taskId')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query_fetch_reward = """
+        SELECT rewardCoins FROM dailyTask WHERE taskId = %s
+    """
+    cursor.execute(query_fetch_reward, (taskId,))
+    reward = cursor.fetchone()
+
+    if reward is None:
+        cursor.close()
+        conn.close()
+        return jsonify({
+                'isSuccess': False,
+                'message': 'No sections found',
+                'data': [],
+                'data2': None,
+                'totalCount': 0
+        }), 200
+    reward_amount = reward[0]
+
+    query_update_player_daily_task = """
+        UPDATE playerDailyTask
+        SET isClaimed = 1
+        WHERE userPlayerId = %s AND taskId = %s
+    """
+    cursor.execute(query_update_player_daily_task, (userId, taskId))
+
+    query_update_vista = """
+        UPDATE vista
+        SET vcoin = vcoin + %s
+        WHERE userPlayerId = %s
+    """
+    cursor.execute(query_update_vista, (reward_amount, userId))
+
+    conn.commit()
+
+    return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+    }), 200
+
+def updateNotifications():
+    userId = request.json.get('userId')
+    print(f"Updating notifications for userId: {userId}")
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    
+    query_fetch_notifications = """
+        SELECT id, message, isOpened
+        FROM notifications
+        WHERE userPlayerId = %s AND isOpened = 0
+    """
+    cursor.execute(query_fetch_notifications, (userId,))
+    notifications = cursor.fetchall()
+
+    if not notifications:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No unopened notifications to update.',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    
+    try:
+        for notification in notifications:
+            notification_id = notification['id']
+            query_update_notification = """
+                UPDATE notifications
+                SET isOpened = 1
+                WHERE id = %s
+            """
+            cursor.execute(query_update_notification, (notification_id,))
+        
+        conn.commit()  
+
+        print(f"Number of notifications updated: {len(notifications)}")
+
+        return jsonify({
+            'isSuccess': True,
+            'message': 'Notifications updated successfully',
+            'data': notifications,  
+            'data2': None,
+            'totalCount': len(notifications)  
+        }), 200
+
+    except Exception as e:
+        print(f"Error occurred while updating notifications: {e}")
+        return jsonify({'isSuccess': False, 'message': str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()

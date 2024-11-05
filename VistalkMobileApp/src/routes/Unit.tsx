@@ -14,10 +14,13 @@ import IncorrectIcon from '../assets/svg/IncorrectIcon';
 import UnitIcon from '../assets/svg/UnitIcon';
 import Loader from '../components/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import useBackButtonHandler from '../utilities/useBackButtonHandler';
 
 type Props = StackScreenProps<RootStackParamList, 'Unit'>;
 
 const Unit: React.FC<Props> = ({ route, navigation }) => {
+    useBackButtonHandler(navigation, 'Dashboard');
+
     const { sectionId, sectionName } = route.params;
     const [units, setUnits] = useState<UnitDetails[]>([]);
     const [loading, setLoading] = useState(true);

@@ -1,5 +1,5 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putFormMainApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp, GamePlayDto, LeaderBoardDto } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp, GamePlayDto, LeaderBoardDto, SelfLeaderBoardDto, DailyTaskDto, NotificationsDto } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
 import { SectionListRenderItem } from "react-native";
@@ -184,9 +184,9 @@ export function getBackgroundMusic(fileName: string): string {
     return `${baseUrl}/getBackgroundMusic?fileName=${fileName}&t=${timestamp}`;
 }
 
-export async function getSections(languageId:number)
+export async function getSections(userId:number, languageId:number)
 {
-    return await getFromMainApi<CallResultDto<SectionDetails[]>>('getSections', {languageId});
+    return await getFromMainApi<CallResultDto<SectionDetails[]>>('getSections', {userId, languageId});
 }
 
 export async function getUnits(sectionId:number, userId:string | null)
@@ -217,7 +217,7 @@ export async function saveGamePlay(gamePlay:GamePlayDto)
     formData.append('unitId', gamePlay.unitId.toString());
     formData.append('totalCorrectAnswer', gamePlay.totalCorrectAnswer.toString());
     formData.append('totalScore', gamePlay.totalScore.toString());
-
+    formData.append('powerUps', JSON.stringify(gamePlay.powerUps));
     return await putFormMainApi<CallResultDto<object>>('saveGamePlay', formData);
 }
 
@@ -234,9 +234,33 @@ export async function reActivateVista(email:string){
 }
 
 export async function getSelfRank(userId:number){
-    return await getFromMainApi<CallResultDto<number>>('getLeaderBoards', {userId});
+    return await getFromMainApi<CallResultDto<SelfLeaderBoardDto>>('getSelfRank', {userId});
+}
+
+export async function getSelfRankAllTime(userId:number){
+    return await getFromMainApi<CallResultDto<SelfLeaderBoardDto>>('getSelfRankAllTime', {userId});
+}
+
+export async function getLeaderBoardsAllTime(){
+    return await getFromMainApi<CallResultDto<LeaderBoardDto[]>>('getLeaderBoardsAllTime');
 }
 
 export async function addrating(userId:number, rating:number){
     return await postToMainApi<CallResultDto<object>>('addRating', {userId, rating});
+}
+
+export async function getDailyTasks(userId:number){
+    return await getFromMainApi<CallResultDto<DailyTaskDto[]>>('getDailyTasks', {userId});
+}
+
+export async function claimReward(userId:string, taskId:number){
+    return await putToMainApi<CallResultDto<object>>('claimReward', {userId, taskId});
+}
+
+export async function getNotifications(userId:number){
+    return await getFromMainApi<CallResultDto<NotificationsDto[]>>('getNotifications', {userId});
+}
+
+export async function updateNotifications(userId:string){
+    return await putToMainApi<CallResultDto<object>>('updateNotifications', {userId});
 }

@@ -135,6 +135,7 @@ export type SectionDetails = {
     isPremium: boolean;
     description: string;
     unitCount:number;
+    completedUnitCount:number;
 };
 
 export type UnitDetails = {
@@ -227,6 +228,13 @@ export type GamePlayDto =
     unitId: number;
     totalCorrectAnswer: number;
     totalScore: number;
+    powerUps:PowerUpGameplay[];
+}
+
+export type PowerUpGameplay = 
+{
+    itemId: number;
+    quantity: number;
 }
 
 export type LeaderBoardDto = 
@@ -235,4 +243,34 @@ export type LeaderBoardDto =
     name: string;
     totalScoreWeekly: number;
     imagePath: string;
+}
+
+export type SelfLeaderBoardDto = 
+{
+    id:number;
+    name: string;
+    totalScoreWeekly: number;
+    imagePath: string;
+    userRank:number;
+}
+
+export type DailyTaskDto = 
+{
+    userPlayerID:number;
+    taskID: number;
+    isCompleted: boolean;
+    rewardcoins: number;
+    tasktypeId: number;
+    taskName: string;
+    taskDescription: string;
+    isClaimed:boolean;
+    totalValue:number;
+    currentValue:number
+}
+
+export type NotificationsDto = 
+{
+    id:number;
+    message:string;
+    isOpened:number;
 }

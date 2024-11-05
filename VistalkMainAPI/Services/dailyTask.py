@@ -1,36 +1,35 @@
 from db import get_db_connection, QuestionFiles
 from flask import request, jsonify, send_from_directory
+from datetime import date
 
-def get_Sections():
-    langID = request.args.get('languageId')
+def getDailyTasks():
+    userId = request.args.get('userId')
+    dateToday = date.today() 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = """SELECT 
-                s.*, 
-                COUNT(u.unitId) AS unitCount
-                FROM section s
-                LEFT JOIN unit u ON u.sectionId = s.sectionId
-                WHERE s.languageID = %s
-                AND s.isActive = true
-                AND u.isActive=true
-                GROUP BY s.sectionId"""
-    values = (langID,)
+    query = """SELECT pdt.*, dt.rewardcoins, dt.tasktypeId, dtt.typeName as taskName, dtt.description as taskDescription, dt.quantity as totalValue, el.currentValue
+               FROM playerdailytask pdt 
+               INNER JOIN dailytask dt ON dt.taskId = pdt.taskId 
+               INNER JOIN dailytasktype dtt ON dtt.id = dt.tasktypeId
+               INNER JOIN eventlogs el on el.dailyTaskid = dt.taskid
+               WHERE pdt.userplayerID = %s AND dt.taskDate = %s AND dtt.isImplemented = 1;"""
+    values = (userId, dateToday)
     cursor.execute(query, values)
-    sections = cursor.fetchall()
-    for section in sections:
-        section['isPremium'] = bool(section['isPremium'])
-    if not sections:
+    tasks = cursor.fetchall()
+
+    if not tasks:
         return jsonify({
             'isSuccess': True,
-            'message': 'No sections found',
+            'message': 'No tasks found',
             'data': [],
             'data2': None,
             'totalCount': 0
         }), 200
+    
     return jsonify({
-                'isSuccess': True,
-                'message': 'Successfully Retrieved',
-                'data': sections,
-                'data2': None,
-                'totalCount': None 
-            }), 200
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': tasks,
+        'data2': None,
+        'totalCount': None
+    }), 200

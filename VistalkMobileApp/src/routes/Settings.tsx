@@ -101,7 +101,7 @@ const Settings: React.FC<Props> = ({ navigation }) => {
     await AsyncStorage.removeItem('userID');
     await AsyncStorage.removeItem('userToken');
     setIsRateModalVisible(false);
-    navigation.navigate('LogIn');
+    navigation.navigate('Home');
   };
 
 

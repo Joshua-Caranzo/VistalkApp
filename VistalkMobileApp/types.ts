@@ -22,6 +22,7 @@ export type RootStackParamList = {
   Unit:{sectionId:number, sectionName:string};
   UnitContent: {unitId:number, sectionId:number,  sectionName:string};
   Leaderboard:undefined;
+  AllTimeLeaderboard:undefined;
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -42,6 +43,7 @@ export type ChangePasswordScreenNavigationProp = NativeStackNavigationProp<RootS
 export type UnitScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Unit'>;
 export type UnitContentScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'UnitContent'>;
 export type LeaderboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Leaderboard'>;
+export type AllTimeLeaderboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AllTimeLeaderboard'>;
 
 export type MenuScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, keyof RootStackParamList>;
 

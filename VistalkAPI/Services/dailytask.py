@@ -122,6 +122,7 @@ def save_dailyTask():
     
     task_typeId = int(request.form.get('taskTypeId'))
     task_ID = request.form.get('taskID')
+    powerupId = request.form.get('powerUpId')
     is_update = task_ID is not None and task_ID != '0'
 
     if is_update:
@@ -137,7 +138,7 @@ def save_dailyTask():
         
         sql_content = """
             UPDATE dailytask
-            SET rewardCoins = %s, taskDate = %s, taskTypeId = %s, quantity = %s
+            SET rewardCoins = %s, taskDate = %s, taskTypeId = %s, quantity = %s, powerUpId = %s
             WHERE taskID = %s
         """
         cursor.execute(sql_content, (
@@ -145,19 +146,21 @@ def save_dailyTask():
             task_Date,
             task_typeId,
             quantity,
+            powerupId,
             task_ID
         ))
 
     else:
         sql_content = """
-            INSERT INTO dailytask (rewardCoins, taskDate, taskTypeId, quantity)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO dailytask (rewardCoins, taskDate, taskTypeId, quantity, powerupId)
+            VALUES (%s, %s, %s, %s, %s)
         """
         cursor.execute(sql_content, (
             reward_Coins,
             task_Date,
             task_typeId,
-            quantity
+            quantity,
+            powerupId
         ))
 
         task_id = cursor.lastrowid  
@@ -173,12 +176,23 @@ def save_dailyTask():
             VALUES (%s, %s, %s)
         """
 
+        eventLogsQuery = """
+            INSERT INTO eventlogs (eventDate, dailyTaskId, userPlayerID, currentValue)
+            VALUES (%s, %s, %s, %s)
+        """
+
         for user in users:
             user_player_id = user[0]
             cursor.execute(sql_content_playerdailytask, (
                 user_player_id,  
                 task_id,         
                 False            
+            ))
+            cursor.execute(eventLogsQuery, (
+                task_Date,
+                task_id,  
+                user_player_id,         
+                0            
             ))
 
     conn.commit()
@@ -229,5 +243,25 @@ def deleteDailyTask():
         cursor.close()
         conn.close()
 
-
+def get_powerUps():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = "SELECT * FROM powerup WHERe isImplemented = 1"
+    cursor.execute(query)
+    powerUps = cursor.fetchall()
+    if not powerUps:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No types found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+    return jsonify({
+                'isSuccess': True,
+                'message': 'Successfully Retrieved',
+                'data': powerUps,
+                'data2': None,
+                'totalCount': None 
+            }), 200
     
