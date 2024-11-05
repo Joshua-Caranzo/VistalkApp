@@ -6,7 +6,7 @@ interface DashboardIconProps extends SvgProps {
 }
 
 const DashboardIcon: React.FC<DashboardIconProps> = ({ isActive = false, ...props }) => {
-  const strokeColor = isActive ? "#99BC85" : "#000000"; // Set color based on isActive
+  const strokeColor = isActive ? "#E8C58F" : "#000000"; // Set color based on isActive
 
   return (
     <Svg

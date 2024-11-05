@@ -11,6 +11,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import SettingIcon from '../assets/svg/SettingIcon';
 import Loader from '../components/Loader';
 import { LineChart } from 'react-native-chart-kit';
+import EditIcon from '../assets/svg/EditIcon';
 
 type Props = StackScreenProps<RootStackParamList, 'UserProfile'>;
 const screenWidth = Dimensions.get('window').width;
@@ -60,8 +61,8 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
             <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
               <BackIcon className="h-8 w-8 text-white" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-              <SettingIcon className="h-8 w-8 text-white" />
+            <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
+              <EditIcon className="h-6 w-6 text-white" />
             </TouchableOpacity>
           </View>
           

@@ -14,6 +14,7 @@ import IncorrectIcon from '../assets/svg/IncorrectIcon';
 import UnitIcon from '../assets/svg/UnitIcon';
 import Loader from '../components/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CircleIcon from '../assets/svg/CircleIcon';
 
 type Props = StackScreenProps<RootStackParamList, 'Unit'>;
 
@@ -41,10 +42,10 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
         fetchUnits();
     }, [sectionId]);
     const navigateToUnitContent = () => {
-        if(currentUnit){
-        const unitId = currentUnit?.unitID
-        closeModal();
-        navigate.navigate('UnitContent', {unitId, sectionId, sectionName});
+        if (currentUnit) {
+            const unitId = currentUnit?.unitID
+            closeModal();
+            navigate.navigate('UnitContent', { unitId, sectionId, sectionName });
         }
 
     };
@@ -74,58 +75,70 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                     </TouchableOpacity>
                 </View>
                 <View className="items-center mb-3 mt-8">
-                    <Text className="text-4xl font-bold text-white">Section {sectionName}</Text>
+                    <Text className="text-4xl font-black text-white">Section {sectionName}</Text>
                 </View>
-                <ScrollView contentContainerStyle={{ padding: 20 }} className="" showsVerticalScrollIndicator={false}>
+                <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
                     <View className="justify-around mt-2">
-                        {units.map((unit: UnitDetails, index: number) => (
-                            <View key={index} className="mb-8">
-                                <TouchableOpacity onPress={() => openModal(unit)}>
-                                    <View className="border border-[#FAF9F6] rounded-2xl py-3 px-6" style={{
-                                        backgroundColor: 'rgba(240, 240, 240, 0.4)'
-                                    }}>
-                                        <View className="flex-row items-center justify-between gap-4">
-                                            <View className="flex-row items-center gap-1">
-                                                <UnitIcon className="h-6 w-6 text-black" />
-                                                <Text className="text-black text-xl font-bold">Unit {unit.unitNumber}</Text>
+                        {units.map((unit: UnitDetails, index: number) => {
+                            // Determine colors based on index
+                            const boxColor = index % 2 === 0 ? '#6ADDD0' : '#F7C188';
+                            const buttonColor = index % 2 === 0 ? '#6ADDD0' : '#F7C188';
+
+                            return (
+                                <View key={index} className="mb-8">
+                                    <View className="flex-row gap-x-3 items-center">
+                                        {/* First Box with alternating color and shadow */}
+                                        <View
+                                            style={{
+                                                backgroundColor: boxColor,
+                                                shadowColor: "#000",
+                                                shadowOffset: { width: 0, height: 2 },
+                                                shadowOpacity: 0.25,
+                                                shadowRadius: 4,
+                                                elevation: 5, // for Android
+                                            }}
+                                            className="rounded-xl w-[30%] items-center justify-center px-4 py-4 flex-col"
+                                        >
+                                            <Text className="text-white text-2xl font-black">Unit {unit.unitNumber}</Text>
+                                            <View className="flex-row gap-x-2 items-center mt-2">
+                                                {/* Set color directly on SVG icon */}
+                                                <CircleIcon className="h-4 w-4 text-white" />
+                                                <Text className="text-white font-bold text-lg">{unit.totalScore}</Text>
                                             </View>
-                                            <View className="relative items-center">
-                                                <View className="flex-row">
-                                                    <StarIcon className="text-[#FFFF00] h-6 w-6 items-center" />
-                                                    <Text className="text-black text-lg font-bold">Score</Text>
-                                                </View>
-                                                <Text className="text-black text-3xl font-bold">{unit.totalScore}</Text>
-                                            </View>
+                                            <Text className="text-white font-bold text-lg">Score</Text>
                                         </View>
-                                        <View className="border-t border-[#FAF9F6] flex-row items-center justify-between gap-2 mt-4">
-                                            <View className="relative items-center">
-                                                <View className="flex-row">
-                                                    <TotalIcon className="text-black h-6 w-6" />
-                                                    <Text className="text-black text-lg font-light">Total</Text>
-                                                </View>
-                                                <Text className="text-black text-lg font-bold">{unit.totalItems}</Text>
+
+                                        {/* Second Box with shadow */}
+                                        <View
+                                            style={{
+                                                shadowColor: "#000",
+                                                shadowOffset: { width: 0, height: 2 },
+                                                shadowOpacity: 0.25,
+                                                shadowRadius: 4,
+                                                elevation: 5, // for Android
+                                            }}
+                                            className="rounded-xl bg-white w-[62%] px-4 py-3 flex-col items-start"
+                                        >
+                                            <View className="flex-row items-center gap-x-2">
+                                                {/* Set color directly on SVG icon */}
+                                                <CircleIcon className="h-4 w-4" color={boxColor} />
+                                                <Text style={{ color: boxColor }} className="font-bold text-lg">{unit.totalItems}</Text>
                                             </View>
-                                            <View className="relative items-center border-l border-[#FAF9F6]">
-                                                <View className="flex-row">
-                                                    <CorrectIcon className="text-green-600 h-6 w-6" />
-                                                    <Text className="text-black text-lg font-light">Correct</Text>
-                                                </View>
-                                                <Text className="text-green-600 text-lg font-bold">{unit.totalCorrect}</Text>
-                                            </View>
-                                            <View className="relative items-center border-l border-[#FAF9F6]">
-                                                <View className="flex-row">
-                                                    <IncorrectIcon className="text-[#FF0000] h-6 w-6" />
-                                                    <Text className="text-black text-lg font-light">Wrong</Text>
-                                                </View>
-                                                <Text className="text-[#FF0000] text-lg font-bold">{unit.totalWrong}</Text>
-                                            </View>
+                                            <Text className="text-black text-xl font-bold ml-4">Total No. Question</Text>
+                                            <TouchableOpacity onPress={() => openModal(unit)}>
+                                                {/* Play button with alternating color */}
+                                                <Text style={{ backgroundColor: buttonColor }} className="text-white py-2 px-4 rounded-lg ml-[67%] mt-2">Play</Text>
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
-                                </TouchableOpacity>
-                            </View>
-                        ))}
+                                </View>
+                            );
+                        })}
                     </View>
                 </ScrollView>
+
+
+
 
                 {/* Modal for showing unit details */}
                 {currentUnit && (
@@ -139,20 +152,21 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                                 <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-t-xl">
                                     <View className="p-8">
                                         <View className="flex-row items-center mb-2">
-                                            <UnitIcon className="h-4 w-4 text-black" />
-                                            <Text className="text-xl font-bold text-black items-start">
+                                            {/* <UnitIcon className="h-4 w-4 text-black" /> */}
+                                            <Text className="text-md font-medium text-black items-start">
                                                 Unit {currentUnit.unitNumber}
                                             </Text>
                                         </View>
-                                        <Text className="text-3xl text-black mb-2 text-center">{currentUnit.title}</Text>
+                                        <Text className="text-3xl text-black mb-2 text-center font-bold">{currentUnit.title}</Text>
                                         <Text className="text-base text-black mb-5 text-center">
                                             {currentUnit.description}
                                         </Text>
-                                        <View className="pb-10 px-10">
+                                        <View className="pb-4 px-10">
                                             <TouchableOpacity
                                                 onPress={() => navigateToUnitContent()}
                                             >
-                                                <LinearGradient colors={['#6addd0', '#f7c188']} className="bg-gray-600 py-2 px-10 rounded-full self-center">
+                                                <LinearGradient colors={['#6addd0', '#f7c188']} start={{ x: 0, y: 0 }}
+                                                    end={{ x: 1, y: 0 }} className="bg-gray-600 py-2 px-14 rounded-2xl self-center">
                                                     <Text className="text-lg text-white font-bold">Start Unit</Text>
                                                 </LinearGradient>
                                             </TouchableOpacity>

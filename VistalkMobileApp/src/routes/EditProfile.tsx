@@ -3,10 +3,12 @@ import { SafeAreaView, Text, TextInput, TouchableOpacity, View, Alert, Image, Mo
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getIsEmailUsed, getUserDetails, getUserImageUrl, sendCodetoEmail, verifyCode, editVistaProfile} from './repo'; // Ensure updateUserProfile is imported
+import { getIsEmailUsed, getUserDetails, getUserImageUrl, sendCodetoEmail, verifyCode, editVistaProfile } from './repo'; // Ensure updateUserProfile is imported
 import { EditProfileVista, UserProfileDto } from './type';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Path, Svg } from 'react-native-svg';
+import BackIcon from '../assets/svg/BackIcon';
+import LinearGradient from 'react-native-linear-gradient';
 
 type Props = StackScreenProps<RootStackParamList, 'EditProfile'>;
 
@@ -27,8 +29,8 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
         setName(result.data.name);
         setEmail(result.data.email);
         if (result.data.imagePath) {
-            const newFileUrl = getUserImageUrl(result.data.imagePath);
-            setFileUrl(newFileUrl);
+          const newFileUrl = getUserImageUrl(result.data.imagePath);
+          setFileUrl(newFileUrl);
         }
       }
     } catch (error) {
@@ -40,7 +42,7 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     fetchUserData();
     const unsubscribe = navigation.addListener('focus', fetchUserData);
-    
+
     return unsubscribe;
   }, [navigation]);
 
@@ -87,19 +89,19 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
 
   const updateProfile = async () => {
     const userID = await AsyncStorage.getItem('userID');
-     if (userID) {
-        const formData = new FormData();
-            formData.append('userId', String(userID));
-            formData.append('name', name);
-            formData.append('email', email);
-            if (fileUrl) {
-                formData.append('file', {
-                    uri: fileUrl,
-                    name: `${name}${userID}.jpg`,
-                    type: 'image/jpeg',
-                } as any);
-            }
-            const result = await editVistaProfile(formData);
+    if (userID) {
+      const formData = new FormData();
+      formData.append('userId', String(userID));
+      formData.append('name', name);
+      formData.append('email', email);
+      if (fileUrl) {
+        formData.append('file', {
+          uri: fileUrl,
+          name: `${name}${userID}.jpg`,
+          type: 'image/jpeg',
+        } as any);
+      }
+      const result = await editVistaProfile(formData);
       if (result.isSuccess) {
         Alert.alert(result.message);
         fetchUserData();
@@ -107,7 +109,7 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
       } else {
         Alert.alert('Update failed', result.message);
       }
-    } 
+    }
   };
 
   const handleConfirmCode = async () => {
@@ -131,84 +133,81 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView className="flex-1">
-      <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
-      <View className="flex-row justify-between w-full px-5 absolute top-10">
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Svg width="30" height="30" className='bg-white text-[#99BC85] rounded-lg' viewBox="0 0 24 24">
-                <Path
-                  fill="currentColor"
-                  d="M3.636 11.293a1 1 0 000 1.414l5.657 5.657a1 1 0 001.414-1.414L6.757 13H20a1 1 0 100-2H6.757l3.95-3.95a1 1 0 00-1.414-1.414z"
-                />
-          </Svg>
-        </TouchableOpacity>
-      </View>
-      <View className="flex-1 justify-center">
-        <View className="items-center mb-4">
-          <Text className="text-white text-2xl font-bold">Edit Profile</Text>
-        </View>
-        <View className="items-center mb-4">
-          <TouchableOpacity onPress={handleImageSelect}>
-            {fileUrl ? (
-              <Image
-                source={{ uri: fileUrl }}
-                className="w-20 h-20 rounded-full border-2 border-white"
-                
-              />
-            ) : (
-              <View className="w-20 h-20 rounded-full border-2 border-white bg-gray-600 justify-center items-center">
-                <Text className="text-white text-base">Select Image</Text>
-              </View>
-            )}
+      <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 resize-cover">
+        <View className="flex-row justify-between w-full px-5 absolute top-10">
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <BackIcon className="h-8 w-8 text-white" />
           </TouchableOpacity>
         </View>
-        <TextInput
-          className="bg-transparent border-2 border-white text-white p-3 mb-3 rounded-lg"
-          placeholder="Name"
-          placeholderTextColor="#white"
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          className="bg-transparent border-2 border-white text-white p-3 mb-3 rounded-lg"
-          placeholder="Email"
-          placeholderTextColor="white"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-        <TouchableOpacity className="bg-white p-2 rounded-lg items-center" onPress={handleSave}>
-          <Text className="text-[#99BC85] text-lg">Save Changes</Text>
-        </TouchableOpacity>
-      </View>
+        <View className="flex-1 justify-center items-center">
+          <View className="items-center mb-4">
+            <Text className="text-white text-2xl font-black">Edit Profile</Text>
+          </View>
+          <View className="items-center mb-4">
+            <TouchableOpacity onPress={handleImageSelect}>
+              {fileUrl ? (
+                <Image
+                  source={{ uri: fileUrl }}
+                  className="w-20 h-20 rounded-full border-2 border-white"
 
-      {/* Modal for email verification */}
-      <Modal
-        transparent={true}
-        visible={isModalVisible}
-        animationType="slide"
-        onRequestClose={() => setIsModalVisible(false)}
-      >
-        <View className="flex-1 justify-center items-center bg-gray-800 bg-opacity-50">
-          <View className="w-4/5 bg-white p-4 rounded-lg items-center">
-            <Text className="text-xl font-bold mb-4">Enter Confirmation Code</Text>
-            <TextInput
-              className="bg-gray-200 text-gray-900 p-3 mb-4 rounded-lg"
-              placeholder="Confirmation Code"
-              placeholderTextColor="#999"
-              onChangeText={setConfirmationCode}
-              value={confirmationCode}
-              keyboardType="numeric"
-            />
-            <TouchableOpacity className="bg-blue-500 p-3 rounded-lg w-full mb-4" onPress={handleConfirmCode}>
-              <Text className="text-white text-lg">Confirm</Text>
+                />
+              ) : (
+                <View className="w-20 h-20 rounded-full border-2 border-white bg-transparent justify-center items-center">
+                  <Text className="text-white text-base">Select Image</Text>
+                </View>
+              )}
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-              <Text className="text-gray-600 text-lg">Cancel</Text>
+          </View>
+          <View className='items-center w-full'>
+            <TextInput
+              className="w-4/5 h-13 bg-transparent border-2 border-white text-white p-3 mb-3 rounded-lg"
+              placeholder="Name"
+              placeholderTextColor="#white"
+              value={name}
+              onChangeText={setName}
+            />
+            <TextInput
+              className="w-4/5 h-13 bg-transparent border-2 border-white text-white p-3 mb-3 rounded-lg"
+              placeholder="Email"
+              placeholderTextColor="white"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
+            <TouchableOpacity className="bg-white p-2 rounded-lg items-center w-[80%]" onPress={handleSave}>
+              <Text className="text-[#AEAEAE] text-lg font-bold" style={{ opacity: 0.7 }}>Save Changes</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
-      </ImageBackground>
+
+        {/* Modal for email verification */}
+        <Modal
+          transparent={true}
+          visible={isModalVisible}
+          animationType="slide"
+          onRequestClose={() => setIsModalVisible(false)}
+        >
+          <View className="flex-1 justify-center items-center bg-gray-800 bg-opacity-50">
+            <View className="w-4/5 bg-white p-4 rounded-lg items-center">
+              <Text className="text-xl font-bold mb-4">Enter Confirmation Code</Text>
+              <TextInput
+                className="bg-gray-200 text-gray-900 p-3 mb-4 rounded-lg"
+                placeholder="Confirmation Code"
+                placeholderTextColor="#999"
+                onChangeText={setConfirmationCode}
+                value={confirmationCode}
+                keyboardType="numeric"
+              />
+              <TouchableOpacity className="bg-blue-500 p-3 rounded-lg w-full mb-4" onPress={handleConfirmCode}>
+                <Text className="text-white text-lg">Confirm</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                <Text className="text-gray-600 text-lg">Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </LinearGradient>
     </SafeAreaView>
   );
 };
