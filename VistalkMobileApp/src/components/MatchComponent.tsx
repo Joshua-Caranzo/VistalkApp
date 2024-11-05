@@ -87,8 +87,8 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
             <GestureHandlerRootView className="flex-1">
                 <DraxProvider>
                     <SafeAreaView className="flex-1">
-                        <View className="flex-1">
-                            <View className="flex-1 mb-4 flex-row">
+                        <View className="flex-1 justify-center items-center">
+                            <View className="flex-1 mb-2 flex-row">
                                 <View className="w-[50%] pr-2">
                                     <FlatList
                                         data={fixedItems}
@@ -117,12 +117,12 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
                                         data={draggableData}
                                         renderItemContent={({ item }, { viewState }) => (
                                             <View
-                                                className={`p-3 bg-transparent rounded-lg my-1 border items-center ${viewState?.dragStatus === DraxViewDragStatus.Dragging
-                                                        ? 'border-2 border-blue-500'
+                                                className={`p-3 bg-white rounded-lg my-1 border items-center ${viewState?.dragStatus === DraxViewDragStatus.Dragging
+                                                        ? 'border border-black'
                                                         : 'border border-white'
                                                     }`}
                                             >
-                                                <Text className="text-white text-center text-justify">
+                                                <Text className="text-black text-center text-justify">
                                                     {item.name}
                                                 </Text>
                                             </View>
@@ -136,10 +136,9 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
                             <TouchableOpacity
                                 onPress={this.handleSubmit}
                                 disabled={isLoading}
-                                className="p-4"
                             >
-                                <View className="px-3 py-2 border border-white rounded-lg">
-                                    <Text className="text-base text-white text-center font-bold">Submit</Text>
+                                <View className="w-[40%] mb-12 px-6 py-2 bg-white rounded-xl">
+                                    <Text className="text-base text-[#AEAEAE] text-center font-bold">Submit</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>

@@ -6,7 +6,7 @@ interface ShopIconProps extends SvgProps {
 }
 
 const ShopIcon: React.FC<ShopIconProps> = ({ isActive = false, ...props }) => {
-  const strokeColor = isActive ? "#99BC85" : "#000000";
+  const strokeColor = isActive ? "#E8C58F" : "#000000";
   return (
     <Svg
     viewBox="0 0 15 14"

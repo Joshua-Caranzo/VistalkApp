@@ -71,7 +71,7 @@ const HeartComponent: React.FC<HeartComponentProps> = ({ hearts }) => {
     }, [hearts]);
 
     return (
-        <View className="flex-row items-center justify-center mr-4">
+        <View className="flex-row items-center justify-center">
             {hearts > 0 ? (
                 <Animated.View
                     className="relative items-center justify-center"
