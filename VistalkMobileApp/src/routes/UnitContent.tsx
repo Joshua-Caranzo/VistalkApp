@@ -20,6 +20,8 @@ import SnowflakeComponent from "../components/SnowFlakeComponent";
 import MatchComponent from "../components/MatchComponent";
 import GameOver from "../components/GameOver";
 import Congratulations from "../components/Congratulations";
+import PlayIcon from "../assets/svg/PlayIcon";
+import Svg, { Circle } from "react-native-svg";
 
 type Props = StackScreenProps<RootStackParamList, 'UnitContent'>;
 
@@ -539,6 +541,11 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
             await saveGamePlay(newGamePlay)
         }
     }
+    const radius = 24;
+    const strokeWidth = 4;
+    const circumference = 2 * Math.PI * radius;
+    const progress = timeLeft / 15;
+    const strokeDashoffset = circumference * (1 - progress);
     return (
         <SafeAreaView className="flex-1">
 
@@ -547,83 +554,108 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
 
                 <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
                     {isLoading ? (
-                        <Loader isVisible={isLoading}/>
+                        <Loader isVisible={isLoading} />
                     ) : (
                         <>
                             {showSnowflakes && (<SnowflakeComponent />)}
-
-                            <View className="flex-row justify-between items-center mt-2 w-full">
-                                <TouchableOpacity className="ml-4" onPress={() => navigation.goBack()}>
-                                    <BackIcon className=" w-8 h-8 text-white" />
-                                </TouchableOpacity>
-
-                                <View className="relative items-center justify-center">
-
-                                    <Animated.View
-                                        className="relative items-center justify-center"
-                                        style={[
-                                            {
-                                                transform: [
-                                                    { rotate: timerRunning ? rotation : '0deg' },
-                                                    { scale: timerRunning ? scaleAnimation : 1 },
-                                                ],
-                                            },
-                                        ]}
-                                    >
-                                        <ClockIcon className="h-10 w-10 text-white" />
-                                    </Animated.View>
-                                    <Text className="absolute text-white bottom-2 mb-1 font-bold">{timeLeft}</Text>
-                                </View>
-
-                                <View >
-                                    {hearts > 0 && (
-                                        <HeartComponent hearts={hearts} />
-                                    )}
-
-                                </View>
-
-                            </View>
-
                             {questionList.length > 0 && (
-                                <View className="mt-5 mb-32">
-                                    <View className="flex-1 items-center justify-center w-[85%]">
-                                        {fileUrls[currentQuestionIndex]?.audioUrl && (
-                                            <View className="items-center rounded-xl py-3 px-4 overflow-hidden">
-                                                <TouchableOpacity onPress={() => toggleSound(fileUrls[currentQuestionIndex].audioUrl, questionList[currentQuestionIndex].questionID)}
-                                                    disabled={isPlaying}
-                                                    style={{ opacity: isPlaying ? 0.5 : 1 }}
-                                                >
-                                                    <View className="border-2 border-white rounded-full p-4">
-                                                        <SpeakerIcon className="w-24 h-24 text-white" />
+                                <View className="mt-6 mb-10">
+                                    <View className="flex-1 items-center justify-center w-[85%] mx-8">
+                                        <View className="relative justify-center items-center mb-2">
+                                            {/* Play Box in the Background */}
+                                            <LinearGradient
+                                                colors={['#6addd0', '#f7c188']}
+                                                start={{ x: 0, y: 0 }}
+                                                end={{ x: 1, y: 0 }}
+                                                className="border border-white rounded-3xl py-2 px-[24%] min-w-screen mx-12 items-center absolute top-0 mb-4"
+                                                style={{ zIndex: 1 }} // Lower zIndex so it's in the background
+                                            >
+                                                <View className="flex-row items-center justify-between gap-x-6">
+                                                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                                                        <BackIcon className="h-6 w-6 text-white" />
+                                                    </TouchableOpacity>
+                                                    <Text className="text-white text-3xl font-black">SECTION {sectionName}</Text>
+                                                    <View>
+                                                        {hearts > 0 && <HeartComponent hearts={hearts} />}
                                                     </View>
-                                                </TouchableOpacity>
-                                            </View>
-                                        )}
+                                                </View>
 
-                                        {fileUrls[currentQuestionIndex]?.imageUrl && (
-                                            <View className="items-center rounded-xl py-3 px-4 overflow-hidden">
-                                                <Image
-                                                    source={{ uri: fileUrls[currentQuestionIndex]?.imageUrl }}
-                                                    className="w-48 h-32 rounded-xl mr-2"
-                                                    resizeMode="contain"
-                                                />
-                                            </View>
-                                        )}
+                                                {/* Audio or Image Content */}
+                                                {fileUrls[currentQuestionIndex]?.audioUrl ? (
+                                                    <View className="items-center justify-center rounded-xl overflow-hidden mt-4">
+                                                        <TouchableOpacity
+                                                            onPress={() => toggleSound(fileUrls[currentQuestionIndex].audioUrl, questionList[currentQuestionIndex].questionID)}
+                                                            disabled={isPlaying}
+                                                            style={{ opacity: isPlaying ? 0.5 : 1 }}
+                                                        >
+                                                            <View className="border border-black bg-white rounded-full p-4 items-center">
+                                                                <PlayIcon className="h-8 w-8 text-black" />
+                                                            </View>
+                                                        </TouchableOpacity>
+                                                    </View>
+                                                ) : fileUrls[currentQuestionIndex]?.imageUrl ? (
+                                                    <View className="items-center justify-center rounded-xl overflow-hidden mt-4 p-4">
+                                                        <Image
+                                                            source={{ uri: fileUrls[currentQuestionIndex]?.imageUrl }}
+                                                            className="w-12 h-12 rounded-xl"
+                                                            resizeMode="contain"
+                                                        />
+                                                    </View>
+                                                ) : (
+                                                    // Invisible placeholder if no audio or image
+                                                    <View style={{ width: 48, height: 48, opacity: 0 }} />
+                                                )}
+                                            </LinearGradient>
 
-                                        <View className="items-center mb-2 w-[85%] shadow-lg">
-                                            <Text className="text-white text-center font-bold text-xl">
-                                                {questionList[currentQuestionIndex].questionText}
-                                            </Text>
+                                            {/* Question Text with Timer on Top */}
+                                            <View
+                                                className="items-center mb-2 w-[95%] bg-white py-4 px-6 rounded-2xl"
+                                                style={{ zIndex: 2, marginTop: 170 }} // Higher zIndex for foreground
+                                            >
+                                                {/* Timer Circle */}
+                                                <View className="absolute -top-8 bg-white p-1 rounded-full items-center">
+                                                    <Svg height="56" width="56" viewBox="0 0 56 56">
+                                                        <Circle
+                                                            cx="28"
+                                                            cy="28"
+                                                            r={radius}
+                                                            stroke="#d3d3d3"
+                                                            strokeWidth={strokeWidth}
+                                                            fill="none"
+                                                        />
+                                                        <Circle
+                                                            cx="28"
+                                                            cy="28"
+                                                            r={radius}
+                                                            stroke="#4CAF50" // Green color for progress
+                                                            strokeWidth={strokeWidth}
+                                                            fill="none"
+                                                            strokeDasharray={circumference}
+                                                            strokeDashoffset={strokeDashoffset}
+                                                            rotation="-90"
+                                                            origin="28, 28"
+                                                        />
+                                                    </Svg>
+                                                    <Text className="absolute text-center text-green-500 font-bold text-xl top-[18px]">{timeLeft}</Text>
+                                                </View>
+
+                                                <Text className="text-black text-center font-bold text-lg mt-4">
+                                                    Question {currentQuestionIndex + 1}/{questionList.length}
+                                                </Text>
+                                                <Text className="text-black text-center mt-2 text-lg">
+                                                    {questionList[currentQuestionIndex].questionText}
+                                                </Text>
+                                            </View>
                                         </View>
 
                                         {(questionList[currentQuestionIndex].questionTypeID === 1 || questionList[currentQuestionIndex].questionTypeID === 2) && (
-                                            <View className="mt-6 mb-4 items-center">
+                                            <View className="mt-4 mb-4 items-center w-[85%]">
                                                 {!disabledChoiceIndex.includes(1) && (
-                                                    <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
+                                                    <View className="flex-row items-center py-2 px-4 rounded-2xl mb-4 w-[80%] bg-white">
 
                                                         <TouchableOpacity
                                                             onPress={() => checkAnswer(questionList[currentQuestionIndex].choice1 ?? 0)}
-                                                            className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice1
+                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice1
                                                                 ? isCorrect
                                                                     ? 'bg-green-600 border border-1 border-green-600'
                                                                     : 'bg-[#FF0000] border border-1 border-[#FF0000]'
@@ -631,22 +663,22 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(1)}
                                                         >
 
-                                                            <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(1) ? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice1ContentText}</Text>
+                                                            <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(1) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice1ContentText}</Text>
                                                         </TouchableOpacity>
                                                         {fileUrls[currentQuestionIndex]?.choice1AudioUrl && questionList[currentQuestionIndex].choice1AudioPath !== null && (
                                                             <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice1AudioUrl, questionList[currentQuestionIndex].questionID) }}
                                                                 disabled={isPlaying}
                                                                 style={{ opacity: isPlaying ? 0.5 : 1 }}>
-                                                                <SpeakerIcon className="h-5 w-5 ml-2 text-white" />
+                                                                <SpeakerIcon className="h-8 w-8 ml-2 text-black" />
                                                             </TouchableOpacity>
                                                         )}
                                                     </View>
                                                 )}
                                                 {!disabledChoiceIndex.includes(2) && (
-                                                    <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
+                                                    <View className="flex-row items-center py-2 px-4 rounded-2xl mb-4 w-[80%] bg-white">
                                                         <TouchableOpacity
                                                             onPress={() => checkAnswer(questionList[currentQuestionIndex].choice2 ?? 0)}
-                                                            className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice2
+                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice2
                                                                 ? isCorrect
                                                                     ? 'bg-green-600 border border-1 border-green-600'
                                                                     : 'bg-[#FF0000] border border-1 border-[#FF0000]'
@@ -654,22 +686,22 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(2)}
                                                         >
 
-                                                            <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(2) ? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice2ContentText}</Text>
+                                                            <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(2) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice2ContentText}</Text>
                                                         </TouchableOpacity>
                                                         {fileUrls[currentQuestionIndex]?.choice2AudioUrl && questionList[currentQuestionIndex].choice2AudioPath !== null && (
                                                             <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice2AudioUrl, questionList[currentQuestionIndex].questionID) }}
                                                                 disabled={isPlaying}
                                                                 style={{ opacity: isPlaying ? 0.5 : 1 }}>
-                                                                <SpeakerIcon className="h-5 w-5 ml-2 text-white" />
+                                                                <SpeakerIcon className="h-8 w-8 ml-2 text-black" />
                                                             </TouchableOpacity>
                                                         )}
                                                     </View>
                                                 )}
                                                 {!disabledChoiceIndex.includes(3) && (
-                                                    <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
+                                                    <View className="flex-row items-center py-2 px-4 rounded-2xl mb-4 w-[80%] bg-white">
                                                         <TouchableOpacity
                                                             onPress={() => checkAnswer(questionList[currentQuestionIndex].choice3 ?? 0)}
-                                                            className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice3
+                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice3
                                                                 ? isCorrect
                                                                     ? 'bg-green-600 border border-1 border-green-600'
                                                                     : 'bg-[#FF0000] border border-1 border-[#FF0000]'
@@ -677,22 +709,22 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(3)}
                                                         >
 
-                                                            <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(3) ? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice3ContentText}</Text>
+                                                            <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(3) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice3ContentText}</Text>
                                                         </TouchableOpacity>
                                                         {fileUrls[currentQuestionIndex]?.choice3AudioUrl && questionList[currentQuestionIndex].choice3AudioPath !== null && (
                                                             <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice3AudioUrl, questionList[currentQuestionIndex].questionID) }}
                                                                 disabled={isPlaying}
                                                                 style={{ opacity: isPlaying ? 0.5 : 1 }}>
-                                                                <SpeakerIcon className="h-5 w-5 ml-2 text-white" />
+                                                                <SpeakerIcon className="h-8 w-8 ml-2 text-black" />
                                                             </TouchableOpacity>
                                                         )}
                                                     </View>
                                                 )}
                                                 {!disabledChoiceIndex.includes(4) && (
-                                                    <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
+                                                    <View className="flex-row items-center py-2 px-4 rounded-2xl mb-4 w-[80%] bg-white">
                                                         <TouchableOpacity
                                                             onPress={() => checkAnswer(questionList[currentQuestionIndex].choice4 ?? 0)}
-                                                            className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice4
+                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice4
                                                                 ? isCorrect
                                                                     ? 'bg-green-600 border border-1 border-green-600'
                                                                     : 'bg-[#FF0000] border border-1 border-[#FF0000]'
@@ -700,96 +732,96 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(4)}
                                                         >
 
-                                                            <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(4) ? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice4ContentText}</Text>
+                                                            <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(4) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice4ContentText}</Text>
                                                         </TouchableOpacity>
                                                         {fileUrls[currentQuestionIndex]?.choice4AudioUrl && questionList[currentQuestionIndex].choice4AudioPath !== null && (
                                                             <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice4AudioUrl, questionList[currentQuestionIndex].questionID) }}
                                                                 disabled={isPlaying}
                                                                 style={{ opacity: isPlaying ? 0.5 : 1 }}>
-                                                                <SpeakerIcon className="h-5 w-5 ml-2 text-white" />
+                                                                <SpeakerIcon className="h-8 w-8 ml-2 text-black" />
                                                             </TouchableOpacity>
                                                         )}
                                                     </View>
                                                 )}
                                             </View>
                                         )}
-                                    
-                                    {(questionList[currentQuestionIndex].questionTypeID === 3) && (
-                                        <View className="flex-1">
-                                            <MatchComponent
-                                                showCorrectAnswer={showCorrectAnswer}
-                                                clairVoyageDone={clairVoyageDone}
-                                                questionList={questionList}
-                                                clairVoyanceUsed={clairVoyanceUsed}
-                                                currentQuestionIndex={currentQuestionIndex}
-                                                draggableItems={[
-                                                    {
-                                                        id: questionList[currentQuestionIndex].match1 ?? 0,
-                                                        name: questionList[currentQuestionIndex].match1ContentText ?? ''
-                                                    },
-                                                    {
-                                                        id: questionList[currentQuestionIndex].match2 ?? 0,
-                                                        name: questionList[currentQuestionIndex].match2ContentText ?? ''
-                                                    },
-                                                    {
-                                                        id: questionList[currentQuestionIndex].match3 ?? 0,
-                                                        name: questionList[currentQuestionIndex].match3ContentText ?? ''
-                                                    },
-                                                    {
-                                                        id: questionList[currentQuestionIndex].match4 ?? 0,
-                                                        name: questionList[currentQuestionIndex].match4ContentText ?? ''
-                                                    }
-                                                ]}
-                                                fixedItems={[
-                                                    questionList[currentQuestionIndex].word1EnglishTranslation ?? '',
-                                                    questionList[currentQuestionIndex].word2EnglishTranslation ?? '',
-                                                    questionList[currentQuestionIndex].word3EnglishTranslation ?? '',
-                                                    questionList[currentQuestionIndex].word4EnglishTranslation ?? ''
-                                                ]}
-                                                isLoading={isLoading}
-                                                onSubmit={submit}
-                                            />
-                                        </View>
 
-                                    )}
-                                    
-                                    {(questionList[currentQuestionIndex].questionTypeID === 4) && (
-                                        <View className="flex-1">
-                                            <MatchComponent
-                                                showCorrectAnswer={showCorrectAnswer}
-                                                questionList={questionList}
-                                                clairVoyageDone={clairVoyageDone}
-                                                clairVoyanceUsed={clairVoyanceUsed}
-                                                currentQuestionIndex={currentQuestionIndex}
-                                                draggableItems={[
-                                                    {
-                                                        id: questionList[currentQuestionIndex].match1 ?? 0,
-                                                        name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
-                                                    },
-                                                    {
-                                                        id: questionList[currentQuestionIndex].match2 ?? 0,
-                                                        name: questionList[currentQuestionIndex].match2EnglishTranslation ?? ''
-                                                    },
-                                                    {
-                                                        id: questionList[currentQuestionIndex].match3 ?? 0,
-                                                        name: questionList[currentQuestionIndex].match4EnglishTranslation ?? ''
-                                                    },
-                                                    {
-                                                        id: questionList[currentQuestionIndex].match4 ?? 0,
-                                                        name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
-                                                    }
-                                                ]}
-                                                fixedItems={[
-                                                    questionList[currentQuestionIndex].word1ContentText ?? '',
-                                                    questionList[currentQuestionIndex].word3ContentText ?? '',
-                                                    questionList[currentQuestionIndex].word2ContentText ?? '',
-                                                    questionList[currentQuestionIndex].word4ContentText ?? ''
-                                                ]}
-                                                onSubmit={submit}
-                                                isLoading={isLoading}
-                                            />
-                                        </View>
-                                    )}
+                                        {(questionList[currentQuestionIndex].questionTypeID === 3) && (
+                                            <View className="flex-1">
+                                                <MatchComponent
+                                                    showCorrectAnswer={showCorrectAnswer}
+                                                    clairVoyageDone={clairVoyageDone}
+                                                    questionList={questionList}
+                                                    clairVoyanceUsed={clairVoyanceUsed}
+                                                    currentQuestionIndex={currentQuestionIndex}
+                                                    draggableItems={[
+                                                        {
+                                                            id: questionList[currentQuestionIndex].match1 ?? 0,
+                                                            name: questionList[currentQuestionIndex].match1ContentText ?? ''
+                                                        },
+                                                        {
+                                                            id: questionList[currentQuestionIndex].match2 ?? 0,
+                                                            name: questionList[currentQuestionIndex].match2ContentText ?? ''
+                                                        },
+                                                        {
+                                                            id: questionList[currentQuestionIndex].match3 ?? 0,
+                                                            name: questionList[currentQuestionIndex].match3ContentText ?? ''
+                                                        },
+                                                        {
+                                                            id: questionList[currentQuestionIndex].match4 ?? 0,
+                                                            name: questionList[currentQuestionIndex].match4ContentText ?? ''
+                                                        }
+                                                    ]}
+                                                    fixedItems={[
+                                                        questionList[currentQuestionIndex].word1EnglishTranslation ?? '',
+                                                        questionList[currentQuestionIndex].word2EnglishTranslation ?? '',
+                                                        questionList[currentQuestionIndex].word3EnglishTranslation ?? '',
+                                                        questionList[currentQuestionIndex].word4EnglishTranslation ?? ''
+                                                    ]}
+                                                    isLoading={isLoading}
+                                                    onSubmit={submit}
+                                                />
+                                            </View>
+
+                                        )}
+
+                                        {(questionList[currentQuestionIndex].questionTypeID === 4) && (
+                                            <View className="flex-1">
+                                                <MatchComponent
+                                                    showCorrectAnswer={showCorrectAnswer}
+                                                    questionList={questionList}
+                                                    clairVoyageDone={clairVoyageDone}
+                                                    clairVoyanceUsed={clairVoyanceUsed}
+                                                    currentQuestionIndex={currentQuestionIndex}
+                                                    draggableItems={[
+                                                        {
+                                                            id: questionList[currentQuestionIndex].match1 ?? 0,
+                                                            name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
+                                                        },
+                                                        {
+                                                            id: questionList[currentQuestionIndex].match2 ?? 0,
+                                                            name: questionList[currentQuestionIndex].match2EnglishTranslation ?? ''
+                                                        },
+                                                        {
+                                                            id: questionList[currentQuestionIndex].match3 ?? 0,
+                                                            name: questionList[currentQuestionIndex].match4EnglishTranslation ?? ''
+                                                        },
+                                                        {
+                                                            id: questionList[currentQuestionIndex].match4 ?? 0,
+                                                            name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
+                                                        }
+                                                    ]}
+                                                    fixedItems={[
+                                                        questionList[currentQuestionIndex].word1ContentText ?? '',
+                                                        questionList[currentQuestionIndex].word3ContentText ?? '',
+                                                        questionList[currentQuestionIndex].word2ContentText ?? '',
+                                                        questionList[currentQuestionIndex].word4ContentText ?? ''
+                                                    ]}
+                                                    onSubmit={submit}
+                                                    isLoading={isLoading}
+                                                />
+                                            </View>
+                                        )}
                                     </View>
                                 </View>
                             )}

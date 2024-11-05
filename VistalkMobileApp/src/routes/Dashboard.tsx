@@ -256,7 +256,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                   <TouchableOpacity onPress={() => navigateToUnit()}>
                     <LinearGradient colors={['#6addd0', '#f7c188']} start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }} className="bg-gray-600 py-2 px-14 rounded-2xl self-center">
-                      <Text className="text-lg text-gray-100 font-bold">Let's Begin</Text>
+                      <Text className="text-lg text-white font-bold">Let's Begin</Text>
                     </LinearGradient>
 
                   </TouchableOpacity>
