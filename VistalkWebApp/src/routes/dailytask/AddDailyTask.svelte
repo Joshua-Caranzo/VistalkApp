@@ -1,11 +1,12 @@
 <script lang="ts">
     import { createEventDispatcher, onMount } from "svelte";
-    import type { DailyTaskDto, DailyTaskType } from "./type";
+    import type { DailyTaskDto, DailyTaskType, PowerUp } from "./type";
     import { getDailyTaskTypes, saveDailyTask } from "./repo";
 
     export let modalOpen: boolean;
     export let isAdd: boolean;
     export let dailyTask: DailyTaskDto;
+    export let powerUps : PowerUp[];
 
     let dailyTaskTypes: DailyTaskType[] = [];
     const dispatch = createEventDispatcher();
@@ -77,13 +78,24 @@
                                 {/each}
                         </select>
                     </div>
+                    {#if dailyTask.taskTypeId == 2}
+                    <div class="mt-2">
+                        <label for="email" class="block text-sm text-black capitalize dark:text-black">Specify Power Up</label>
+                        <select bind:value={dailyTask.powerUpId} class="w-full text-center p-2 border border-gray-300 rounded-md mt-2">
+                            <option value={0} class="text-left">--SELECT--</option>
+                                {#each powerUps as p}
+                                <option class="text-left" value={p.itemID} >{p.name}</option>
+                                {/each}
+                        </select>
+                    </div>
+                    {/if}
                     <div class="mt-2">
                         <label for="email" class="block text-sm text-black capitalize dark:text-black">Reward Coins</label>
                         <input autocomplete="off" bind:value={dailyTask.rewardCoins} id="email" type="number" placeholder="Reward Coins" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
                     </div>
                     <div class="mt-2">
                         <label for="taskDate" class="block text-sm text-black capitalize dark:text-black">Task Date</label>
-                        <input autocomplete="off" bind:value={dailyTask.taskDate} id="email" type="date" placeholder="Task Date" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
+                        <input autocomplete="off" disabled={!isAdd} bind:value={dailyTask.taskDate} id="email" type="date" placeholder="Task Date" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
                     </div>
                     <div class="mt-2">
                         <label for="email" class="block text-sm text-black capitalize dark:text-black">Goal Number</label>

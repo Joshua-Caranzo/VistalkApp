@@ -310,6 +310,10 @@ def salesSubscriptions():
 def getTotalSales():
     return dashboard.getTotalSales()
 
+@app.route('/getPowerUps', methods=['GET'])
+def getPowerUps():
+    return dailytask.get_powerUps()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
 

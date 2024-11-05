@@ -8,18 +8,16 @@ import Svg, { Path } from 'react-native-svg';
 import CrownIcon from '../assets/svg/CrownIcon';
 import { LeaderBoardDto, SelfLeaderBoardDto } from './type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getLeaderBoards, getSelfRank, getUserImageUrl } from './repo';
-import useBackButtonHandler from '../utilities/useBackButtonHandler';
+import { getLeaderBoards, getLeaderBoardsAllTime, getSelfRank, getSelfRankAllTime, getUserImageUrl } from './repo';
 
 interface FileUrl {
     index: number;
     url: string;
 }
 
-type Props = StackScreenProps<RootStackParamList, 'Leaderboard'>;
+type Props = StackScreenProps<RootStackParamList, 'AllTimeLeaderboard'>;
 
-const Leaderboard: React.FC<Props> = ({ navigation }) => {
-    useBackButtonHandler(navigation, 'Dashboard');
+const AllTimeLeaderboard: React.FC<Props> = ({ navigation }) => {
     const [leaderboardData, setLeaderBoardData] = useState<LeaderBoardDto[]>([]);
     const [fileUrl, setFileUrl] = useState<FileUrl[]>([]);
     const [userRank, setUserRank] = useState<SelfLeaderBoardDto>();
@@ -30,7 +28,7 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
             try {
                 const userIdString = await AsyncStorage.getItem('userID');
                 if (userIdString) {
-                    const result = await getLeaderBoards();
+                    const result = await getLeaderBoardsAllTime();
                     const top10Data = result.data.slice(0, 10);
                     setLeaderBoardData(top10Data);
                     console.log(top10Data)
@@ -41,7 +39,7 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
                         }
                     });
 
-                      const userRankResult = await getSelfRank(Number(userIdString)); 
+                      const userRankResult = await getSelfRankAllTime(Number(userIdString)); 
                       setUserRank(userRankResult.data);
                       if (userRankResult.data.imagePath) {
                         const userImageUrl = getUserImageUrl(userRankResult.data.imagePath);
@@ -104,11 +102,11 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
             <View className="flex-1 top-8">
                 <Text className="text-white text-3xl font-black text-center">Leaderboard</Text>
                 <View className="flex-row gap-x-10 mt-8 w-full items-center">
-                    <TouchableOpacity>
-                        <Text className="text-lg text-black font-bold bg-white px-5 py-2 rounded-2xl">Weekly</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Leaderboard')}>
+                        <Text className="text-lg text-black font-bold">Weekly</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('AllTimeLeaderboard')}>
-                        <Text className="text-lg font-bold">All Time</Text>
+                    <TouchableOpacity>
+                        <Text className="text-lg text-lg text-black font-bold bg-white px-5 py-2 rounded-2xl">All Time</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -283,4 +281,4 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
     );
 };
 
-export default Leaderboard;
+export default AllTimeLeaderboard;

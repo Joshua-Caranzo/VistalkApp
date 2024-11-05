@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import HeartIcon from "../assets/svg/HeartIcon";
 import { Vibration } from 'react-native';
 import SpeakerIcon from "../assets/svg/SpeakerIcon";
-import { GamePlayDto, PowerUp, QuestionDetails, UserPowerUp } from "./type";
+import { GamePlayDto, PowerUp, PowerUpGameplay, QuestionDetails, UserPowerUp } from "./type";
 import { getContentPronunciation, getPowerupImage, getPowerUps, getQuestionFiles, getUnitQuestions, getUserPowerUps, saveGamePlay } from "./repo";
 import Sound from "react-native-sound";
 import Loader from "../components/Loader";
@@ -20,6 +20,7 @@ import SnowflakeComponent from "../components/SnowFlakeComponent";
 import MatchComponent from "../components/MatchComponent";
 import GameOver from "../components/GameOver";
 import Congratulations from "../components/Congratulations";
+import useBackButtonHandler from "../utilities/useBackButtonHandler";
 import PlayIcon from "../assets/svg/PlayIcon";
 import Svg, { Circle } from "react-native-svg";
 
@@ -82,6 +83,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     const [showCongratlulation, setShowCongratulation] = useState<boolean>(false);
     const [totalCorrect, setTotalCorrect] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(false);
+    useBackButtonHandler(navigation, 'Unit', { sectionId: sectionId, sectionName: sectionName });
 
     async function fetchQuestion() {
         try {
@@ -253,17 +255,14 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
         if (currentQuestion.questionTypeID === 1 || currentQuestion.questionTypeID === 2) {
             if (choiceId === currentQuestion.correctChoice) {
                 const currentScore = Math.round((1000 * timeLeft) / 15);
-                setScore(prevScore => {
-                    const newScore = prevScore + currentScore;
-                    return newScore;
-                });
+                const updatedScore = score + currentScore;
+                const updatedTotalCorrect = totalCorrect + 1;
+                setScore(updatedScore);
+                setTotalCorrect(updatedTotalCorrect);
+    
                 setIsCorrect(true);
-                setTotalCorrect(prevScore => {
-                    const newScore = prevScore + 1;
-                    return newScore;
-                });
                 setTimeout(() => {
-                    proceedToNextQuestion();
+                    proceedToNextQuestion(updatedScore, updatedTotalCorrect);
                     setIsCorrect(null);
                     setSelectedChoice(null);
                     setDisabledChoiceIndex([]);
@@ -279,7 +278,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                             setDisabledChoiceIndex([]);
                             setIsCorrect(null);
                             setSelectedChoice(null);
-                            proceedToNextQuestion();
+                            proceedToNextQuestion(score, totalCorrect);
                         }, 2000);
                         return prevHearts - 1;
                     }
@@ -288,7 +287,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
         }
     };
 
-    const proceedToNextQuestion = async () => {
+    const proceedToNextQuestion = async (updatedScore: number, updatedTotalCorrect: number) => {
         if (currentQuestionIndex < questionList.length - 1) {
             setLoading(false);
             setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
@@ -296,7 +295,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
             setTimerRunning(true);
         } else {
             if (hearts > 0) {
-                await saveGameplayLocal();
+                await saveGameplayLocal(updatedScore, updatedTotalCorrect);
                 setShowCongratulation(true);
             }
             else if (hearts == 0) {
@@ -470,17 +469,13 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
         if (count === 4) {
             setIsCorrect(true);
             const currentScore = Math.round((1000 * timeLeft) / 15);
-            setScore(prevScore => {
-                const newScore = prevScore + currentScore;
-                return newScore;
-            });
-            setTotalCorrect(prevScore => {
-                const newScore = prevScore + 1;
-                return newScore;
-            });
+            const updatedScore = score + currentScore;
+            const updatedTotalCorrect = totalCorrect + 1;
+            setScore(updatedScore);
+            setTotalCorrect(updatedTotalCorrect);
             setCorrectAnswer(true);
             setTimeout(() => {
-                proceedToNextQuestion();
+                proceedToNextQuestion(updatedScore, updatedTotalCorrect);
                 setCorrectAnswer(false);
                 setIsCorrect(null);
                 setSelectedChoice(null);
@@ -499,7 +494,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                         setCorrectAnswer(false);
                         setIsCorrect(null);
                         setSelectedChoice(null);
-                        proceedToNextQuestion();
+                        proceedToNextQuestion(score, totalCorrect);
                     }, 2000);
                     return prevHearts - 1;
                 }
@@ -527,15 +522,26 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
         navigation.navigate('Unit', { sectionId, sectionName })
     }
 
-    async function saveGameplayLocal() {
+    async function saveGameplayLocal(finalScore: number, finalTotalCorrect: number) {
         const userID = await AsyncStorage.getItem('userID');
         if (userID) {
+            let newGameplayPowerUp:PowerUpGameplay[]=[];
+            powerUps.forEach(p => {
+                let newGP:PowerUpGameplay = 
+                {
+                    itemId: p.itemId,
+                    quantity:p.quantity
+                }
+                newGameplayPowerUp.push(newGP);
+            });
+
             let newGamePlay: GamePlayDto =
             {
                 userId: userID,
                 unitId: unitId,
-                totalCorrectAnswer: totalCorrect,
-                totalScore: totalScore
+                totalCorrectAnswer: finalTotalCorrect,
+                totalScore: finalScore,
+                powerUps: newGameplayPowerUp
             };
             console.log(newGamePlay)
             await saveGamePlay(newGamePlay)

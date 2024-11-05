@@ -1,12 +1,23 @@
-import React from 'react';
-import { SafeAreaView, Text, TouchableOpacity, View, Image } from 'react-native';
+import React, { useEffect } from 'react';
+import { SafeAreaView, Text, TouchableOpacity, View, Image, BackHandler } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../../types'; // Adjust the import path
+import { RootStackParamList } from '../../types'; 
 import LinearGradient from 'react-native-linear-gradient';
 
 type Props = StackScreenProps<RootStackParamList, 'Home'>;
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
+  useEffect(() => {
+    const backAction = () => {
+      BackHandler.exitApp(); 
+      return true; 
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove(); 
+  }, []);
+
   return (
     <SafeAreaView className="flex-1">
       <LinearGradient
@@ -18,7 +29,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         <View className="items-center mb-8">
           <Image source={require('../assets/White.png')} className="w-44 h-44" />
           <Text className="text-white text-4xl font-bold" style={{ color: '#ffffff', fontFamily: 'cursive' }}>
-              Vistalk
+            Vistalk
           </Text>
         </View>
 
@@ -27,7 +38,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             className="border border-2 border-white p-3 w-[80%] rounded-xl items-center mb-3"
             onPress={() => navigation.navigate('LogIn')}
           >
-          <Text className="text-xl font-bold text-white">
+            <Text className="text-xl font-bold text-white">
               Login
             </Text>
           </TouchableOpacity>

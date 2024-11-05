@@ -5,11 +5,19 @@ export type DailyTaskDto ={
     taskDate: string;
     taskTypeId: number;
     quantity: number;
+    powerUpId: number| null;
 }
 
 export type DailyTaskType = {
     id: number;
     typeName: string;
     description: string;
-    powerupId: number;
+}
+
+export type PowerUp = 
+{
+    itemID:number,
+    name:string,
+    descriptiong:string,
+    isImplemented:boolean;
 }

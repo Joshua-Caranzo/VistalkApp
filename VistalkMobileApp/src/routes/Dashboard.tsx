@@ -4,14 +4,12 @@ import { View, Text, ImageBackground, TouchableOpacity, Image, ScrollView, Modal
 import Menu from '../components/Menu';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { LeaderboardScreenNavigationProp, RootStackParamList, UnitScreenNavigationProp } from '../../types';
-import { getSections, getUserDetails, getUserImageUrl, getUserLanguage } from './repo';
+import { claimReward, getDailyTasks, getNotifications, getSections, getUserDetails, getUserImageUrl, getUserLanguage, updateNotifications } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Languages, SectionDetails, UserProfileDto } from './type';
+import { DailyTaskDto, Languages, NotificationsDto, SectionDetails, UserProfileDto } from './type';
 import { StackScreenProps } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
-import UnitIcon from '../assets/svg/UnitIcon';
-import Leaderboard from '../components/LeaderBoard';
 import LeaderboardIcon from '../assets/svg/LeaderboardIcon';
 import DailyTaskIcon from '../assets/svg/DailyTaskIcon';
 import NotificationIcon from '../assets/svg/NotificationIcon';
@@ -30,9 +28,17 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const unit = useNavigation<UnitScreenNavigationProp>();
   const [sections, setSections] = useState<SectionDetails[]>([]);
-  const leaderboardNavigation = useNavigation<LeaderboardScreenNavigationProp>();
-
-  let progressnumber = 17;
+  const [dailyTasks, setdailyTasks] = useState<DailyTaskDto[]>([]);
+  const [expandedTasks, setExpandedTasks] = useState<{ [key: number]: boolean }>({});
+  const [notifications, setNotifications] = useState<NotificationsDto[]>([]);
+  const [notificationCount, setNotifCount] = useState<number>(0);
+  const [userId, setUserID] = useState<string>("");
+  const toggleDescription = (taskID: number) => {
+    setExpandedTasks((prev) => ({
+      ...prev,
+      [taskID]: !prev[taskID],
+    }));
+  };
 
   const handleBackPress = () => {
     BackHandler.exitApp();
@@ -50,16 +56,24 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   const fetchUserData = async () => {
     try {
       const userID = await AsyncStorage.getItem('userID');
+      setUserID(userID ?? "");
       const result = await getUserLanguage(Number(userID));
       setLanguageDetails(result.data);
       const userResult = await getUserDetails(Number(userID));
       setUserDetails(userResult.data);
-      const sectionResult = await getSections(result.data.languageID);
+      const sectionResult = await getSections(Number(userID), result.data.languageID);
 
       setSections(sectionResult.data)
       if (userResult.data.imagePath) {
         setFileUrl(getUserImageUrl(userResult.data.imagePath));
       }
+
+      const dailyTaskResult = await getDailyTasks(Number(userID));
+      setdailyTasks(dailyTaskResult.data);
+
+      const notifResult = await getNotifications(Number(userID));
+      setNotifCount(notifResult.totalCount || 0);
+      setNotifications(notifResult.data);
     } catch (error) {
       console.error('Error retrieving user data:', error);
     }
@@ -80,7 +94,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   };
 
   const navigateToLeaderboard = () => {
-    leaderboardNavigation.navigate("Leaderboard");
+    navigation.navigate("Leaderboard");
   };
 
 
@@ -102,22 +116,25 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
     setdailyTaskVisible(false);
   };
 
-  const openLeaderBoard = () => {
-    setLeaderBoardVisible(true);
-  };
-
   const closeLeaderBoard = () => {
-    console.log('close')
     setLeaderBoardVisible(false);
   };
 
-  const openNotification = () => {
+  const openNotification = async () => {
     setNotificationVisible(true);
   };
 
-  const closeNotification = () => {
+  const closeNotification = async () => {
+    console.log(userId)
+    await updateNotifications(userId);
     setNotificationVisible(false);
+    fetchUserData();
   };
+
+  async function claimRewardDashboard(taskId: number) {
+    await claimReward(userId, taskId);
+    fetchUserData();
+  }
 
   const circleSize = 100;
 
@@ -140,31 +157,33 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
           <TouchableOpacity className="" onPress={navigateToLeaderboard}>
             <LeaderboardIcon className="h-8 w-8 text-white" />
           </TouchableOpacity>
-          {/* <TouchableOpacity className="ml-2" onPress={openLeaderBoard}>
-            <Svg width="24" height="24" className='bg-white rounded-lg' viewBox="0 0 24 24">
-              <Path
-                fill="black"
-                d="M12 2C10.9 2 10 2.9 10 4H5C4.45 4 4 4.45 4 5V19C4 19.55 4.45 20 5 20H19C19.55 20 20 19.55 20 19V5C20 4.45 19.55 4 19 4H14C14 2.9 13.1 2 12 2ZM12 4C12.55 4 13 4.45 13 5H11C11 4.45 11.45 4 12 4ZM6 6H18V18H6V6ZM8 8V16H10V10H12V16H14V8H12V10H10V8H8Z"
-              />
-            </Svg>
-          </TouchableOpacity> */}
           <TouchableOpacity className="ml-1" onPress={opendailyTask}>
             <DailyTaskIcon className="h-8 w-8 text-white" />
-{/*             <Svg width="24" height="24" className='bg-white rounded-lg' viewBox="0 0 16 16">
-              <Path
-                fill="black"
-                d="M2 4.5A2.5 2.5 0 0 1 4.5 2h7A2.5 2.5 0 0 1 14 4.5v7a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 11.5zm6.5 6a.5.5 0 0 0 .5.5h2.25a.5.5 0 0 0 0-1H9a.5.5 0 0 0-.5.5M9 6a.5.5 0 0 0 0 1h2.25a.5.5 0 0 0 0-1zM7.354 9.146a.5.5 0 0 0-.708 0L5.5 10.293l-.394-.395a.5.5 0 0 0-.708.707l.748.749a.5.5 0 0 0 .708 0l1.5-1.5a.5.5 0 0 0 0-.708m0-3.292a.5.5 0 1 0-.708-.708L5.5 6.293l-.394-.395a.5.5 0 0 0-.708.708l.748.748a.5.5 0 0 0 .708 0z"
-              />
-            </Svg> */}
           </TouchableOpacity>
           <TouchableOpacity className="ml-1" onPress={openNotification}>
-            <NotificationIcon className="h-8 w-8 text-white" />
-            {/* <Svg width="24" height="24" className='bg-white rounded-lg' viewBox="0 0 24 24">
-              <Path
-                fill="black"
-                d="M14.235 19c.865 0 1.322 1.024.745 1.668A4 4 0 0 1 12 22a4 4 0 0 1-2.98-1.332c-.552-.616-.158-1.579.634-1.661l.11-.006zM12 2c1.358 0 2.506.903 2.875 2.141l.046.171l.008.043a8.01 8.01 0 0 1 4.024 6.069l.028.287L19 11v2.931l.021.136a3 3 0 0 0 1.143 1.847l.167.117l.162.099c.86.487.56 1.766-.377 1.864L20 18H4c-1.028 0-1.387-1.364-.493-1.87a3 3 0 0 0 1.472-2.063L5 13.924l.001-2.97A8 8 0 0 1 8.822 4.5l.248-.146l.01-.043a3 3 0 0 1 2.562-2.29l.182-.017z"
-              />
-            </Svg> */}
+            <View style={{ position: 'relative' }}>
+              <NotificationIcon className="h-8 w-8 text-white" />
+              {notificationCount > 0 && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -4,
+                    right: -4,
+                    backgroundColor: 'red',
+                    borderRadius: 8,
+                    paddingHorizontal: 4,
+                    minWidth: 16,
+                    height: 16,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
+                    {notificationCount}
+                  </Text>
+                </View>
+              )}
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -215,12 +234,12 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                     stroke="#ffffff"
                     strokeWidth="6"
                     fill="none" // No fill for the progress circle
-                    strokeDasharray={`${(progressnumber / 100) * 2 * Math.PI * ((circleSize / 2) - 5)} ${2 * Math.PI * ((circleSize / 2) - 5) - (progressnumber / 100) * 2 * Math.PI * ((circleSize / 2) - 5)}`}
+                    strokeDasharray={`${(section.completedUnitCount / 100) * 2 * Math.PI * ((circleSize / 2) - 5)} ${2 * Math.PI * ((circleSize / 2) - 5) - (section.completedUnitCount / 100) * 2 * Math.PI * ((circleSize / 2) - 5)}`}
                     strokeDashoffset={(Math.PI / 2) * ((circleSize / 2) - 5)}
                   />
                 </Svg>
                 {/* Percentage Text */}
-                <Text className="text-2xl text-white font-black absolute">{progressnumber}%</Text>
+                <Text className="text-2xl text-white font-black absolute">{section.completedUnitCount}%</Text>
               </View>
             </View>
           </View>
@@ -238,17 +257,15 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
           <View className="rounded-t-xl w-full" >
             <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-t-xl" >
               <View className="p-8">
-                <View className="flex-row justify-between">
+                <View className="flex-row justify-between mb-2">
                   <Text className="text-md font-medium text-black">SECTION {currentSection?.sectionNumber}</Text>
                   <View className="flex-row gap-x-1">
-                    <Text className="text-md font-medium text-black">Difficulty:</Text>
-                    <Text className="text-md font-black text-black">Easy</Text>
+                    <Text className="text-md font-medium text-black ml-4s">{currentSection?.unitCount} Units</Text>
+
                   </View>
                 </View>
-                <View className="flex-col items-start gap-2 ml-4 mb-6">
-                  <Text className="text-md font-medium text-black ml-4s">{currentSection?.unitCount} Units</Text>
-                </View>
-                <Text className="text-3xl font-bold text-black mb-2 text-center uppercase">{currentSection?.title}</Text>
+
+                <Text className="text-2xl font-bold text-black mb-2 text-center uppercase">{currentSection?.title}</Text>
                 <Text className="text-base text-black text-justify mb-5 text-center">
                   {currentSection?.description}
                 </Text>
@@ -267,7 +284,6 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </Modal>
 
-      {/* dailyTask*/}
       <Modal
         visible={dailyTaskVisible}
         transparent={true}
@@ -275,60 +291,76 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
         onRequestClose={closedailyTask}
       >
         <TouchableOpacity
-          className="flex-1 justify-center items-center bg-[#00000080]"
+          className="flex-1 justify-center items-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
           onPress={closedailyTask}
         >
-          <View className="w-4/5 bg-[#99BC85] rounded-xl p-3 ">
-            <View className="border border-white rounded-md border-2 p-5">
-              <Text className="text-center text-lg text-white font-bold">DAILY TASK</Text>
+          <View className="flex-1 justify-center items-center bg-opacity-50">
+            <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-xl">
 
-              <View className="mt-4">
-                {/* Task Items */}
-                <View className="flex-row items-center mb-2">
-                  <TouchableOpacity className="mr-2">
-                    <View className="w-5 h-5 border border-white rounded"></View>
-                  </TouchableOpacity>
-                  <Text className="text-white text-base">Complete 3 games</Text>
-                </View>
+              <View className="bg-white rounded-lg p-12 w-11/12 max-w-md shadow-lg">
+                <Text className="text-2xl font-bold mb-4 text-black text-center">Daily Tasks</Text>
+                <ScrollView contentContainerStyle={{ maxHeight: 400 }}>
+                  {dailyTasks.length > 0 ? (
+                    dailyTasks.map((task) => (
+                      <View key={task.taskID} className="flex-row items-center mb-4 p-2 justify-between">
+                        <View className="flex-row items-center">
+                          <TouchableOpacity className="mr-4" disabled>
+                            <View className="w-6 h-6 bg-gray-100 rounded-md justify-center items-center">
+                              {task.isCompleted == true && (
+                                <Svg className="w-6 h-6" viewBox="0 0 24 24">
+                                  <Path fill="#000000" d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41z" />
+                                </Svg>
+                              )}
+                            </View>
+                          </TouchableOpacity>
+                          <View>
+                            <Text className="text-md text-gray-700">{task.taskName}</Text>
 
-                <View className="flex-row items-center mb-2">
-                  <TouchableOpacity className="mr-2">
-                    <View className="w-5 h-5 border border-white rounded"></View>
-                  </TouchableOpacity>
-                  <Text className="text-white text-base">Complete 3 games</Text>
-                </View>
+                            <TouchableOpacity onPress={() => toggleDescription(task.taskID)} className="flex-row items-center">
+                              <Text className="text-md text-gray-700">Description</Text>
+                              <Svg
+                                className="ml-1 w-4 h-4"
+                                style={{ transform: [{ rotate: expandedTasks[task.taskID] ? '90deg' : '0deg' }] }}
+                                viewBox="0 0 24 24"
+                              >
+                                <Path fill="#000000" d="M7 10l5 5 5-5H7z" />
+                              </Svg>
+                            </TouchableOpacity>
 
-                <View className="flex-row items-center mb-2">
-                  <TouchableOpacity className="mr-2">
-                    <View className="w-5 h-5 border border-white rounded"></View>
-                  </TouchableOpacity>
-                  <Text className="text-white text-base">Complete 3 games</Text>
-                </View>
+                            {expandedTasks[task.taskID] && (
+                              <Text className="text-sm text-gray-600 mt-1 w-24">{task.taskDescription}</Text>
+                            )}
+                            <Text className="text-md text-gray-700">Reward: {task.rewardcoins}</Text>
+                          </View>
+                        </View>
+
+                        <TouchableOpacity
+                          disabled={!task.isCompleted}
+                          onPress={() => claimRewardDashboard(task.taskID)}
+                          className={`px-2 py-1 rounded-full ml-6 ${task.isCompleted ? 'bg-[#E8C58F]' : 'bg-gray-400'
+                            }`}
+                        >
+                          <Text
+                            className={`text-xs text-white ${task.isClaimed ? 'line-through decoration-red-500' : ''
+                              }`}
+                          >
+                            Claim
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))
+                  ) : (
+                    <Text className="text-center text-gray-500 mt-4">No daily tasks today.</Text>
+                  )}
+                </ScrollView>
               </View>
-
-              {/* Rewards Section */}
-              <View className="mt-4 items-center">
-                <Text className="text-white text-sm">
-                  Rewards:
-                  <Text> 2x 🪙 </Text>
-                  <Text> 1x 💧</Text>
-                </Text>
-              </View>
-
-              {/* Claim Button */}
-              <TouchableOpacity onPress={closedailyTask} className="mt-5 bg-white py-3 rounded-full shadow-md w-40 mx-auto">
-                <Text className="text-gray-800 text-center font-bold">CLAIM</Text>
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
       </Modal>
 
-      {leaderBoardVisible && (
-        <Leaderboard onCloseLeaderBoard={closeLeaderBoard} />
-      )}
 
-      {/* Notification Modal */}
       <Modal
         visible={notificationVisible}
         transparent={true}
@@ -336,18 +368,35 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
         onRequestClose={closeNotification}
       >
         <TouchableOpacity
-          className="flex-1 justify-center items-center bg-[#00000080]"
+          className="flex-1 justify-center items-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
           onPress={closeNotification}
         >
-          <View className="w-4/5 bg-[#99BC85] rounded-xl p-3">
-            <View className="border border-white rounded-md border-1 p-2">
-              <Text className="text-center text-xl font-bold mb-4 text-white">NOTIFICATIONS</Text>
-              {/* Notification content here */}
-              <ScrollView>
-                <Text className="text-white">You have no new notifications!</Text>
-                {/* Add more notifications as needed */}
-              </ScrollView>
-            </View>
+          <View className="flex-1 justify-center items-center bg-opacity-50">
+            <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-xl">
+
+              <View className="bg-white rounded-lg p-12 w-11/12 max-w-md shadow-lg">
+                <Text className="text-2xl font-bold mb-4 text-black text-center">Notifications</Text>
+                <ScrollView contentContainerStyle={{ maxHeight: 400 }}>
+                  {notifications.length > 0 ? (
+                    notifications.map((notif) => (
+                      <View key={notif.id} className="flex-row items-center mb-4 p-2 justify-between">
+                        {notif.isOpened === 0 && (
+                          <View style={{ width: 10, height: 10, backgroundColor: 'red', borderRadius: 5, marginRight: 8 }} />
+                        )}
+
+                        <Text className="text-black text-lg">
+                          {notif.message}
+                        </Text>
+                      </View>
+                    ))
+                  ) : (
+                    <Text className="text-center text-gray-500 mt-4">No notifications.</Text>
+                  )}
+                </ScrollView>
+
+              </View>
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
       </Modal>

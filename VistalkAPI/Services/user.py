@@ -1,4 +1,4 @@
-# user.py
+
 import jwt
 from datetime import datetime, timedelta, timezone, date
 from flask import request, jsonify, send_from_directory
@@ -68,7 +68,6 @@ def createVista():
     password = data.get('password')
     name = data.get('name')
     languageId = data.get('languageId')
-
     if not email or not password or not name:
         return jsonify({
             'isSuccess': False,
@@ -106,8 +105,9 @@ def createVista():
         cursor.execute(vistaQuery, (userId, 0, languageId))
         conn.commit()
 
+        
         sectionQuery = """
-        SELECT u.unitId 
+        SELECT u.unitId, u.unitNumber
         FROM unit u 
         INNER JOIN section s ON s.sectionId = u.sectionID 
         WHERE s.languageID = %s and u.isActive = 1
@@ -115,14 +115,15 @@ def createVista():
         cursor.execute(sectionQuery, (languageId,))
         unitIds = cursor.fetchall()
 
+        
         for unit in unitIds:
+            isLocked = 0 if unit['unitNumber'] == 1 else 1
             userUnitQuery = """
-            INSERT INTO userunit (userPlayerId, unitId, totalCorrectAnswers, totalScore) 
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO userunit (userPlayerId, unitId, totalCorrectAnswers, totalScore, isLocked) 
+            VALUES (%s, %s, %s, %s, %s)
             """
-            cursor.execute(userUnitQuery, (userId, unit['unitId'], 0, 0))
-        conn.commit()
-
+            cursor.execute(userUnitQuery, (userId, unit['unitId'], 0, 0, isLocked))
+        
         itemQuery = """
         SELECT i.itemId 
         FROM powerUp p 
@@ -137,8 +138,33 @@ def createVista():
             VALUES (%s, %s, %s)
             """
             cursor.execute(userItemQuery, (userId, item['itemId'], 0))
+        
+        today = datetime.now().date()
+        dailyTaskQuery = """
+        SELECT taskID, taskDate  FROM dailyTask 
+        WHERE taskDate >= %s
+        """
+        cursor.execute(dailyTaskQuery, (today,))
+        dailyTasks = cursor.fetchall()
+        print(dailyTasks)
+        for task in dailyTasks:
+            taskId = task['taskID']
+            taskDate = task['taskDate']
+            playerDailyTaskQuery = """
+            INSERT INTO playerDailyTask (taskId, userPlayerId, isCompleted, isClaimed) 
+            VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(playerDailyTaskQuery, (taskId, userId, 0, 0))
+
+            eventLogQuery = """
+            INSERT INTO eventlogs (dailyTaskId, userPlayerId, currentValue, eventDate) 
+            VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(eventLogQuery, (taskId, userId, 0, taskDate))
+        
         conn.commit()
 
+        
         subject = "Welcome to Vistalk"
         message = """
         Maayong Adlaw, Vista!
@@ -152,6 +178,7 @@ def createVista():
         return jsonify({'isSuccess': True, "message": "User registered successfully"}), 200
 
     except Exception as e:
+        print(str(e))
         conn.rollback()
         return jsonify({'isSuccess': False, "message": str(e)}), 500
 
@@ -159,7 +186,6 @@ def createVista():
         cursor.close()
         conn.close()
 
-from datetime import datetime, timedelta
 
 def lock_account(email, conn):
     cursor = conn.cursor()

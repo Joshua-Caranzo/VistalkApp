@@ -119,6 +119,7 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
       await updateScore(userID,0);
     setIsLoggedIn(token != null); 
     setLoading(false);
+    closeModal();
     if(isLoggedIn)
       navigation.navigate('Dashboard')
   };
