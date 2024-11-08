@@ -16,6 +16,7 @@ import Loader from '../components/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useBackButtonHandler from '../utilities/useBackButtonHandler';
 import CircleIcon from '../assets/svg/CircleIcon';
+import Svg from 'react-native-svg';
 
 type Props = StackScreenProps<RootStackParamList, 'Unit'>;
 
@@ -41,9 +42,15 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                 setLoading(false);
             }
         };
-
-        fetchUnits();
-    }, [sectionId]);
+    
+        fetchUnits(); 
+    
+        const unsubscribe = navigation.addListener('focus', fetchUnits); 
+        return () => {
+            unsubscribe(); 
+        };
+    }, [navigation, sectionId]); 
+    
     const navigateToUnitContent = () => {
         if (currentUnit) {
             const unitId = currentUnit?.unitID
@@ -83,14 +90,14 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                 <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
                     <View className="justify-around mt-2">
                         {units.map((unit: UnitDetails, index: number) => {
-                            // Determine colors based on index
+
                             const boxColor = index % 2 === 0 ? '#6ADDD0' : '#F7C188';
                             const buttonColor = index % 2 === 0 ? '#6ADDD0' : '#F7C188';
+                            const backgroundColor = unit.isLocked ? '#333' : 'white';
 
                             return (
                                 <View key={index} className="mb-8">
                                     <View className="flex-row gap-x-3 items-center">
-                                        {/* First Box with alternating color and shadow */}
                                         <View
                                             style={{
                                                 backgroundColor: boxColor,
@@ -98,52 +105,51 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                                                 shadowOffset: { width: 0, height: 2 },
                                                 shadowOpacity: 0.25,
                                                 shadowRadius: 4,
-                                                elevation: 5, // for Android
+                                                elevation: 5,
                                             }}
                                             className="rounded-xl w-[30%] items-center justify-center px-4 py-4 flex-col"
                                         >
                                             <Text className="text-white text-2xl font-black">Unit {unit.unitNumber}</Text>
                                             <View className="flex-row gap-x-2 items-center mt-2">
-                                                {/* Set color directly on SVG icon */}
                                                 <CircleIcon className="h-4 w-4 text-white" />
                                                 <Text className="text-white font-bold text-lg">{unit.totalScore}</Text>
                                             </View>
                                             <Text className="text-white font-bold text-lg">Score</Text>
                                         </View>
 
-                                        {/* Second Box with shadow */}
                                         <View
                                             style={{
                                                 shadowColor: "#000",
                                                 shadowOffset: { width: 0, height: 2 },
                                                 shadowOpacity: 0.25,
                                                 shadowRadius: 4,
-                                                elevation: 5, // for Android
+                                                elevation: 5,
+                                                backgroundColor: backgroundColor,
                                             }}
-                                            className="rounded-xl bg-white w-[62%] px-4 py-3 flex-col items-start"
+                                            className="rounded-xl w-[62%] px-4 py-3 flex-col"
                                         >
+                                            
                                             <View className="flex-row items-center gap-x-2">
-                                                {/* Set color directly on SVG icon */}
                                                 <CircleIcon className="h-4 w-4" color={boxColor} />
                                                 <Text style={{ color: boxColor }} className="font-bold text-lg">{unit.totalItems}</Text>
+                                                <Text className="text-black text-xl font-bold ml-4">Questions</Text>
                                             </View>
-                                            <Text className="text-black text-xl font-bold ml-4">Total No. Question</Text>
-                                            <TouchableOpacity onPress={() => openModal(unit)}>
-                                                {/* Play button with alternating color */}
-                                                <Text style={{ backgroundColor: buttonColor }} className="text-white py-2 px-4 rounded-lg ml-[67%] mt-2">Play</Text>
-                                            </TouchableOpacity>
+                                            <View className="flex-grow flex items-center mt-2">
+                                                <TouchableOpacity onPress={() => openModal(unit)} disabled={unit.isLocked == 1}>
+                                                    <Text style={{ backgroundColor: buttonColor }} className="text-white py-2 px-4 rounded-lg">
+                                                        {unit.isLocked ? 'Locked' : 'Play'}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            </View>
                                         </View>
                                     </View>
                                 </View>
                             );
                         })}
                     </View>
+
                 </ScrollView>
 
-
-
-
-                {/* Modal for showing unit details */}
                 {currentUnit && (
                     <Modal visible={modalVisible} transparent={true} animationType="none" onRequestClose={closeModal}>
                         <TouchableOpacity
@@ -155,7 +161,6 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                                 <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-t-xl">
                                     <View className="p-8">
                                         <View className="flex-row items-center mb-2">
-                                            {/* <UnitIcon className="h-4 w-4 text-black" /> */}
                                             <Text className="text-md font-medium text-black items-start">
                                                 Unit {currentUnit.unitNumber}
                                             </Text>

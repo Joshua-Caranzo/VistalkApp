@@ -186,7 +186,6 @@ def saveGamePlay():
     totalScore = int(data.get('totalScore')) 
     powerUps = request.form.get('powerUps')
     powerUps = json.loads(powerUps) if powerUps else [] 
-    print(powerUps)
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -208,8 +207,6 @@ def saveGamePlay():
         }), 404
 
     existing_total_score = current_total_score[0]
-    print(existing_total_score)
-    print(totalScore)
 
     if totalScore > existing_total_score:
         dailyScore(userId, totalScore)
@@ -259,6 +256,21 @@ def saveGamePlay():
             """
             cursor.execute(query_update_powerup, (quantity, userId, itemId))
 
+        query_next_unit = """
+            SELECT unitID FROM unit
+            WHERE sectionID = (SELECT sectionID FROM unit WHERE unitID = %s) 
+            AND unitNumber = (SELECT unitNumber + 1 FROM unit WHERE unitID = %s)
+        """
+        cursor.execute(query_next_unit, (unitId, unitId))
+        next_unit = cursor.fetchone()
+
+        if next_unit:
+            next_unit_id = next_unit[0]
+            query_unlock_next_unit = """
+                UPDATE userunit SET isLocked = 0 WHERE userPlayerID = %s AND unitID = %s
+            """
+            cursor.execute(query_unlock_next_unit, (userId, next_unit_id))
+            
         conn.commit()
         return jsonify({
             'isSuccess': True,

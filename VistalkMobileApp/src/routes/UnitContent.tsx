@@ -543,7 +543,6 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                 totalScore: finalScore,
                 powerUps: newGameplayPowerUp
             };
-            console.log(newGamePlay)
             await saveGamePlay(newGamePlay)
         }
     }

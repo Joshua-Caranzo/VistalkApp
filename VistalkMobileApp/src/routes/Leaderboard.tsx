@@ -10,6 +10,7 @@ import { LeaderBoardDto, SelfLeaderBoardDto } from './type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLeaderBoards, getSelfRank, getUserImageUrl } from './repo';
 import useBackButtonHandler from '../utilities/useBackButtonHandler';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface FileUrl {
     index: number;
@@ -25,37 +26,39 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
     const [userRank, setUserRank] = useState<SelfLeaderBoardDto>();
     const [file, setFile] = useState<string>();
 
-    useEffect(() => {
-        const fetchLeaderboardData = async () => {
-            try {
-                const userIdString = await AsyncStorage.getItem('userID');
-                if (userIdString) {
-                    const result = await getLeaderBoards();
-                    const top10Data = result.data.slice(0, 10);
-                    setLeaderBoardData(top10Data);
-                    console.log(top10Data)
-                    top10Data.forEach((user, index) => {
-                        if (user.imagePath) {
-                            const userImageUrl = getUserImageUrl(user.imagePath);
-                            setFileUrl(prevFileUrl => [...prevFileUrl, { index, url: userImageUrl }]);
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchLeaderboardData = async () => {
+                try {
+                    const userIdString = await AsyncStorage.getItem('userID');
+                    if (userIdString) {
+                        const result = await getLeaderBoards();
+                        const top10Data = result.data.slice(0, 10);
+                        setLeaderBoardData(top10Data);
+                        console.log(top10Data);
+                        top10Data.forEach((user, index) => {
+                            if (user.imagePath) {
+                                const userImageUrl = getUserImageUrl(user.imagePath);
+                                setFileUrl(prevFileUrl => [...prevFileUrl, { index, url: userImageUrl }]);
+                            }
+                        });
+
+                        const userRankResult = await getSelfRank(Number(userIdString)); 
+                        setUserRank(userRankResult.data);
+                        if (userRankResult.data.imagePath) {
+                            const userImageUrl = getUserImageUrl(userRankResult.data.imagePath);
+                            setFile(userImageUrl);
                         }
-                    });
-
-                      const userRankResult = await getSelfRank(Number(userIdString)); 
-                      setUserRank(userRankResult.data);
-                      if (userRankResult.data.imagePath) {
-                        const userImageUrl = getUserImageUrl(userRankResult.data.imagePath);
-                        setFile(userImageUrl);
                     }
+                } catch (error) {
+                    console.error('Error fetching leaderboard data:', error);
                 }
-            } catch (error) {
-                console.error('Error fetching leaderboard data:', error);
-            }
-        };
+            };
 
-        fetchLeaderboardData();
-    }, []);
-    
+            fetchLeaderboardData();
+        }, [])
+    );
+
     const firstPlaceHeight = useRef(new Animated.Value(0)).current;
     const secondPlaceHeight = useRef(new Animated.Value(0)).current;
     const thirdPlaceHeight = useRef(new Animated.Value(0)).current;

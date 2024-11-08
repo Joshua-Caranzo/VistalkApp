@@ -314,6 +314,10 @@ def getTotalSales():
 def getPowerUps():
     return dailytask.get_powerUps()
 
+@app.route('/getUserRatings', methods=['GET'])
+def userRatings():
+    return dashboard.userRatings()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
 
