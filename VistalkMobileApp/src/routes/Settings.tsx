@@ -9,6 +9,7 @@ import { addrating, deactivateVistaAccount, sendFeedback, sendReport } from './r
 import { Path, Svg } from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
 import BackIcon from '../assets/svg/BackIcon';
+import Menu from '../components/Menu';
 
 type Props = StackScreenProps<RootStackParamList, 'Settings'>;
 
@@ -20,6 +21,7 @@ const Settings: React.FC<Props> = ({ navigation }) => {
   const [reportText, setReportText] = useState('');
   const [isRateModalVisible, setIsRateModalVisible] = useState(false);
   const [rating, setRating] = useState(0);
+  const [activeScreen] = useState<keyof RootStackParamList | null>('Settings');
 
   const handleDeactivateAccount = () => {
     setIsModalVisible(true);
@@ -155,15 +157,25 @@ const Settings: React.FC<Props> = ({ navigation }) => {
           animationType="slide"
         >
           <View className="flex-1 items-center justify-center bg-[#00000080]">
-            <View className="bg-[#99BC85] p-6 w-[80%] rounded-lg items-center">
-              <Text className="text-xl font-bold mb-3">Deactivate Account</Text>
-              <Text className="text-base mb-4 text-center">Are you sure you want to deactivate your account?</Text>
-              <View className="flex-row justify-between w-[100%] gap-2">
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleConfirmDeactivate}>
-                  <Text className="text-base text-black">Yes</Text>
+            <View className="bg-white p-6 w-[80%] rounded-xl items-center">
+              <Text className="text-xl font-black text-black mb-3">Deactivate Account</Text>
+              <Text className="text-base text-black mb-4 text-center">Are you sure you want to deactivate your account?</Text>
+              <View className="flex-row justify-center items-center w-[100%] gap-x-4">
+                <TouchableOpacity onPress={handleConfirmDeactivate}>
+                  <LinearGradient
+                    className="py-2 px-4 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base font-bold text-white">Yes</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleCancelDeactivate}>
-                  <Text className="text-base text-black">No</Text>
+                <TouchableOpacity onPress={handleCancelDeactivate}>
+                  <LinearGradient
+                    className="py-2 px-4 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base font-bold text-white">No</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
             </View>
@@ -176,22 +188,33 @@ const Settings: React.FC<Props> = ({ navigation }) => {
           animationType="slide"
         >
           <View className="flex-1 items-center justify-center bg-[#00000080]">
-            <View className="bg-[#99BC85] p-6 w-[80%] rounded-lg items-center">
-              <Text className="text-xl font-bold mb-3">Send Feedback</Text>
+            <View className="bg-white p-6 w-[80%] rounded-xl items-center">
+              <Text className="text-xl text-black font-black mb-3">Send Feedback</Text>
               <TextInput
                 className="w-[100%] h-36 border border-gray-500 rounded-md border-1 p-5 mb-4"
                 multiline
                 numberOfLines={4}
                 placeholder="Enter your feedback here..."
+                placeholderTextColor="#a9a9a9"
                 value={feedbackText}
                 onChangeText={setFeedbackText}
               />
-              <View className="flex-row justify-between w-[100%] gap-2">
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleSendFeedback}>
-                  <Text className="text-base text-black">Send</Text>
+              <View className="flex-row items-center justify-center gap-x-4">
+                <TouchableOpacity onPress={handleSendFeedback}>
+                  <LinearGradient
+                    className="py-2 px-6 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base font-bold text-white">Send</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleCancelFeedback}>
-                  <Text className="text-base text-black">Cancel</Text>
+                <TouchableOpacity onPress={handleCancelFeedback}>
+                  <LinearGradient
+                    className="py-2 px-4 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base font-bold text-white">Cancel</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
             </View>
@@ -205,22 +228,33 @@ const Settings: React.FC<Props> = ({ navigation }) => {
           animationType="slide"
         >
           <View className="flex-1 items-center justify-center bg-[#00000080]">
-            <View className="bg-[#99BC85] p-6 w-[80%] rounded-lg items-center">
-              <Text className="text-xl font-bold mb-3">Send Report</Text>
+            <View className="bg-white p-6 w-[80%] rounded-xl items-center">
+              <Text className="text-xl font-black mb-3 text-black">Send Report</Text>
               <TextInput
                 className="w-[100%] h-36 border border-gray-500 rounded-md border-1 p-5 mb-4"
                 multiline
                 numberOfLines={4}
                 placeholder="Enter your report here..."
+                placeholderTextColor="#a9a9a9"
                 value={reportText}
                 onChangeText={setReportText}
               />
-              <View className="flex-row justify-between w-[100%] gap-2">
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleSendReport}>
-                  <Text className="text-base text-black">Send</Text>
+              <View className="flex-row items-center justify-center gap-x-4">
+                <TouchableOpacity onPress={handleSendReport}>
+                  <LinearGradient
+                    className="py-2 px-6 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base font-bold text-white">Send</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleCancelReport}>
-                  <Text className="text-base text-black">Cancel</Text>
+                <TouchableOpacity onPress={handleCancelReport}>
+                  <LinearGradient
+                    className="py-2 px-4 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base font-bold text-white">Cancel</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
             </View>
@@ -233,16 +267,22 @@ const Settings: React.FC<Props> = ({ navigation }) => {
           animationType="slide"
         >
           <View className="flex-1 items-center justify-center bg-[#00000080]">
-            <View className="bg-[#99BC85] p-6 w-[80%] rounded-lg items-center">
-              <Text className="text-xl font-bold mb-3">Rate Our Platform</Text>
-              <Text className="text-base mb-4 text-center">Please rate your experience with our platform</Text>
+            <View className="bg-white p-6 w-[80%] rounded-xl items-center">
+              <Text className="text-xl font-black text-black mb-3">Rate Our Platform</Text>
+              <Text className="text-base mb-4 text-center text-black">Please rate your experience with our platform</Text>
               <View className="flex-row mb-4">{renderStars()}</View>
-              <TouchableOpacity className="p-3 bg-white rounded-md items-center" onPress={handleSubmitRating}>
-                <Text className="text-lg text-black">Submit Rating</Text>
+              <TouchableOpacity onPress={handleSubmitRating}>
+              <LinearGradient
+                    className="py-2 px-6 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base font-bold text-white">Submit Rating</Text>
+                  </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
+        <Menu activeScreen={activeScreen} />
       </LinearGradient>
     </SafeAreaView>
   );

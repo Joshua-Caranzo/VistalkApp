@@ -153,7 +153,7 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
                 />
               ) : (
                 <View className="w-20 h-20 rounded-full border-2 border-white bg-transparent justify-center items-center">
-                  <Text className="text-white text-base">Select Image</Text>
+                  <Text className="text-white text-base font-bold">Select Image</Text>
                 </View>
               )}
             </TouchableOpacity>

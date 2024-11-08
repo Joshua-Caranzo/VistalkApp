@@ -13,6 +13,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import LeaderboardIcon from '../assets/svg/LeaderboardIcon';
 import DailyTaskIcon from '../assets/svg/DailyTaskIcon';
 import NotificationIcon from '../assets/svg/NotificationIcon';
+import ProfileIcon from '../assets/svg/ProfileIcon';
 
 type Props = StackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -141,16 +142,14 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   return (
     <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 resize-cover justify-center">
       <View className="flex-row justify-between p-2 items-center">
-        <TouchableOpacity className="w-10 h-10 rounded-full overflow-hidden bg-white justify-center items-center" onPress={() => navigation.navigate('UserProfile')}>
+        <TouchableOpacity className="w-10 h-10 rounded-full overflow-hidden justify-center items-center" onPress={() => navigation.navigate('UserProfile')}>
           {fileUrl ? (
             <Image
               source={{ uri: fileUrl }}
               className="w-10 h-10"
             />
           ) : (
-            <Svg width="40" height="40" viewBox="0 0 1792 1792" >
-              <Path fill="black" d="M1523 1339q-22-155-87.5-257.5T1251 963q-67 74-159.5 115.5T896 1120t-195.5-41.5T541 963q-119 16-184.5 118.5T269 1339q106 150 271 237.5t356 87.5t356-87.5t271-237.5m-243-699q0-159-112.5-271.5T896 256T624.5 368.5T512 640t112.5 271.5T896 1024t271.5-112.5T1280 640m512 256q0 182-71 347.5t-190.5 286T1245 1721t-349 71q-182 0-348-71t-286-191t-191-286T0 896t71-348t191-286T548 71T896 0t348 71t286 191t191 286t71 348" />
-            </Svg>
+            <ProfileIcon className="text-white h-10 w-10" />
           )}
         </TouchableOpacity>
         <View className="flex-row items-center">
@@ -298,17 +297,19 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
           <View className="flex-1 justify-center items-center bg-opacity-50">
             <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-xl">
 
-              <View className="bg-white rounded-lg p-12 w-11/12 max-w-md shadow-lg">
-                <Text className="text-2xl font-bold mb-4 text-black text-center">Daily Tasks</Text>
-                <ScrollView contentContainerStyle={{ maxHeight: 400 }}>
+              <View className="bg-white rounded-2xl py-3 px-6 w-11/12 max-w-md shadow-lg">
+                <Text className="text-2xl font-black mt-2 mb-4 text-black text-center">Daily Tasks</Text>
+                <ScrollView contentContainerStyle={{ maxHeight: 400 }} showsVerticalScrollIndicator={false}>
                   {dailyTasks.length > 0 ? (
                     dailyTasks.map((task) => (
-                      <View key={task.taskID} className="flex-row items-center mb-4 p-2 justify-between">
+                      <LinearGradient colors={['#f7c188', '#6addd0']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }} key={task.taskID} className="flex-row items-center mb-4 py-3 px-4 justify-between rounded-xl">
                         <View className="flex-row items-center">
                           <TouchableOpacity className="mr-4" disabled>
-                            <View className="w-6 h-6 bg-gray-100 rounded-md justify-center items-center">
+                            <View className="w-4 h-4 bg-gray-100 rounded-md justify-center items-center">
                               {task.isCompleted == true && (
-                                <Svg className="w-6 h-6" viewBox="0 0 24 24">
+                                <Svg className="w-4 h-4" viewBox="0 0 24 24">
                                   <Path fill="#000000" d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41z" />
                                 </Svg>
                               )}
@@ -348,7 +349,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                             Claim
                           </Text>
                         </TouchableOpacity>
-                      </View>
+                      </LinearGradient>
                     ))
                   ) : (
                     <Text className="text-center text-gray-500 mt-4">No daily tasks today.</Text>
@@ -375,12 +376,12 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
           <View className="flex-1 justify-center items-center bg-opacity-50">
             <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-xl">
 
-              <View className="bg-white rounded-lg p-12 w-11/12 max-w-md shadow-lg">
-                <Text className="text-2xl font-bold mb-4 text-black text-center">Notifications</Text>
+              <View className="bg-white rounded-2xl px-8 py-6 w-11/12 max-w-md shadow-lg">
+                <Text className="text-2xl font-black mb-4 text-black text-center">Notifications</Text>
                 <ScrollView contentContainerStyle={{ maxHeight: 400 }}>
                   {notifications.length > 0 ? (
                     notifications.map((notif) => (
-                      <View key={notif.id} className="flex-row items-center mb-4 p-2 justify-between">
+                      <View key={notif.id} className="flex-row items-center mb-4 py-3 px-4 justify-between">
                         {notif.isOpened === 0 && (
                           <View style={{ width: 10, height: 10, backgroundColor: 'red', borderRadius: 5, marginRight: 8 }} />
                         )}

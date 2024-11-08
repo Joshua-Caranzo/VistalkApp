@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, Modal, Linking, Alert } from 'reac
 import { CoinBag } from './type';
 import { buyCoinBag, getCoinBags, getUserVCoin, paymongoRedirect } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
 
 type CoinBagProps = {
   vCoin: number;
@@ -16,7 +17,7 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedBag, setSelectedBag] = useState<CoinBag | null>(null);
 
-  
+
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
@@ -24,15 +25,15 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
         setCoinBags(result.data);
 
         const userID = await AsyncStorage.getItem('userID');
-        
+
         if (userID) {
           const result = await getUserVCoin(userID);
           if (result.isSuccess) {
-            setVcoin(result.data); 
+            setVcoin(result.data);
           } else {
             setError('Failed to fetch vCoin');
           }
-      }
+        }
       } catch (err) {
         setError('Failed to fetch power-ups');
       } finally {
@@ -61,16 +62,16 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
             setTimeout(async () => {
               const paymentSuccess = true;
               if (paymentSuccess) {
-                  await buyCoinBag(userID ,selectedBag.coinBagId).then(() => {
-                    setVcoin(prev => prev + selectedBag.quantity);
-                    setModalVisible(false);
-                    
-                  });
-                  Alert.alert("Payment Success", "Your payment was successful!");
+                await buyCoinBag(userID, selectedBag.coinBagId).then(() => {
+                  setVcoin(prev => prev + selectedBag.quantity);
+                  setModalVisible(false);
+
+                });
+                Alert.alert("Payment Success", "Your payment was successful!");
               } else {
-                  Alert.alert("Payment Failed", "There was a problem with your payment. Please try again.");
+                Alert.alert("Payment Failed", "There was a problem with your payment. Please try again.");
               }
-          }, 10000);
+            }, 10000);
           } else {
             setError('Failed to initiate payment');
           }
@@ -82,16 +83,21 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
   };
 
   return (
-    <View className="flex flex-row gap-16 items-center p-[60px] mb-24">
+    <View className="flex flex-row gap-16 items-center p-[66px] mb-24">
       {coinBags.map((bag, index) => (
-      <View key={index} className="items-center">
-        <Image source={require('../assets/Vcoin.png')} className="w-56 h-56 mb-4" />
-        <Text className="text-2xl text-white font-bold mb-6">{bag.coinBagName}</Text>
-        <Text className="text-2xl text-white font-bold mb-6">{bag.quantity}</Text>
-        <TouchableOpacity className="bg-white rounded-md py-2 px-3"  onPress={() => handleOpenModal(bag)}>
-        <Text className="text-base font-bold text-black">₱ {bag.moneyPrice}</Text>
-        </TouchableOpacity>
-      </View>))}
+        <View key={index} className="items-center">
+          <View className="justify-center items-center">
+            <Image source={require('../assets/Vcoin.png')} className="w-56 h-56 mb-4" />
+            <Text className="text-2xl text-white font-black">{bag.coinBagName}</Text>
+            <Text className="text-2xl text-white font-bold mb-4">{bag.quantity}</Text>
+          </View>
+          <TouchableOpacity onPress={() => handleOpenModal(bag)}>
+            <LinearGradient colors={['#F8F6F4', '#8399A2']} className="rounded-xl py-3 px-4">
+              <Text className="text-lg font-black text-white">₱ {bag.moneyPrice}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+        </View>))}
 
       {selectedBag && (
         <Modal
@@ -100,25 +106,37 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
           onRequestClose={() => setModalVisible(false)}
         >
           <View className="flex items-center justify-center flex-1 bg-[#00000080]">
-            <View className="bg-white items-center p-6 rounded-lg w-[80%]">
-              <Text className="text-xl text-black font-bold mb-4">Purchase {selectedBag.coinBagName}</Text>
-              <Text className="text-lg text-black mb-4">Quantity: {selectedBag.quantity} VCoins</Text>
+            <View className="bg-white items-center p-6 rounded-2xl w-[80%]">
+              <Text className="text-xl text-black font-black mb-4">Purchase {selectedBag.coinBagName}</Text>
+              <View className="flex-row items-center gap-x-2 mb-4">
+              <Text className="text-lg text-black font-bold">Quantity:</Text>
+              <Text className="text-lg text-black"> {selectedBag.quantity} VCoins</Text>
+              </View>
 
-              <Text className="text-lg text-black mb-4">Total Price: ₱{selectedBag.moneyPrice}</Text>
+              <View className="flex-row items-center gap-x-2 mb-4">
+              <Text className="text-lg text-black font-bold">Total Price:</Text>
+              <Text className="text-lg text-black">₱ {selectedBag.moneyPrice}</Text>
+              </View>
 
               <View className="flex-row gap-2 items-center">
                 <TouchableOpacity
-                  className={`bg-gray-400 rounded-md py-2 px-3`}
                   onPress={handleBuy}
                 >
-                  <Text className="text-white text-center">Buy</Text>
+                  <LinearGradient
+                    className="py-2 px-5 rounded-xl items-center" colors={['#F8F6F4', '#8399A2']}>
+                    <Text className="text-base font-bold text-white">Buy</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className="mt-4 bg-gray-400 rounded-md py-2 px-3"
                   onPress={() => setModalVisible(false)}
                 >
-                  <Text className="text-center text-center">Cancel</Text>
+                  <LinearGradient
+                    className="py-2 px-3 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base font-bold text-white">Cancel</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
             </View>
