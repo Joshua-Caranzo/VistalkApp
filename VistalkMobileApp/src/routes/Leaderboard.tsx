@@ -10,6 +10,7 @@ import { LeaderBoardDto, SelfLeaderBoardDto } from './type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLeaderBoards, getSelfRank, getUserImageUrl } from './repo';
 import useBackButtonHandler from '../utilities/useBackButtonHandler';
+import ProfileIcon from '../assets/svg/ProfileIcon';
 import { useFocusEffect } from '@react-navigation/native';
 
 interface FileUrl {
@@ -126,9 +127,7 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
                                 className="w-16 h-16 rounded-full border-2 border-white"
                             />
                         ) : (
-                            <Svg width="40" height="40" viewBox="0 0 1792 1792">
-                                <Path fill="black" d="M1523 1339q-22-155-87.5-257.5T1251 963q-67 74-159.5 115.5T896 1120t-195.5-41.5T541 963q-119 16-184.5 118.5T269 1339q106 150 271 237.5t356 87.5t356-87.5t271-237.5m-243-699q0-159-112.5-271.5T896 256T624.5 368.5T512 640t112.5 271.5T896 1024t271.5-112.5T1280 640m512 256q0 182-71 347.5t-190.5 286T1245 1721t-349 71q-182 0-348-71t-286-191t-191-286T0 896t71-348t191-286T548 71T896 0t348 71t286 191t191 286t71 348" />
-                            </Svg>
+                            <ProfileIcon className="h-10 w-10 text-white" />
                         )}
                         <Text className="text-base text-white font-black">{leaderboardData[1].name}</Text>
                         <Text className="text-base text-black font-bold bg-white px-4 py-2 rounded-2xl mt-2">{leaderboardData[1].totalScoreWeekly || 0}</Text>
@@ -148,9 +147,7 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
                                     className="w-16 h-16 rounded-full border-2 border-white"
                                 />
                                 ) : (
-                                    <Svg width="40" height="40" viewBox="0 0 1792 1792">
-                                        <Path fill="black" d="M1523 1339q-22-155-87.5-257.5T1251 963q-67 74-159.5 115.5T896 1120t-195.5-41.5T541 963q-119 16-184.5 118.5T269 1339q106 150 271 237.5t356 87.5t356-87.5t271-237.5m-243-699q0-159-112.5-271.5T896 256T624.5 368.5T512 640t112.5 271.5T896 1024t271.5-112.5T1280 640m512 256q0 182-71 347.5t-190.5 286T1245 1721t-349 71q-182 0-348-71t-286-191t-191-286T0 896t71-348t191-286T548 71T896 0t348 71t286 191t191 286t71 348" />
-                                    </Svg>
+                                    <ProfileIcon className="h-10 w-10 text-white" />
                                 )}
                             <Text className="text-base text-white font-black">{leaderboardData[0].name}</Text>
                             <Text className="text-base text-black font-bold bg-white px-4 py-2 rounded-2xl mt-2">{leaderboardData[0].totalScoreWeekly || 0}</Text>
@@ -170,9 +167,7 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
                                     className="w-16 h-16 rounded-full border-2 border-white"
                                 />
                                 ) : (
-                                    <Svg width="40" height="40" viewBox="0 0 1792 1792">
-                                        <Path fill="black" d="M1523 1339q-22-155-87.5-257.5T1251 963q-67 74-159.5 115.5T896 1120t-195.5-41.5T541 963q-119 16-184.5 118.5T269 1339q106 150 271 237.5t356 87.5t356-87.5t271-237.5m-243-699q0-159-112.5-271.5T896 256T624.5 368.5T512 640t112.5 271.5T896 1024t271.5-112.5T1280 640m512 256q0 182-71 347.5t-190.5 286T1245 1721t-349 71q-182 0-348-71t-286-191t-191-286T0 896t71-348t191-286T548 71T896 0t348 71t286 191t191 286t71 348" />
-                                    </Svg>
+                                    <ProfileIcon className="h-10 w-10 text-white" />
                                 )}
                             <Text className="text-base text-white font-black">{leaderboardData[2].name}</Text>
                             <Text className="text-base text-black font-bold bg-white px-4 py-2 rounded-2xl mt-2">{leaderboardData[2].totalScoreWeekly || 0}</Text>
@@ -204,9 +199,7 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
                                     className="w-16 h-16 rounded-full border-2 border-white"
                                 />
                                 ) : (
-                                    <Svg width="40" height="40" viewBox="0 0 1792 1792">
-                                        <Path fill="black" d="M1523 1339q-22-155-87.5-257.5T1251 963q-67 74-159.5 115.5T896 1120t-195.5-41.5T541 963q-119 16-184.5 118.5T269 1339q106 150 271 237.5t356 87.5t356-87.5t271-237.5m-243-699q0-159-112.5-271.5T896 256T624.5 368.5T512 640t112.5 271.5T896 1024t271.5-112.5T1280 640m512 256q0 182-71 347.5t-190.5 286T1245 1721t-349 71q-182 0-348-71t-286-191t-191-286T0 896t71-348t191-286T548 71T896 0t348 71t286 191t191 286t71 348" />
-                                    </Svg>
+                                    <ProfileIcon className="h-10 w-10 text-white" />
                                 )}
                         </View>
                         <View className="flex-col gap-y-1 p-2">
@@ -233,9 +226,7 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
                                     className="w-16 h-16 rounded-full border-2 border-white"
                                 />
                                 ) : (
-                                    <Svg width="40" height="40" viewBox="0 0 1792 1792">
-                                        <Path fill="black" d="M1523 1339q-22-155-87.5-257.5T1251 963q-67 74-159.5 115.5T896 1120t-195.5-41.5T541 963q-119 16-184.5 118.5T269 1339q106 150 271 237.5t356 87.5t356-87.5t271-237.5m-243-699q0-159-112.5-271.5T896 256T624.5 368.5T512 640t112.5 271.5T896 1024t271.5-112.5T1280 640m512 256q0 182-71 347.5t-190.5 286T1245 1721t-349 71q-182 0-348-71t-286-191t-191-286T0 896t71-348t191-286T548 71T896 0t348 71t286 191t191 286t71 348" />
-                                    </Svg>
+                                    <ProfileIcon className="h-10 w-10 text-white" />
                                 )}
                         </View>
                         <View className="flex-col gap-y-1 p-2">
@@ -266,9 +257,7 @@ const Leaderboard: React.FC<Props> = ({ navigation }) => {
                                     className="w-12 h-12 rounded-full border-2 border-white"
                                 />
                                 ) : (
-                                    <Svg width="40" height="40" viewBox="0 0 1792 1792">
-                                        <Path fill="black" d="M1523 1339q-22-155-87.5-257.5T1251 963q-67 74-159.5 115.5T896 1120t-195.5-41.5T541 963q-119 16-184.5 118.5T269 1339q106 150 271 237.5t356 87.5t356-87.5t271-237.5m-243-699q0-159-112.5-271.5T896 256T624.5 368.5T512 640t112.5 271.5T896 1024t271.5-112.5T1280 640m512 256q0 182-71 347.5t-190.5 286T1245 1721t-349 71q-182 0-348-71t-286-191t-191-286T0 896t71-348t191-286T548 71T896 0t348 71t286 191t191 286t71 348" />
-                                    </Svg>
+                                    <ProfileIcon className="h-10 w-10 text-white" />
                                 )}
                             </View>
                             <View className="flex-col gap-y-1 p-2">

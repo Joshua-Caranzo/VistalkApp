@@ -23,21 +23,23 @@ const Congratulations: React.FC<CongratulationsProps> = ({ score, onRestart, onH
               <View className="bg-[#FAF9F6] rounded-t-xl w-full">
                 <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-t-xl">
                   <View className="p-10 items-center">
-                    <Text className="text-3xl font-bold text-green-500 mb-6 uppercase">Congratulations!</Text>
-                    <View className="relative items-center mb-2">
-                      <Text className="text-2xl font-semibold text-gray-600 mb-2 uppercase">Your Score</Text>
+                    <Text className="text-3xl font-black text-green-500 mb-4 uppercase">Congratulations!</Text>
+                    <View className="relative items-center mb-4">
+                      <Text className="text-2xl font-black text-gray-600 mb-2 uppercase">Your Score</Text>
                       <View className="w-[80%] border rounded-xl py-2 px-8">
                         <Text className="text-2xl font-semibold text-black">{score}</Text>
                       </View>
                     </View>
-                    <View className="pb-4 px-10">
+                    <View className="pb-4 px-10 flex-row items-center gap-x-4">
                       <TouchableOpacity onPress={onRestart}>
-                        <LinearGradient colors={['#6addd0', '#f7c188']} className="bg-blue-500 px-6 py-3 rounded-full mb-2">
+                        <LinearGradient colors={['#f7c188', '#6addd0']} start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }} className="bg-blue-500 px-6 py-3 rounded-xl">
                           <Text className="text-white text-lg font-bold">Play Again</Text>
                         </LinearGradient>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={onHome}>
-                        <LinearGradient colors={['#6addd0', '#f7c188']} className="bg-gray-600 px-6 py-3 rounded-full">
+                        <LinearGradient colors={['#f7c188', '#6addd0']} start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }} className="bg-gray-600 px-6 py-3 rounded-xl">
                           <Text className="text-white text-lg font-bold">Go Home</Text>
                         </LinearGradient>
                       </TouchableOpacity>

@@ -6,6 +6,7 @@ import { Musics } from './type';
 import { buyMusic, getBackgroundMusic, getMusic, getUserVCoin } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Sound from 'react-native-sound';
+import LinearGradient from 'react-native-linear-gradient';
 
 type FileUrl = {
   id: number;
@@ -74,42 +75,42 @@ const Music: React.FC<MusicProps> = ({ vCoin, setVcoin }) => {
       setIsPlaying(false);
     } else {
       if (sound) {
-        sound.stop(); 
-        sound.release(); 
+        sound.stop();
+        sound.release();
       }
-  
+
       const newSound = new Sound(fileUrl, '', (error: Error | null) => {
         if (error) {
           console.error('Failed to load sound', error);
           return;
         }
-  
-        newSound.setVolume(1.0); 
+
+        newSound.setVolume(1.0);
         newSound.play(() => {
           setIsPlaying(false);
-          setCurrentTrack(null); 
-          newSound.release(); 
+          setCurrentTrack(null);
+          newSound.release();
         });
       });
-  
-      setSound(newSound); 
-      setIsPlaying(true); 
-      setCurrentTrack(trackId); 
+
+      setSound(newSound);
+      setIsPlaying(true);
+      setCurrentTrack(trackId);
     }
   };
 
   const handleOpenModal = (music: Musics) => {
     setSelectedMusic(music);
-    setQuantity(1); 
-    setTotalPrice(music.vcoinPrice); 
+    setQuantity(1);
+    setTotalPrice(music.vcoinPrice);
     setModalVisible(true);
   };
 
   const handleBuy = async () => {
     if (selectedMusic && quantity > 0 && totalPrice <= vCoin) {
       const userID = await AsyncStorage.getItem('userID');
-      if(userID)
-        buyMusic(userID ,selectedMusic.itemID, quantity).then(() => {
+      if (userID)
+        buyMusic(userID, selectedMusic.itemID, quantity).then(() => {
           setVcoin(prev => prev - totalPrice);
           setModalVisible(false);
         });
@@ -123,15 +124,15 @@ const Music: React.FC<MusicProps> = ({ vCoin, setVcoin }) => {
   if (error) {
     return <Text>{error}</Text>;
   }
-  
+
 
   return (
     <View className="flex flex-row gap-12 items-center p-[65px] mb-24">
-        {fileUrls.length > 0 && (
-          music.map((m, index) => (
+      {fileUrls.length > 0 && (
+        music.map((m, index) => (
           <View className="items-center">
-          <Image source={require('../assets/Disk.png')} className="w-56 h-56 mb-2" />
-            <View className="items-center" key={index}>
+            <View className="items-center mb-4" key={index}>
+            <Image source={require('../assets/Disk.png')} className="w-56 h-56" />
               <TouchableOpacity onPress={() => toggleSound(fileUrls[index].url, m.itemID)}>
                 {isPlaying && currentTrack === m.itemID ? (
                   <PauseIcon className="w-8 h-8 text-black bg-white p-4 rounded-full mb-2" />
@@ -139,50 +140,64 @@ const Music: React.FC<MusicProps> = ({ vCoin, setVcoin }) => {
                   <PlayIcon className="w-8 h-8 text-black bg-white p-4 rounded-full mb-2" />
                 )}
               </TouchableOpacity>
-              <Text className="text-2xl text-white font-bold mb-2">{m.musicTitle}</Text>
-              <Text className="text-lg text-white font-light mb-6">{m.musicGenre}</Text>
-              <View className="flex flex-row gap-4">
-                <TouchableOpacity className={`bg-white rounded-md py-2 px-3 ${m.isAlreadyBought == 1 ? 'opacity-50' : ''}`} onPress ={() => handleOpenModal(m)} disabled={m.isAlreadyBought == 1}>
-                  <View className="flex flex-row gap-2" >
-                    <Image source={require('../assets/Vcoin.png')} className="w-6 h-6" />
-                    <Text className="text-base font-bold text-black">{m.vcoinPrice}</Text>
+              <Text className="text-2xl text-white font-black mb-2">{m.musicTitle}</Text>
+              {/* <Text className="text-lg text-white font-light mb-6">{m.musicGenre}</Text> */}
+            </View>
+            <View className="flex flex-row gap-4">
+              <TouchableOpacity className={`${m.isAlreadyBought == 1 ? 'opacity-50' : ''}`} onPress={() => handleOpenModal(m)} disabled={m.isAlreadyBought == 1}>
+                <LinearGradient colors={['#F8F6F4', '#8399A2']} className="rounded-xl py-3 px-4">
+                  <View className="flex flex-row gap-2">
+                    <Image
+                      source={require('../assets/Vcoin.png')}
+                      className="w-6 h-6"
+                    />
+                    <Text className="text-lg font-black text-white">{m.vcoinPrice}</Text>
                   </View>
-                </TouchableOpacity>
-              </View>
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
           </View>
-          ))
-        )}
-        {selectedMusic && (
-          <Modal visible={modalVisible}
+        ))
+      )}
+      {selectedMusic && (
+        <Modal visible={modalVisible}
           transparent={true}
           onRequestClose={() => setModalVisible(false)}>
-            <View className="flex items-center justify-center flex-1 bg-[#00000080]">
-            <View className="bg-white items-center p-6 rounded-lg w-[80%]">
-              <Text className="text-xl text-black font-bold mb-4">Buy {selectedMusic.musicTitle}</Text>
-              <Text className="text-lg mb-4 text-black">Price: {totalPrice} vCoins</Text>
-              <Text className="text-sm mb-4 text-black">Your vCoins: {vCoin}</Text>
+          <View className="flex items-center justify-center flex-1 bg-[#00000080]">
+            <View className="bg-white items-center p-6 rounded-2xl w-[80%]">
+              <Text className="text-xl text-black font-black mb-4">Buy {selectedMusic.musicTitle}</Text>
+              <View className="flex-row items-center gap-x-2 mb-4">
+                <Text className="text-lg text-black font-bold">Price:</Text>
+                <Text className="text-lg text-black">{totalPrice} vCoins</Text>
+              </View>
 
               <View className="flex-row gap-2 items-center">
                 <TouchableOpacity
-                  className={`bg-gray-400 rounded-md py-2 px-3 ${quantity === 0 || totalPrice > vCoin ? 'opacity-50' : ''}`}
+                  className={`${quantity === 0 || totalPrice > vCoin ? 'opacity-50' : ''}`}
                   onPress={handleBuy}
                   disabled={quantity === 0 || totalPrice > vCoin}
                 >
-                  <Text className="text-black text-center">Buy</Text>
+                  <LinearGradient
+                    className="py-2 px-5 rounded-xl items-center" colors={['#F8F6F4', '#8399A2']}>
+                    <Text className="text-base font-bold text-white">Buy</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className="mt-4 bg-gray-400 rounded-md py-2 px-3"
                   onPress={() => setModalVisible(false)}
                 >
-                  <Text className="text-center text-black">Cancel</Text>
+                  <LinearGradient
+                    className="py-2 px-3 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base font-bold text-white">Cancel</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </Modal>
-        )}
+      )}
     </View>
   );
 };

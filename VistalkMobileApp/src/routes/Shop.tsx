@@ -76,14 +76,14 @@ const Shop: React.FC<Props> = ({ route }) => {
 
   return (
     <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
-      <TouchableOpacity className="absolute top-0 right-0 mr-4 mt-4 bg-white rounded-md py-2 px-3">
+      <View className="absolute top-0 right-0 mr-4 mt-4 bg-white rounded-xl py-2 px-3">
         <View className="flex flex-row gap-2">
           <Image source={require('../assets/Vcoin.png')} className="w-6 h-6" />
-          <Text className="text-base font-bold text-black">{vCoin}</Text>
+          <Text className="text-base font-black text-black">{vCoin}</Text>
         </View>
-      </TouchableOpacity>
+      </View>
       <View className="items-center mt-20 mb-3">
-        <Text className="text-4xl font-bold text-white">Shop</Text>
+        <Text className="text-4xl font-black text-white">Shop</Text>
       </View>
       <View>
         <View className="flex flex-row gap-x-2 items-center flex-wrap w-full">
