@@ -3,7 +3,8 @@
     import Piechart from "$lib/components/Piechart.svelte";
     import { onMount } from "svelte";
     import type { LeaderBoardDto, SalesDto, StatusDto, UserLanguage } from "./types";
-    import { getLeaderBoards, getStatusVista, getSubscriptionData, getTotalSales, getUserLanguage, salesReport, salesReportCoinBags, salesReportSusbcription } from "./repo";
+    import { getLeaderBoards, getRatingData, getStatusVista, getSubscriptionData, getTotalSales, getUserLanguage, salesReport, salesReportCoinBags, salesReportSusbcription } from "./repo";
+    import LineChartRating from "$lib/components/LineChartRating.svelte";
 
     let leaderboardData: LeaderBoardDto[] = [];
     let inActiveData: StatusDto | undefined;
@@ -12,6 +13,7 @@
     let languageUsageData: { name: string; y: number }[] = [];
     const subscriptionCategories = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const subscriptionData: { name: string; data: number[] }[] = [];
+    const ratingData: { name: string; data: number[] }[] = [];
     let totalAmountPaid: number = 0;
     let granularOptions = ["Daily", "Weekly", "Monthly", "Yearly", "All Time"];
     let selectedGranular = granularOptions[0];
@@ -25,6 +27,8 @@
     let selectedTableGranular = granularOptions[0];
     let isOpen = false;
     let totalSales:SalesDto[]=[];
+    const ratingCategories = ['1', '2', '3', '4', '5'];
+
 
     onMount(loadData);
 
@@ -60,6 +64,25 @@
             }
             typeEntry.data[monthIndex] = row.subscriptionCount || 0;
         });
+
+        const ratingResults = await getRatingData();
+        ratingData.length = 0;
+
+        const vistasCount = Array(5).fill(0); 
+
+            ratingResults.data.forEach(row => {
+                const ratingValue =  Number(row.type); 
+                const count = row.ratingCount || 0; 
+
+                if (ratingValue >= 1 && ratingValue <= 5) {
+                    vistasCount[ratingValue - 1] += count; 
+                }
+            });
+
+            ratingData.push({
+                name: 'Number of Vistas',
+                data: vistasCount 
+            });
 
         const totalPaidResult = await salesReport(selectedGranular);
         totalAmountPaid = totalPaidResult.data;
@@ -119,6 +142,16 @@
                     categories={subscriptionCategories} 
                     seriesData={subscriptionData}
                 />
+                {/if}
+            </div>
+
+            <div class="bg-white rounded-lg p-4 shadow-lg mt-6">
+                {#if ratingData.length > 0 && ratingCategories.length > 0}
+                    <LineChartRating 
+                        chartTitle="Ratings" 
+                        categories={ratingCategories} 
+                        seriesData={ratingData}
+                    />
                 {/if}
             </div>
         </div>

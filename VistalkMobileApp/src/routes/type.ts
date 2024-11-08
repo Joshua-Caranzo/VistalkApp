@@ -136,6 +136,7 @@ export type SectionDetails = {
     description: string;
     unitCount:number;
     completedUnitCount:number;
+    isAccessible:boolean;
 };
 
 export type UnitDetails = {
@@ -146,7 +147,8 @@ export type UnitDetails = {
     totalItems:number;
     totalScore:number;
     totalCorrect:number;
-    totalWrong:number
+    totalWrong:number;
+    isLocked:number;
 };
 
 export type QuestionDetails = {

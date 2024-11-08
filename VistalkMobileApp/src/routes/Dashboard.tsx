@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, ImageBackground, TouchableOpacity, Image, ScrollView, Modal, BackHandler } from 'react-native';
 import Menu from '../components/Menu';
@@ -126,7 +126,6 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   };
 
   const closeNotification = async () => {
-    console.log(userId)
     await updateNotifications(userId);
     setNotificationVisible(false);
     fetchUserData();
@@ -136,6 +135,17 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
     await claimReward(userId, taskId);
     fetchUserData();
   }
+
+  const getTextSizeClass = (title: string) => {
+    const length = title.length;
+    if (length > 50) {
+      return 'text-sm';
+    } else if (length > 30) {
+      return 'text-lg';
+    } else {
+      return 'text-3xl';
+    }
+  };
 
   const circleSize = 100;
 
@@ -197,52 +207,63 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
             <View
               className="flex-row items-center justify-between rounded-2xl py-4 px-8"
               style={{
-                backgroundColor: index % 2 === 0 ? '#6addd0' : '#f7c188', // Alternate colors
-                shadowColor: '#000', // Shadow color
-                shadowOffset: { width: 0, height: 4 }, // Offset for the shadow
-                shadowOpacity: 0.3, // Opacity of the shadow
-                shadowRadius: 5, // Radius of the shadow
-                elevation: 6, // For Android shadow
+                backgroundColor: section.isAccessible ? (index % 2 === 0 ? '#6addd0' : '#f7c188') : '#A9A9A9', // Darker background if not accessible
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 5,
+                elevation: 6,
               }}
             >
-              <View className="flex-col gap-y-2">
-                <Text className="text-lg text-white font-bold">Section {section.sectionNumber}</Text>
-                <Text className="text-3xl text-white font-black">{section.unitCount} Units</Text>
-                <TouchableOpacity onPress={() => openModal(section)}>
-                  <View className="bg-white rounded-2xl mt-2 px-10 py-2">
-                    <Text className="text-lg text-black font-bold">Play</Text>
+              <View className="flex-col gap-y-2 max-w-[70%]">
+                <Text className="text-lg text-white font-bold">
+                  Section {section.sectionNumber}
+                </Text>
+                <Text
+                  className={`font-black text-white ${getTextSizeClass(section.title)} truncate`}
+                >
+                  {section.title}
+                </Text>
+                {!section.isAccessible && (
+                  <Text className="text-red-500 font-bold">Locked</Text> // Indicate that the section is locked
+                )}
+                <TouchableOpacity onPress={() => openModal(section)} disabled={!section.isAccessible}>
+                  <View className={`rounded-2xl mt-2 w-32 px-10 py-2 ${section.isAccessible ? 'bg-white' : 'bg-gray-300'}`}>
+                    <Text className={`text-lg ${section.isAccessible ? 'text-black' : 'text-gray-500'} font-bold text-center`}>
+                      {section.isAccessible ? 'Play' : 'Locked'}
+                    </Text>
                   </View>
                 </TouchableOpacity>
               </View>
-              <View className="justify-center items-center" style={{ width: circleSize, height: circleSize }}>
+              <View className="flex justify-center items-center w-[20%]" style={{ height: circleSize }}>
                 <Svg width={circleSize} height={circleSize}>
-                  {/* Background Circle with semi-transparent fill */}
                   <Circle
                     cx={circleSize / 2}
                     cy={circleSize / 2}
-                    r={(circleSize / 2) - 5} // Radius reduced for stroke
+                    r={(circleSize / 2) - 5}
                     stroke="#AEAEAE"
                     strokeWidth="5"
-                    fill="rgba(0, 0, 0, 0.1)" // Semi-transparent fill
+                    fill="rgba(0, 0, 0, 0.1)"
                   />
-                  {/* Progress Circle */}
                   <Circle
                     cx={circleSize / 2}
                     cy={circleSize / 2}
                     r={(circleSize / 2) - 5}
                     stroke="#ffffff"
                     strokeWidth="6"
-                    fill="none" // No fill for the progress circle
-                    strokeDasharray={`${(section.completedUnitCount / 100) * 2 * Math.PI * ((circleSize / 2) - 5)} ${2 * Math.PI * ((circleSize / 2) - 5) - (section.completedUnitCount / 100) * 2 * Math.PI * ((circleSize / 2) - 5)}`}
+                    fill="none"
+                    strokeDasharray={`${((Math.round((section.completedUnitCount / section.unitCount) * 100)) / 100) * 2 * Math.PI * ((circleSize / 2) - 5)} ${2 * Math.PI * ((circleSize / 2) - 5) - ((Math.round((section.completedUnitCount / section.unitCount) * 100)) / 100) * 2 * Math.PI * ((circleSize / 2) - 5)}`}
                     strokeDashoffset={(Math.PI / 2) * ((circleSize / 2) - 5)}
                   />
                 </Svg>
-                {/* Percentage Text */}
-                <Text className="text-2xl text-white font-black absolute">{section.completedUnitCount}%</Text>
+                <Text className="text-2xl text-white font-black absolute">
+                  {Math.round((section.completedUnitCount / section.unitCount) * 100) || 0}%
+                </Text>
               </View>
             </View>
           </View>
         ))}
+
       </ScrollView>
 
 
