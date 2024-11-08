@@ -31,7 +31,6 @@ const AllTimeLeaderboard: React.FC<Props> = ({ navigation }) => {
                     const result = await getLeaderBoardsAllTime();
                     const top10Data = result.data.slice(0, 10);
                     setLeaderBoardData(top10Data);
-                    console.log(top10Data)
                     top10Data.forEach((user, index) => {
                         if (user.imagePath) {
                             const userImageUrl = getUserImageUrl(user.imagePath);

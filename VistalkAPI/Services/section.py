@@ -1,4 +1,4 @@
-# user.py
+
 from flask import request, jsonify
 from db import get_db_connection
 
@@ -128,34 +128,55 @@ def save_units():
     description = data.get('description')
     sectionID = data.get('sectionID')
 
+    
     if not unitNumber or not title or not description:
-         return jsonify({
+        return jsonify({
             'isSuccess': False,
             'message': 'Saving Unit Failed',
             'data': None,
             'data2': None,
             'totalCount': None
         }), 200
-    conn = None
-    cursor = None
+        
     conn = get_db_connection()
     cursor = conn.cursor()
-    if(unitID == 0 or unitID is None):
+
+        
+    if unitID == 0 or unitID is None:
         query = """
-        INSERT INTO unit (unitNumber, title, description, sectionID, totalItems)
-        VALUES (%s, %s, %s, %s, %s)
-        """
+            INSERT INTO unit (unitNumber, title, description, sectionID, totalItems)
+            VALUES (%s, %s, %s, %s, %s)
+            RETURNING unitID
+            """
         values = (unitNumber, title, description, sectionID, 0)
+        cursor.execute(query, values)
+        unitID = cursor.fetchone()[0]  
+
+            
+        queryUsers = "SELECT userPlayerId FROM Vista"
+        cursor.execute(queryUsers)
+        users = cursor.fetchall()
+        isLocked = True if unitNumber > 1 else False
+  
+        for user in users:
+            userPlayerId = user[0]
+            userUnitQuery = """
+                    INSERT INTO userunit (userPlayerId, unitId, totalCorrectAnswers, totalScore, isLocked)
+                    VALUES (%s, %s, %s, %s, %s)
+                """
+            userUnitValues = (userPlayerId, unitID, 0, 0, isLocked)             
+            cursor.execute(userUnitQuery, userUnitValues)
     else:
+            
         query = """
-        UPDATE unit SET unitNumber = %s, title = %s, description = %s WHERE unitID = %s
-        """
+            UPDATE unit SET unitNumber = %s, title = %s, description = %s WHERE unitID = %s
+            """
         values = (unitNumber, title, description, unitID)
+        cursor.execute(query, values)
 
-    cursor.execute(query, values)
+        
     conn.commit()
-
-    return jsonify({'isSuccess': True,"message": "Unit saved successfully"}), 201
+    return jsonify({'isSuccess': True, "message": "Unit saved successfully"}), 200
 
 def get_Units():
     sectionID = request.args.get('sectionID')

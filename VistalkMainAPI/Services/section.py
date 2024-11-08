@@ -1,4 +1,4 @@
-# user.py
+
 from db import get_db_connection, QuestionFiles
 from flask import request, jsonify, send_from_directory
 
@@ -8,6 +8,16 @@ def get_Sections():
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
+
+    
+    query_subscriber = """
+        SELECT isPremium 
+        FROM vista 
+        WHERE userPlayerID = %s
+    """
+    cursor.execute(query_subscriber, (userID,))
+    subscriber_result = cursor.fetchone()
+    is_subscriber = subscriber_result['isPremium'] if subscriber_result else False
     query = """SELECT 
                     s.*, 
                     COUNT(DISTINCT u.unitId) AS unitCount,
@@ -26,11 +36,21 @@ def get_Sections():
                     AND s.isActive = true
                 GROUP BY 
                     s.sectionId"""
-    values = (userID,langID)
+    values = (userID, langID)
     cursor.execute(query, values)
     sections = cursor.fetchall()
+
     for section in sections:
         section['isPremium'] = bool(section['isPremium'])
+        
+        if is_subscriber and section['isPremium']:
+            section['isAccessible'] = True
+        elif not is_subscriber and section['isPremium']:
+            section['isAccessible'] = False
+        else:
+            section['isAccessible'] = True
+
+              
     if not sections:
         return jsonify({
             'isSuccess': True,
@@ -39,14 +59,15 @@ def get_Sections():
             'data2': None,
             'totalCount': 0
         }), 200
-    return jsonify({
-                'isSuccess': True,
-                'message': 'Successfully Retrieved',
-                'data': sections,
-                'data2': None,
-                'totalCount': None 
-            }), 200
 
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': sections,
+        'data2': None,
+        'totalCount': len(sections)  
+    }), 200
+    
 def get_Units():
     sectionID = request.args.get('sectionId')
     userId = request.args.get('userId')
@@ -61,41 +82,22 @@ def get_Units():
     mainUnits = cursor.fetchall()
 
     query_user = """
-          SELECT 
-                u.*, 
-                uu.totalCorrectAnswers AS totalCorrect, 
-                CASE 
-                    WHEN uu.totalScore = 0 THEN 0 
-                    ELSE u.totalItems - uu.totalCorrectAnswers 
-                END AS totalWrong, 
-                uu.totalScore,
-                CASE 
-                    WHEN prev_uu.totalScore IS NULL OR prev_uu.totalScore = 0 THEN TRUE 
-                    ELSE FALSE 
-                END AS isLock
-            FROM 
-                unit u
-            INNER JOIN 
-                userUnit uu ON uu.unitID = u.unitID
-            LEFT JOIN (
-                SELECT 
-                    prev_u.unitNumber,
-                    prev_u.sectionID,
-                    prev_uu.userPlayerID,
-                    prev_uu.totalScore
-                FROM 
-                    unit prev_u
-                INNER JOIN 
-                    userUnit prev_uu ON prev_uu.unitID = prev_u.unitID
-            ) prev_uu ON prev_uu.unitNumber = u.unitNumber - 1 
-                    AND prev_uu.sectionID = u.sectionID 
-                    AND prev_uu.userPlayerID = uu.userPlayerID
-            WHERE 
-                u.sectionID = %s 
-                AND u.isActive = true 
-                AND uu.userPlayerID = %s
-            ORDER BY 
-                u.unitNumber;
+        SELECT 
+            u.*, 
+            uu.totalCorrectAnswers AS totalCorrect, 
+            u.totalItems - uu.totalCorrectAnswers AS totalWrong, 
+            uu.totalScore, 
+            uu.isLocked 
+        FROM 
+            unit u
+        INNER JOIN 
+            userUnit uu ON uu.unitID = u.unitID
+        WHERE 
+            u.sectionID = %s 
+            AND u.isActive = true 
+            AND uu.userPlayerID = %s
+        ORDER BY 
+            u.unitNumber;
     """
     cursor.execute(query_user, (sectionID, userId))
     userUnits = cursor.fetchall()
@@ -122,7 +124,7 @@ def get_Units():
         'message': 'Successfully Retrieved',
         'data': userUnits,
         'data2': [],
-        'totalCount': 1
+        'totalCount': len(userUnits)
     }), 200
 
 def update_user_unit(mainUnits, userId):
@@ -140,12 +142,13 @@ def update_user_unit(mainUnits, userId):
         exists = cursor.fetchone()[0]
         if exists == 0:
             query_insert = """
-                INSERT INTO userUnit (userPlayerID, unitID, totalCorrectAnswers, totalScore) 
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO userUnit (userPlayerID, unitID, totalCorrectAnswers, totalScore, isLocked) 
+                VALUES (%s, %s, %s, %s, %s)
             """
-            cursor.execute(query_insert, (userId, unitId, 0, 0))
+            cursor.execute(query_insert, (userId, unitId, 0, 0, True))  
 
     conn.commit()
+
 
 def getUnitQuestions():
     unitId = request.args.get('unitId')
