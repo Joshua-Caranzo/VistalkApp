@@ -14,6 +14,7 @@ import LeaderboardIcon from '../assets/svg/LeaderboardIcon';
 import DailyTaskIcon from '../assets/svg/DailyTaskIcon';
 import NotificationIcon from '../assets/svg/NotificationIcon';
 import ProfileIcon from '../assets/svg/ProfileIcon';
+import LockIcon from '../assets/svg/LockIcon';
 
 type Props = StackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -224,16 +225,20 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                 >
                   {section.title}
                 </Text>
-                {!section.isAccessible && (
+                {/*  {!section.isAccessible && (
                   <Text className="text-red-500 font-bold">Locked</Text> // Indicate that the section is locked
-                )}
+                )} */}
                 <TouchableOpacity onPress={() => openModal(section)} disabled={!section.isAccessible}>
-                  <View className={`rounded-2xl mt-2 w-32 px-10 py-2 ${section.isAccessible ? 'bg-white' : 'bg-gray-300'}`}>
-                    <Text className={`text-lg ${section.isAccessible ? 'text-black' : 'text-gray-500'} font-bold text-center`}>
+                  <View className={`rounded-2xl mt-2 w-36 px-10 py-2 items-center justify-center flex-row ${section.isAccessible ? 'bg-white' : 'bg-gray-300'}`}>
+                    {!section.isAccessible && (
+                      <LockIcon className="text-gray-500 h-4 w-4" />
+                    )}
+                    <Text className={`text-lg ${section.isAccessible ? 'text-black' : 'text-gray-500'} font-bold`}>
                       {section.isAccessible ? 'Play' : 'Locked'}
                     </Text>
                   </View>
                 </TouchableOpacity>
+
               </View>
               <View className="flex justify-center items-center w-[20%]" style={{ height: circleSize }}>
                 <Svg width={circleSize} height={circleSize}>
@@ -324,8 +329,8 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                   {dailyTasks.length > 0 ? (
                     dailyTasks.map((task) => (
                       <LinearGradient colors={['#f7c188', '#6addd0']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }} key={task.taskID} className="flex-row items-center mb-4 py-3 px-4 justify-between rounded-xl">
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }} key={task.taskID} className="flex-row items-center mb-4 py-3 px-4 justify-between rounded-xl">
                         <View className="flex-row items-center">
                           <TouchableOpacity className="mr-4" disabled>
                             <View className="w-4 h-4 bg-gray-100 rounded-md justify-center items-center">

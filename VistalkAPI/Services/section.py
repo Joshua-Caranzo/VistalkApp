@@ -146,11 +146,10 @@ def save_units():
         query = """
             INSERT INTO unit (unitNumber, title, description, sectionID, totalItems)
             VALUES (%s, %s, %s, %s, %s)
-            RETURNING unitID
             """
         values = (unitNumber, title, description, sectionID, 0)
         cursor.execute(query, values)
-        unitID = cursor.fetchone()[0]  
+        unitID = cursor.lastrowid  
 
             
         queryUsers = "SELECT userPlayerId FROM Vista"
