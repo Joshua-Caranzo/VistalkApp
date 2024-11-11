@@ -30,14 +30,17 @@
 
 {#if $loggedInUser}
     <aside class="sidebar {isExpanded ? 'expanded' : 'collapsed'}">
-        <div class="sidebar-content bg-gradient-to-b from-[#6addd0] to-[#f7c188]">
+        <div
+            class="sidebar-content bg-gradient-to-b from-[#6addd0] to-[#f7c188]"
+        >
             <div class="sidebar-header">
                 <div class="flex items-justify justify-center">
                     <img src="FinalLogo.png" alt="Logo" class="sidebar-logo" />
 
                     {#if isExpanded}
                         <span
-                            class="text-3xl text-center font-bold mt-3 ml-3" style = "color: #ffffff; font-family: 'Dancing Script', cursive;"
+                            class="text-3xl text-center font-bold mt-3 ml-3"
+                            style="color: #ffffff; font-family: 'Dancing Script', cursive;"
                             >Vistalk</span
                         >
                     {/if}
@@ -116,8 +119,8 @@
                     class="nav-link {activePage === '/section' ? 'active' : ''}"
                     on:click={() => goto("/section")}
                 >
-                <i class="fas fa-folder"></i>
-                {#if isExpanded}
+                    <i class="fas fa-folder"></i>
+                    {#if isExpanded}
                         <span class="nav-text">Section</span>
                     {/if}
                 </a>
@@ -164,6 +167,16 @@
                         <span class="nav-text">Reports</span>
                     {/if}
                 </a>
+
+                <a
+                    class="nav-link {activePage === '/userRecording' ? 'active' : ''}"
+                    on:click={() => goto("/userRecording")}
+                >
+                    <i class="fas fa-microphone"></i>
+                    {#if isExpanded}
+                        <span class="nav-text">Recordings</span>
+                    {/if}
+                </a>
             </nav>
 
             <button
@@ -172,7 +185,10 @@
             >
                 <i class="fas fa-sign-out-alt text-black"></i>
                 {#if isExpanded}
-                    <span class="text-black transition duration-300 ease-in-out group-hover:text-transparent bg-gradient-to-r from-[#99BC85] to-[#f7c188] bg-clip-text ml-4">Log Out</span>
+                    <span
+                        class="text-black transition duration-300 ease-in-out group-hover:text-transparent bg-gradient-to-r from-[#99BC85] to-[#f7c188] bg-clip-text ml-4"
+                        >Log Out</span
+                    >
                 {/if}
             </button>
         </div>
@@ -225,14 +241,16 @@
     }
 
     .toggle-button {
-        background-color: rgba(247, 193, 136, 0.7); 
+        background-color: rgba(247, 193, 136, 0.7);
         border: none;
         color: rgba(255, 255, 255, 0.7);
         font-size: 1.5em;
         cursor: pointer;
-        transition: color 0.3s ease, background-color 0.3s ease; 
+        transition:
+            color 0.3s ease,
+            background-color 0.3s ease;
         position: absolute;
-        right: -15px; 
+        right: -15px;
         top: 7%;
         transform: translateY(-50%);
         display: flex;
@@ -242,9 +260,7 @@
         height: 30px;
         border-radius: 50%;
         z-index: 9999;
-        
     }
-
 
     .toggle-button:hover {
         color: #e0e0e0;
@@ -284,7 +300,7 @@
     }
 
     .nav-link:hover {
-        background-color: rgba(255,255,255,0.1);
+        background-color: rgba(255, 255, 255, 0.1);
     }
 
     .logout-button {
@@ -313,7 +329,7 @@
     }
 
     .nav-link.active {
-        background-color: rgba(255,255,255,0.2);
+        background-color: rgba(255, 255, 255, 0.2);
     }
 
     .sidebar-logo {

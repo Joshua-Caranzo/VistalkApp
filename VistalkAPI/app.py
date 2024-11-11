@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from Services import user, section, content, question, shop, emailService, feedback, report, dailytask,dashboard
+from Services import user, section, content, question, shop, emailService, feedback, report, dailytask,dashboard, recording
 import db
 from functools import wraps
 import jwt
@@ -44,7 +44,6 @@ def getSections():
     return section.get_Sections()
 
 @app.route('/getLanguages', methods=['GET'])
-@token_required
 def getLanguages():
     return section.get_Language()
 
@@ -69,9 +68,12 @@ def saveContent():
     return content.save_content()
 
 @app.route('/getContents', methods=['GET'])
-@token_required
 def getcontent():
     return content.get_Contents()
+
+@app.route('/getContentsAll', methods=['GET'])
+def get_Contents_All():
+    return content.get_Contents_All()
 
 @app.route('/getContentById', methods=['GET'])
 @token_required
@@ -314,9 +316,30 @@ def getTotalSales():
 def getPowerUps():
     return dailytask.get_powerUps()
 
+
 @app.route('/getUserRatings', methods=['GET'])
 def userRatings():
     return dashboard.userRatings()
+
+@app.route('/saveAudio', methods=['POST'])
+def saveAudioContent():
+    return recording.save_content()
+
+@app.route('/getRecordingContents', methods=['GET'])
+def getRecordingContents():
+    return recording.get_contents()
+
+@app.route('/getRecordingByFileName', methods=['GET'])
+def getRecordingByFileName():
+    return recording.getRecordingByFileName()
+
+@app.route('/acceptRecording', methods=['PUT'])
+def acceptRecording():
+    return recording.acceptRecording()
+
+@app.route('/rejectRecording', methods=['PUT'])
+def rejectRecording():
+    return recording.rejectRecording()
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

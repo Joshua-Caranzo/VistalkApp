@@ -104,7 +104,6 @@ def get_report():
 
 def reportResponded():
     reportID = int(request.args.get('reportID')) 
-    print(reportID)
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     query = """
