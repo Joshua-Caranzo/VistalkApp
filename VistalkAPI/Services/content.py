@@ -1,4 +1,4 @@
-# user.py
+
 from flask import request, jsonify, send_from_directory
 import os
 from db import get_db_connection, PronunciationDirectory, SyllableDirectory
@@ -131,7 +131,7 @@ def save_content():
             conn.commit()
             content_id = cursor.lastrowid
 
-            # Insert syllables
+            
             for syllable in syllables_data:
                 sql_syllable = """
                     INSERT INTO contentsyllable (contentId, syllableText, audioPath, orderNumber)
@@ -145,7 +145,7 @@ def save_content():
                 ))
                 conn.commit()
 
-            # Insert definitions
+            
             for definition in definitions_data:
                 sql_definition = """
                     INSERT INTO contentDefinition (contentId, nativeDefinition, englishDefinition, orderNumber)
@@ -159,7 +159,7 @@ def save_content():
                 ))
                 conn.commit()
 
-            # Insert examples
+            
             for example in examples_data:
                 sql_example = """
                     INSERT INTO contentExample (contentId, nativeExample, englishExample, orderNumber)
@@ -192,7 +192,7 @@ def save_content():
             
             conn.commit()
 
-            # Handle syllables: delete missing, update existing, add new
+            
             existing_syllables = {syllable['id'] for syllable in syllables_data}
             cursor.execute("SELECT * FROM contentsyllable WHERE contentId = %s", (content_id,))
             print(existing_syllables)
@@ -237,7 +237,7 @@ def save_content():
 
             conn.commit()
            
-            # Handle definitions: delete missing, update existing, add new
+            
             existing_definitions = {definition['id'] for definition in definitions_data}
             cursor.execute("SELECT * FROM contentDefinition WHERE contentId = %s", (content_id,))
 
@@ -279,7 +279,7 @@ def save_content():
 
             conn.commit()
 
-            # Handle examples: delete missing, update existing, add new
+            
             existing_examples = {example['id'] for example in examples_data}
             cursor.execute("SELECT * FROM contentExample WHERE contentId = %s", (content_id,))
 
@@ -340,7 +340,6 @@ def get_Contents():
     contentTypeId = request.args.get('contentTypeID')
     searchString = request.args.get('searchString')
     pageNo = int(request.args.get('pageNo', 1))
-    print(pageNo)
     pageSize = 10
     offset = (pageNo - 1) * pageSize
     conn = get_db_connection()
@@ -351,12 +350,12 @@ def get_Contents():
     values = [langID,]
 
     if searchString:
-        query += "AND (contentText LIKE %s OR englishTranslation LIKE %s)"
+        query += " AND (contentText LIKE %s OR englishTranslation LIKE %s)"
         likePattern = f"%{searchString}%"
         values.extend([likePattern, likePattern])
     
     if contentTypeId:
-        query += "AND (contentTypeId = %s)"
+        query += " AND (contentTypeId = %s)"
         values.extend([contentTypeId])
 
     query += """
@@ -364,10 +363,9 @@ def get_Contents():
         LIMIT %s OFFSET %s
     """
     values.extend([pageSize, offset])
-
     cursor.execute(query, tuple(values))
     contents = cursor.fetchall()
-    count_query = "SELECT COUNT(*) as total FROM content WHERE languageID = %s"
+    count_query = "SELECT COUNT(*) as total FROM content where languageID = %s and isActive = true"
     countvalues = [langID]
     if searchString:
         count_query += " AND (contentText LIKE %s OR englishTranslation LIKE %s)"
@@ -375,12 +373,11 @@ def get_Contents():
         countvalues.extend([likePattern, likePattern])
 
     if contentTypeId:
-        count_query += "AND (contentTypeId = %s)"
+        count_query += " AND (contentTypeId = %s)"
         countvalues.extend([contentTypeId])
 
     cursor.execute(count_query, tuple(countvalues))
     total_count = cursor.fetchone()['total']
-
     if not contents:
         return jsonify({
             'isSuccess': True,
@@ -396,6 +393,50 @@ def get_Contents():
                 'data2': None,
                 'totalCount': total_count
             }), 200
+
+def get_Contents_All():
+    langID = request.args.get('languageID')
+    contentTypeId = 1 
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    
+    query = """
+        SELECT * FROM content
+        WHERE languageID = %s AND contentTypeId = %s AND isActive = true
+        ORDER BY contentText
+    """
+    values = [langID, contentTypeId]
+
+    
+    cursor.execute(query, tuple(values))
+    contents = cursor.fetchall()
+    
+    
+    count_query = """
+        SELECT COUNT(*) as total FROM content
+        WHERE languageID = %s AND contentTypeId = %s AND isActive = true
+    """
+    cursor.execute(count_query, tuple(values))
+    total_count = cursor.fetchone()['total']
+
+    if not contents:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No contents found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+    
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': contents,
+        'data2': None,
+        'totalCount': total_count
+    }), 200
 
 
 def getContentById():

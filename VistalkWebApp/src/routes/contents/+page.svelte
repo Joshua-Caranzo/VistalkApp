@@ -59,7 +59,6 @@
         isloading = true;
         contentListCallResult = await getContents(currentValue, currentType, searchString, pageNo);
         contents = contentListCallResult.data;
-        
         for (const c of contents) {
             if (c.audioPath && c.audioPath.toLowerCase().endsWith('.wav')) {
                     const file = await getFileByFileName(c.audioPath,false);
@@ -290,7 +289,7 @@
         <tbody class="text-center text-sm ">
             {#if isloading}
             <Loader isVisible={isloading} message= {"Loading..."} colspan = {4}></Loader> 
-            {:else if contents && contents.length > 2}
+            {:else if contents && contents.length >= 1}
                 {#each contents as c}
                     <tr class="border-t-2 mx-4">
                         <td class="py-3 px-4">{c.contentText}</td>
