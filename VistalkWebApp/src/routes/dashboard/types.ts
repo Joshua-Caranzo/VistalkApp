@@ -25,6 +25,13 @@ export type SubscriptionDto =
     subscriptionCount:number;
 }
 
+export type RatingDto = 
+{
+    type:string;
+    month: number;
+    ratingCount:number;
+}
+
 export type SalesDto = 
 {
     transactionID:number;

@@ -12,6 +12,7 @@ import SettingIcon from '../assets/svg/SettingIcon';
 import Loader from '../components/Loader';
 import { LineChart } from 'react-native-chart-kit';
 import EditIcon from '../assets/svg/EditIcon';
+import ProfileIcon from '../assets/svg/ProfileIcon';
 
 type Props = StackScreenProps<RootStackParamList, 'UserProfile'>;
 const screenWidth = Dimensions.get('window').width;
@@ -79,12 +80,7 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
                   }} 
                 />
               ) : (
-                <Svg width="128" height="128" viewBox="0 0 1792 1792" className="mb-5">
-                  <Path
-                    fill="black"
-                    d="M1523 1339q-22-155-87.5-257.5T1251 963q-67 74-159.5 115.5T896 1120t-195.5-41.5T541 963q-119 16-184.5 118.5T269 1339q106 150 271 237.5t356 87.5t356-87.5t271-237.5m-243-699q0-159-112.5-271.5T896 256T624.5 368.5T512 640t112.5 271.5T896 1024t271.5-112.5T1280 640m512 256q0 182-71 347.5t-190.5 286T1245 1721t-349 71q-182 0-348-71t-286-191t-191-286T0 896t71-348t191-286T548 71T896 0t348 71t286 191t191 286t71 348"
-                  />
-                </Svg>
+                <ProfileIcon className="mb-5 text-white w-32 h-32" />
               )}
               <View className="items-center mb-5"> 
                 <Text className="text-white text-2xl font-bold text-center">{userDetails.name}</Text>
@@ -97,7 +93,7 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
         <View style={{ 
             position: 'absolute', 
             top: '50%', 
-            left: '50%', 
+            left: '53%', 
             transform: [{ translateX: -95 }, { translateY: -20 }], 
             zIndex: 10  
         }}>
@@ -125,7 +121,7 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
         <View style={{ 
             position: 'absolute', 
             top: '50%', 
-            left: '50%', 
+            left: '53%', 
             transform: [{ translateX: -60 }, { translateY: -20 }], 
             zIndex: 10  
         }}>
@@ -153,20 +149,20 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
 
 
         <View className="flex-1 bg-white rounded-t-lg mt-10">
-          <View className="flex flex-row justify-center items-center gap-5 mt-6">
-            <View className="items-center">
-              <Text className="text-[#f7c188] font-bold text-2xl">{userDetails.unitsUnlocked || 0}</Text>
-              <Text className="text-gray-500 text-xs font-bold">Units Unlocked</Text>
+          <View className="flex-row justify-center items-center gap-5 mt-6">
+            <View className="items-center bg-gray-300 p-2 rounded-xl">
+              <Text className="text-[#f7c188] text-center font-bold text-2xl">{userDetails.unitsUnlocked || 0}</Text>
+              <Text className="text-gray-500 text-xs font-bold w-4/5 text-center">Units Unlocked</Text>
             </View>
 
-            <View className=" items-center">
-            <Text className="text-[#f7c188] font-bold text-2xl">{userDetails.totalScoreWeekly || 0}</Text>
-            <Text className="text-gray-500 text-xs font-bold">Total Weekly Score</Text>
+            <View className=" items-center bg-gray-300 p-2 rounded-xl">
+            <Text className="text-[#f7c188] text-center font-bold text-2xl">{userDetails.totalScoreWeekly || 0}</Text>
+            <Text className="text-gray-500 text-xs font-bold w-4/5 text-center">Total Weekly Score</Text>
             </View>
 
-            <View className=" items-center">
-            <Text className="text-[#f7c188] font-bold text-2xl">{userDetails.highestScore || 0}</Text>
-            <Text className="text-gray-500 text-xs font-bold">High Score</Text>
+            <View className=" items-center bg-gray-300 p-2 rounded-xl">
+            <Text className="text-[#f7c188] text-center font-bold text-2xl">{userDetails.highestScore || 0}</Text>
+            <Text className="text-gray-500 text-xs font-bold w-4/5 text-center">High Score</Text>
             </View>
           </View>
 

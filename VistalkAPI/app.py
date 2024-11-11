@@ -316,8 +316,7 @@ def getTotalSales():
 def getPowerUps():
     return dailytask.get_powerUps()
 
-<<<<<<< Updated upstream
-=======
+
 @app.route('/getUserRatings', methods=['GET'])
 def userRatings():
     return dashboard.userRatings()
@@ -342,7 +341,6 @@ def acceptRecording():
 def rejectRecording():
     return recording.rejectRecording()
 
->>>>>>> Stashed changes
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
 

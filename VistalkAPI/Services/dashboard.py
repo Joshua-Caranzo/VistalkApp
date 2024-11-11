@@ -162,9 +162,43 @@ def getSubscriptionData():
         'totalCount': None 
     }), 200
 
-from flask import request, jsonify
-from datetime import datetime, timedelta
+def userRatings():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    query = """
+            SELECT 
+                rating AS type,
+                MONTH(ratingDate) AS month,
+                COUNT(rating) AS ratingCount
+            FROM 
+                rating
+            GROUP BY 
+                rating, MONTH(ratingDate)
+            ORDER BY 
+                month, rating
+    """
+    
+    cursor.execute(query)
+    rating = cursor.fetchall()
 
+    if not rating:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': rating,
+        'data2': None,
+        'totalCount': None 
+    }), 200
+    
 def salesReport():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)

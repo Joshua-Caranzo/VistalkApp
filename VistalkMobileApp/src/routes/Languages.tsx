@@ -178,7 +178,7 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
                                             <TouchableOpacity
                                                 onPress={() => selectLanguage(userDto, selectedLanguage.languageID)}
                                             >
-                                                <LinearGradient colors={['#6addd0', '#f7c188']} className="bg-gray-600 py-2 px-10 rounded-full self-center">
+                                                <LinearGradient colors={['#6addd0', '#f7c188']} className="bg-gray-600 py-2 px-10 rounded-xl self-center">
                                                     <Text className="text-lg text-white font-bold">Select</Text>
                                                 </LinearGradient>
                                             </TouchableOpacity>

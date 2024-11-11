@@ -171,7 +171,6 @@ export async function getMusic()
 {
     
     const result = await getFromMainApi<CallResultDto<Musics[]>>('getMusic');
-    console.log(result)
     return result;
 }
 

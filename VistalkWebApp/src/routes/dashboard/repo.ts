@@ -1,6 +1,6 @@
 import { get, put } from "$lib/api/baseRepo";
 import type { CallResultDto } from "../../types/types";
-import type { LeaderBoardDto, SalesDto, StatusDto, SubscriptionDto, UserLanguage } from "./types";
+import type { LeaderBoardDto, RatingDto, SalesDto, StatusDto, SubscriptionDto, UserLanguage } from "./types";
 
 export async function getLeaderBoards(granularity:string){
     return await get<CallResultDto<LeaderBoardDto[]>>('getLeaderBoard', {granularity});
@@ -32,4 +32,8 @@ export async function salesReportSusbcription(granular:string){
 
 export async function getTotalSales(granular:string, item:string){
     return await get<CallResultDto<SalesDto[]>>('getTotalSales', {granular, item});
+}
+
+export async function getRatingData(){
+    return await get<CallResultDto<RatingDto[]>>('getUserRatings');
 }
