@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useBackButtonHandler from '../utilities/useBackButtonHandler';
 import CircleIcon from '../assets/svg/CircleIcon';
 import Svg from 'react-native-svg';
+import LockIcon from '../assets/svg/LockIcon';
 
 type Props = StackScreenProps<RootStackParamList, 'Unit'>;
 
@@ -42,15 +43,15 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                 setLoading(false);
             }
         };
-    
-        fetchUnits(); 
-    
-        const unsubscribe = navigation.addListener('focus', fetchUnits); 
+
+        fetchUnits();
+
+        const unsubscribe = navigation.addListener('focus', fetchUnits);
         return () => {
-            unsubscribe(); 
+            unsubscribe();
         };
-    }, [navigation, sectionId]); 
-    
+    }, [navigation, sectionId]);
+
     const navigateToUnitContent = () => {
         if (currentUnit) {
             const unitId = currentUnit?.unitID
@@ -128,7 +129,7 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                                             }}
                                             className="rounded-xl w-[62%] px-4 py-3 flex-col"
                                         >
-                                            
+
                                             <View className="flex-row items-center gap-x-2">
                                                 <CircleIcon className="h-4 w-4" color={boxColor} />
                                                 <Text style={{ color: boxColor }} className="font-bold text-lg">{unit.totalItems}</Text>
@@ -136,9 +137,14 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                                             </View>
                                             <View className="flex-grow flex items-center mt-2">
                                                 <TouchableOpacity onPress={() => openModal(unit)} disabled={unit.isLocked == 1}>
-                                                    <Text style={{ backgroundColor: buttonColor }} className="text-white py-2 px-4 rounded-lg">
-                                                        {unit.isLocked ? 'Locked' : 'Play'}
-                                                    </Text>
+                                                    <View className="flex-row items-center py-2 px-4 rounded-lg" style={{ backgroundColor: buttonColor }}>
+                                                        {unit.isLocked == 1 && (
+                                                            <LockIcon className="text-white h-4 w-4" />
+                                                        )}
+                                                        <Text className="text-white font-bold">
+                                                            {unit.isLocked ? 'Locked' : 'Play'}
+                                                        </Text>
+                                                    </View>
                                                 </TouchableOpacity>
                                             </View>
                                         </View>
