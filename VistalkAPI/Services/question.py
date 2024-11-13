@@ -102,7 +102,7 @@ def get_Questions():
     cursor.execute(query, tuple(values))
     quesions = cursor.fetchall()
 
-    count_query = "SELECT COUNT(*) as total FROM question WHERE unitId = %s"
+    count_query = "SELECT COUNT(*) as total FROM question WHERE unitId = %s AND isActive = true"
     countvalues = [unitId]
     if searchString:
         count_query += " AND (questionText LIKE %s OR questionTypeID LIKE %s)"

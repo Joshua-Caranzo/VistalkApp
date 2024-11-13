@@ -7,13 +7,13 @@ def getDailyTasks():
     dateToday = date.today() 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = """SELECT pdt.*, dt.rewardcoins, dt.tasktypeId, dtt.typeName as taskName, dtt.description as taskDescription, dt.quantity as totalValue, el.currentValue
-               FROM playerdailytask pdt 
+    query = """SELECT pdt.*, dt.rewardcoins, dt.tasktypeId, dtt.typeName as taskName, dt.taskDate,pdt.userplayerID, dtt.description as taskDescription, dt.quantity as totalValue, el.currentValue
+               FROM eventlogs el
+				INNER JOIN playerDailyTask pdt on el.dailyTaskid = pdt.taskID
                INNER JOIN dailytask dt ON dt.taskId = pdt.taskId 
                INNER JOIN dailytasktype dtt ON dtt.id = dt.tasktypeId
-               INNER JOIN eventlogs el on el.dailyTaskid = dt.taskid
-               WHERE pdt.userplayerID = %s AND dt.taskDate = %s AND dtt.isImplemented = 1;"""
-    values = (userId, dateToday)
+               WHERE el.userplayerID = %s and pdt.userPlayerId = %s AND dt.taskDate = %s and el.eventDate = %s AND dtt.isImplemented = 1;"""
+    values = (userId, userId, dateToday, dateToday)
     cursor.execute(query, values)
     tasks = cursor.fetchall()
 

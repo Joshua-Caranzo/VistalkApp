@@ -41,6 +41,7 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
             draggableData: this.jumbleArray(props.draggableItems),
             results: new Array(props.fixedItems.length).fill(false),
         };
+        console.log(this.state.draggableData)
     }
 
     jumbleArray(array: Item[]): Item[] {
@@ -58,7 +59,15 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
     };
 
     handleSubmit = () => {
-        this.props.onSubmit(this.state.draggableData);
+        const { draggableData } = this.state;
+        const { questionList, currentQuestionIndex } = this.props;
+        const currentQuestion = questionList[currentQuestionIndex];
+
+        const newResults = draggableData.map((item, index) =>
+            currentQuestion[`match${index + 1}`] === item.id
+        );
+        this.setState({ results: newResults });
+        this.props.onSubmit(draggableData);
     };
 
     checkAnswer = () => {

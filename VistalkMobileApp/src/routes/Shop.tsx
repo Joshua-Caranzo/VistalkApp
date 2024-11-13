@@ -40,10 +40,7 @@ const Shop: React.FC<Props> = ({ route }) => {
       case 'Subscription':
         return <Subscription vCoin={vCoin} setVcoin={setVcoin} />;
       case 'Currency':
-        return <Currency vCoin={vCoin} setVcoin={setVcoin} />;
-      case 'Music':
-        return <Music vCoin={vCoin} setVcoin={setVcoin}/>; 
-
+        return <Currency vCoin={vCoin} setVcoin={setVcoin} />; 
       default:
         return null;
     }
@@ -90,25 +87,19 @@ const Shop: React.FC<Props> = ({ route }) => {
           <TouchableOpacity
             className={`p-2 px-3 rounded-full ${selectedItem === 'Power Ups' ? 'bg-white' : 'bg-transparent'}`}
             onPress={() => setSelectedItem('Power Ups')}>
-            <PotionIcon className={`text-base h-8 w-8 font-${selectedItem === 'Power Ups' ? 'bold' : 'light'} ${selectedItem === 'Power Ups' ? 'text-black' : 'text-white'}`} />
+            <PotionIcon className={`text-base h-8 w-8 font-${selectedItem === 'Power Ups' ? 'bold' : 'light'} ${selectedItem === 'Power Ups' ? 'text-[#6addd0]' : 'text-white'}`} />
           </TouchableOpacity>
 
           <TouchableOpacity
             className={`py-2 px-3 rounded-full ${selectedItem === 'Subscription' ? 'bg-white' : 'bg-transparent'}`}
             onPress={() => setSelectedItem('Subscription')}>
-            <SubscriptionIcon className={`text-base h-8 w-8 font-${selectedItem === 'Subscription' ? 'bold' : 'light'} ${selectedItem === 'Subscription' ? 'text-black' : 'text-white'}`} />
+            <SubscriptionIcon className={`text-base h-8 w-8 font-${selectedItem === 'Subscription' ? 'bold' : 'light'} ${selectedItem === 'Subscription' ? 'text-[#6addd0]' : 'text-white'}`} />
           </TouchableOpacity>
 
           <TouchableOpacity
             className={`py-2 px-3 rounded-full ${selectedItem === 'Currency' ? 'bg-white' : 'bg-transparent'}`}
             onPress={() => setSelectedItem('Currency')}>
-            <CurrencyIcon className={`text-white h-8 w-8 font-${selectedItem === 'Currency' ? 'bold' : 'light'} ${selectedItem === 'Currency' ? 'text-black' : 'text-white'}`} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            className={`py-2 px-3 rounded-full ${selectedItem === 'Music' ? 'bg-white' : 'bg-transparent'}`}
-            onPress={() => setSelectedItem('Music')}>
-            <MusicIcon className={`text-base h-8 w-8 font-${selectedItem === 'Music' ? 'bold' : 'light'} ${selectedItem === 'Music' ? 'text-black' : 'text-white'}`} />
+            <CurrencyIcon className={`text-white h-8 w-8 font-${selectedItem === 'Currency' ? 'bold' : 'light'} ${selectedItem === 'Currency' ? 'text-[#6addd0]' : 'text-white'}`} />
           </TouchableOpacity>
         </View>
       </View>
