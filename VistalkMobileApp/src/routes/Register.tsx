@@ -224,7 +224,9 @@ const Register: React.FC<Props> = ({ navigation }) => {
             )}
 
             <TouchableOpacity
-              className="border border-2 border-white p-3 w-[80%] rounded-xl items-center mb-4"
+              className="p-3 w-[80%] rounded-xl items-center mb-4" style={{
+                backgroundColor: 'rgba(240, 240, 240, 0.4)'
+              }}
               onPress={handleCreatePress}
             >
               <Text className={"text-white text-xl font-bold"}>Create</Text>
@@ -262,13 +264,19 @@ const Register: React.FC<Props> = ({ navigation }) => {
                 onBlur={() => setConfirmationCodePlaceHolder('Confirmation Code')}
               />
 
-              <View className="flex-row items-center justify-between w-[100%] gap-2">
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleConfirmCode}>
-                  <Text className="text-base text-black">Confirm</Text>
+              <View className="flex-row items-center justify-center w-[100%] gap-2">
+                <TouchableOpacity className="flex py-2 px-4 rounded-xl items-center" style={{
+                backgroundColor: 'rgba(240, 240, 240, 0.4)'
+              }} onPress={handleConfirmCode}>
+                  <Text className="text-base text-white">Confirm</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => setIsModalVisible(false)}>
-                  <Text className="text-base text-black">Cancel</Text>
+                <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                  <LinearGradient className="flex py-2 px-4 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                      <Text className="text-base text-white">Cancel</Text>
+                  </LinearGradient>  
                 </TouchableOpacity>
               </View>
             </LinearGradient>

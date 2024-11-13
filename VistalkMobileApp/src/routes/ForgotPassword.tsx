@@ -3,6 +3,7 @@ import { SafeAreaView, Text, TextInput, TouchableOpacity, ImageBackground, Image
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import { sendCodetoEmail, verifyCode } from './repo';
+import LinearGradient from 'react-native-linear-gradient';
 
 type Props = StackScreenProps<RootStackParamList, 'ForgotPassword'>;
 
@@ -13,13 +14,12 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
 
   const handleSendCode = async () => {
     if (email) {
-        const result = await sendCodetoEmail(email);
-        if(result.isSuccess == true)
-            setIsModalVisible(true);
-        else
-        {
-            Alert.alert(result.message);
-        }
+      const result = await sendCodetoEmail(email);
+      if (result.isSuccess == true)
+        setIsModalVisible(true);
+      else {
+        Alert.alert(result.message);
+      }
     } else {
       console.warn('Please enter a valid email address.');
     }
@@ -27,15 +27,14 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
 
   const handleConfirmCode = async () => {
     if (confirmationCode) {
-        const result = await verifyCode(email, confirmationCode);
-        if(result.isSuccess == true){
-            setIsModalVisible(false);
-            navigation.navigate('SetNewPassword',{email});
-        }
-        else
-        {
-            return;
-        }
+      const result = await verifyCode(email, confirmationCode);
+      if (result.isSuccess == true) {
+        setIsModalVisible(false);
+        navigation.navigate('SetNewPassword', { email });
+      }
+      else {
+        return;
+      }
     } else {
       console.warn('Please enter the confirmation code.');
     }
@@ -43,12 +42,16 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView className="flex-1">
-      <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
-        <Image source={require('../assets/logo.png')} className="w-44 h-44 mb-10" resizeMode="contain" />
+      <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
+        <Image source={require('../assets/White.png')} className="w-44 h-44" />
+
+        <Text className="text-white text-4xl font-bold mb-6" style={{ color: '#ffffff', fontFamily: 'cursive' }}>
+          Vistalk
+        </Text>
 
         <View className="w-[100%] px-5 items-center">
           <TextInput
-            className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
+            className="w-[90%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
             placeholder="Email"
             placeholderTextColor="white"
             onChangeText={setEmail}
@@ -57,8 +60,10 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
             autoCapitalize="none"
             textContentType="emailAddress"
           />
-          <TouchableOpacity className="bg-white w-[100%] rounded-3xl items-center p-3 mb-3" onPress={handleSendCode}>
-            <Text className="text-[#99BC85] font-bold text-xl">Send Code</Text>
+          <TouchableOpacity className="w-[90%] rounded-xl items-center p-3 mb-3" style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.4)'
+          }} onPress={handleSendCode}>
+            <Text className="text-white font-bold text-xl">Send Code</Text>
           </TouchableOpacity>
         </View>
 
@@ -70,7 +75,7 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
           onRequestClose={() => setIsModalVisible(false)}
         >
           <View className="flex-1 justify-center items-center bg-[#00000080]">
-            <View className="w-4/5 bg-[#99BC85] p-5 rounded-lg items-center">
+            <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
               <Text className="text-xl font-bold mb-4 text-white">Enter Confirmation Code</Text>
 
               <TextInput
@@ -82,19 +87,25 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
                 keyboardType="numeric"
               />
 
-              <View className="flex-row items-center justify-between w-[100%] gap-2">
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleConfirmCode}>
-                  <Text className="text-base text-black">Confirm</Text>
+              <View className="flex-row items-center justify-center w-[100%] gap-2">
+                <TouchableOpacity className="flex py-2 px-4 rounded-xl items-center" style={{
+                  backgroundColor: 'rgba(240, 240, 240, 0.4)'
+                }} onPress={handleConfirmCode}>
+                  <Text className="text-base text-white">Confirm</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => setIsModalVisible(false)}>
-                  <Text className="text-base text-black">Cancel</Text>
+                <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                  <LinearGradient className="flex py-2 px-4 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base text-white">Cancel</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
-            </View>
+            </LinearGradient>
           </View>
         </Modal>
-      </ImageBackground>
+      </LinearGradient>
     </SafeAreaView>
   );
 };

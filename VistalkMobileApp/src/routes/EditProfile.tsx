@@ -174,8 +174,10 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
               onChangeText={setEmail}
               keyboardType="email-address"
             />
-            <TouchableOpacity className="bg-white p-2 rounded-lg items-center w-[80%]" onPress={handleSave}>
-              <Text className="text-[#AEAEAE] text-lg font-bold" style={{ opacity: 0.7 }}>Save Changes</Text>
+            <TouchableOpacity className="p-2 rounded-xl items-center w-[80%]" style={{
+                  backgroundColor: 'rgba(240, 240, 240, 0.4)'
+                }} onPress={handleSave}>
+              <Text className="text-white text-lg font-bold">Save Changes</Text>
             </TouchableOpacity>
           </View>
         </View>

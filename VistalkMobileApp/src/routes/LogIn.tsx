@@ -123,8 +123,10 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
           onBlur={() => setPasswordPlaceholder('Password')}
         />
 
-        <TouchableOpacity className="border border-2 border-white p-3 w-[80%] rounded-xl items-center mb-4" onPress={handleLogin}>
-          <Text className="text-white text-xl font-bold">Login</Text>
+        <TouchableOpacity className="p-3 w-[80%] rounded-xl items-center mb-4" style={{
+              backgroundColor: 'rgba(240, 240, 240, 0.4)'
+            }} onPress={handleLogin}>
+          <Text className="text-white text-xl font-black">Login</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

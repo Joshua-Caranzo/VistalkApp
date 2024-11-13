@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, ImageBackground, TouchableOpacity, Image, ScrollView, Modal, BackHandler } from 'react-native';
+import { View, Text, ImageBackground, TouchableOpacity, Image, ScrollView, Modal, BackHandler, TouchableWithoutFeedback } from 'react-native';
 import Menu from '../components/Menu';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { LeaderboardScreenNavigationProp, RootStackParamList, UnitScreenNavigationProp } from '../../types';
@@ -71,6 +71,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
       }
 
       const dailyTaskResult = await getDailyTasks(Number(userID));
+      console.log(dailyTaskResult)
       setdailyTasks(dailyTaskResult.data);
 
       const notifResult = await getNotifications(Number(userID));
@@ -310,82 +311,88 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
       </Modal>
 
       <Modal
-        visible={dailyTaskVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={closedailyTask}
-      >
-        <TouchableOpacity
-          className="flex-1 justify-center items-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
-          onPress={closedailyTask}
+            visible={dailyTaskVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={closedailyTask}
         >
-          <View className="flex-1 justify-center items-center bg-opacity-50">
-            <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-xl">
+            <TouchableOpacity
+                className="flex-1 justify-center items-center"
+                style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+                onPress={closedailyTask}
+            >
+                <View className="justify-center items-center bg-opacity-50">
+                    <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-xl">
 
-              <View className="bg-white rounded-2xl py-3 px-6 w-11/12 max-w-md shadow-lg">
-                <Text className="text-2xl font-black mt-2 mb-4 text-black text-center">Daily Tasks</Text>
-                <ScrollView contentContainerStyle={{ maxHeight: 400 }} showsVerticalScrollIndicator={false}>
-                  {dailyTasks.length > 0 ? (
-                    dailyTasks.map((task) => (
-                      <LinearGradient colors={['#f7c188', '#6addd0']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }} key={task.taskID} className="flex-row items-center mb-4 py-3 px-4 justify-between rounded-xl">
-                        <View className="flex-row items-center">
-                          <TouchableOpacity className="mr-4" disabled>
-                            <View className="w-4 h-4 bg-gray-100 rounded-md justify-center items-center">
-                              {task.isCompleted == true && (
-                                <Svg className="w-4 h-4" viewBox="0 0 24 24">
-                                  <Path fill="#000000" d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41z" />
-                                </Svg>
-                              )}
-                            </View>
-                          </TouchableOpacity>
-                          <View>
-                            <Text className="text-md text-gray-700">{task.taskName}</Text>
+                        <View className="bg-white rounded-2xl py-3 px-6 shadow-lg" style={{ maxHeight: 360 }}>
+                            <Text className="text-2xl font-black mt-2 mb-4 text-black text-center">Daily Tasks</Text>
 
-                            <TouchableOpacity onPress={() => toggleDescription(task.taskID)} className="flex-row items-center">
-                              <Text className="text-md text-gray-700">Description</Text>
-                              <Svg
-                                className="ml-1 w-4 h-4"
-                                style={{ transform: [{ rotate: expandedTasks[task.taskID] ? '90deg' : '0deg' }] }}
-                                viewBox="0 0 24 24"
-                              >
-                                <Path fill="#000000" d="M7 10l5 5 5-5H7z" />
-                              </Svg>
-                            </TouchableOpacity>
+                            <ScrollView showsVerticalScrollIndicator={false}>
+                                <TouchableWithoutFeedback>
+                                    <View>
+                                        {dailyTasks.length > 0 ? (
+                                            dailyTasks.map((task) => (
+                                                <LinearGradient colors={['#f7c188', '#6addd0']}
+                                                    start={{ x: 0, y: 0 }}
+                                                    end={{ x: 1, y: 0 }} key={task.taskID} className="flex-row items-center mb-4 py-3 px-4 justify-between rounded-xl">
+                                                    <View className="flex-row items-center">
+                                                        <View className="w-4 h-4 bg-gray-100 rounded-md justify-center items-center mr-4">
+                                                            {task.isCompleted == true && (
+                                                                <Svg className="w-4 h-4" viewBox="0 0 24 24">
+                                                                    <Path fill="#000000" d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41z" />
+                                                                </Svg>
+                                                            )}
+                                                        </View>
+                                                        <View>
+                                                            <Text className="text-md text-gray-700 font-bold">{task.taskName}</Text>
 
-                            {expandedTasks[task.taskID] && (
-                              <Text className="text-sm text-gray-600 mt-1 w-24">{task.taskDescription}</Text>
-                            )}
-                            <Text className="text-md text-gray-700">Reward: {task.rewardcoins}</Text>
-                          </View>
+                                                            <TouchableOpacity onPress={() => toggleDescription(task.taskID)} className="flex-row items-center">
+                                                                <Text className="text-md text-gray-700 font-bold">Description</Text>
+                                                                <Svg
+                                                                    className="ml-1 w-4 h-4"
+                                                                    style={{ transform: [{ rotate: expandedTasks[task.taskID] ? '90deg' : '0deg' }] }}
+                                                                    viewBox="0 0 24 24"
+                                                                >
+                                                                    <Path fill="#000000" d="M7 10l5 5 5-5H7z" />
+                                                                </Svg>
+                                                            </TouchableOpacity>
+
+                                                            {expandedTasks[task.taskID] && (
+                                                                <Text className="text-sm text-gray-600 mt-1 w-24">{task.taskDescription}</Text>
+                                                            )}
+                                                            <View className="flex-row items-center">
+                                                                <Text className="text-md text-gray-700 font-bold">Reward:</Text>
+                                                                <Text className="text-md text-gray-700"> {task.rewardcoins}</Text>
+                                                            </View>
+                                                        </View>
+                                                    </View>
+
+                                                    <TouchableOpacity
+                                                        disabled={!task.isCompleted}
+                                                        onPress={() => claimRewardDashboard(task.taskID)}
+                                                        className={`px-2 py-1 rounded-full ml-6 ${task.isCompleted ? 'bg-[#E8C58F]' : 'bg-gray-400'
+                                                            }`}
+                                                    >
+                                                        <Text
+                                                            className={`text-xs text-white ${task.isClaimed ? 'line-through decoration-red-500' : ''
+                                                                }`}
+                                                        >
+                                                            Claim
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                </LinearGradient>
+                                            ))
+                                        ) : (
+                                            <Text className="text-center text-gray-500 mt-4">No daily tasks today.</Text>
+                                        )}
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            </ScrollView>
                         </View>
-
-                        <TouchableOpacity
-                          disabled={!task.isCompleted}
-                          onPress={() => claimRewardDashboard(task.taskID)}
-                          className={`px-2 py-1 rounded-full ml-6 ${task.isCompleted ? 'bg-[#E8C58F]' : 'bg-gray-400'
-                            }`}
-                        >
-                          <Text
-                            className={`text-xs text-white ${task.isClaimed ? 'line-through decoration-red-500' : ''
-                              }`}
-                          >
-                            Claim
-                          </Text>
-                        </TouchableOpacity>
-                      </LinearGradient>
-                    ))
-                  ) : (
-                    <Text className="text-center text-gray-500 mt-4">No daily tasks today.</Text>
-                  )}
-                </ScrollView>
-              </View>
+                    </TouchableOpacity>
+                </View>
             </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+        </Modal>
 
 
       <Modal

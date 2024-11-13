@@ -35,19 +35,23 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
         <View className="mt-4 items-center">
           <TouchableOpacity
-            className="border border-2 border-white p-3 w-[80%] rounded-xl items-center mb-3"
+            className="p-3 w-[80%] rounded-xl items-center mb-3" style={{
+              backgroundColor: 'rgba(240, 240, 240, 0.4)'
+            }}
             onPress={() => navigation.navigate('LogIn')}
           >
-            <Text className="text-xl font-bold text-white">
+            <Text className="text-xl font-black text-white" >
               Login
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="border border-2 border-white p-3 w-[80%] rounded-xl items-center mb-3"
+            className="p-3 w-[80%] rounded-xl items-center mb-3" style={{
+              backgroundColor: 'rgba(240, 240, 240, 0.4)'
+            }}
             onPress={() => navigation.navigate('Register')}
           >
-            <Text className="text-xl font-bold text-white">
+            <Text className="text-xl font-black text-white">
               Create an Account
             </Text>
           </TouchableOpacity>

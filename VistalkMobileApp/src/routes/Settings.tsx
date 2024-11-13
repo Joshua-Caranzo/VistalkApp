@@ -125,28 +125,40 @@ const Settings: React.FC<Props> = ({ navigation }) => {
     <SafeAreaView className="flex-1">
       <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 resize-cover">
         <View className="flex-row justify-between w-full px-5 absolute top-10">
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          {/* <TouchableOpacity onPress={() => navigation.goBack()}>
             <BackIcon className="h-8 w-8 text-white" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View className="flex-1 items-center justify-center space-y-4">
-          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" onPress={() => navigation.navigate("ChangePassword")}>
-            <Text className="text-black text-center text-lg font-bold">Change Password</Text>
+          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.4)'
+          }} onPress={() => navigation.navigate("ChangePassword")}>
+            <Text className="text-white text-center text-lg font-black">Change Password</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" onPress={handleDeactivateAccount}>
-            <Text className="text-black text-center text-lg font-bold">Deactivate Account</Text>
+          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.4)'
+          }} onPress={handleDeactivateAccount}>
+            <Text className="text-white text-center text-lg font-black">Deactivate Account</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" onPress={() => setIsFeedbackModalVisible(true)}>
-            <Text className="text-black text-center text-lg font-bold">Send Feedback</Text>
+          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.4)'
+          }} onPress={() => setIsFeedbackModalVisible(true)}>
+            <Text className="text-white text-center text-lg font-black">Send Feedback</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" onPress={() => setIsReportModalVisible(true)}>
-            <Text className="text-black text-center text-lg font-bold">Send Report</Text>
+          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.4)'
+          }} onPress={() => setIsReportModalVisible(true)}>
+            <Text className="text-white text-center text-lg font-black">Send Report</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl">
-            <Text className="text-black text-center text-lg font-bold">Change Language</Text>
+          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.4)'
+          }}>
+            <Text className="text-white text-center text-lg font-black">Change Language</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" onPress={handleSignOut}>
-            <Text className="text-black text-center text-lg font-bold">Sign Out</Text>
+          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.4)'
+          }} onPress={handleSignOut}>
+            <Text className="text-white text-center text-lg font-black">Sign Out</Text>
           </TouchableOpacity>
         </View>
 
@@ -272,12 +284,12 @@ const Settings: React.FC<Props> = ({ navigation }) => {
               <Text className="text-base mb-4 text-center text-black">Please rate your experience with our platform</Text>
               <View className="flex-row mb-4">{renderStars()}</View>
               <TouchableOpacity onPress={handleSubmitRating}>
-              <LinearGradient
-                    className="py-2 px-6 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}>
-                    <Text className="text-base font-bold text-white">Submit Rating</Text>
-                  </LinearGradient>
+                <LinearGradient
+                  className="py-2 px-6 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}>
+                  <Text className="text-base font-bold text-white">Submit Rating</Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>

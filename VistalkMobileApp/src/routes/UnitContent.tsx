@@ -23,6 +23,7 @@ import Congratulations from "../components/Congratulations";
 import useBackButtonHandler from "../utilities/useBackButtonHandler";
 import PlayIcon from "../assets/svg/PlayIcon";
 import Svg, { Circle } from "react-native-svg";
+import BagIcon from "../assets/svg/BagIcon";
 
 type Props = StackScreenProps<RootStackParamList, 'UnitContent'>;
 
@@ -49,6 +50,7 @@ interface Item {
 
 const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     const [timeLeft, setTimeLeft] = useState(15);
+    const [modalVisible, setModalVisible] = useState(false);
     const rotateAnimation = useRef(new Animated.Value(0)).current;
     const scaleAnimation = useRef(new Animated.Value(1)).current;
     const { unitId, sectionId, sectionName } = route.params;
@@ -83,6 +85,8 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     const [showCongratlulation, setShowCongratulation] = useState<boolean>(false);
     const [totalCorrect, setTotalCorrect] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(false);
+    const rows = [];
+
     useBackButtonHandler(navigation, 'Unit', { sectionId: sectionId, sectionName: sectionName });
 
     async function fetchQuestion() {
@@ -154,6 +158,9 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
 
             return () => clearInterval(timerId);
         } else if (timeLeft === 0) {
+            console.log(currentQuestionIndex)
+            console.log(questionList.length)
+
             if (currentQuestionIndex < questionList.length - 1) {
                 setDisabledChoiceIndex([]);
                 setHearts((prevHearts) => {
@@ -170,6 +177,10 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                 }
                 setCurrentQuestionIndex(prevIndex => prevIndex + 1);
                 setTimeLeft(15);
+            }
+            else{
+                setShowGameOver(true);
+                return ;
             }
         }
     }, [timerRunning, timeLeft, currentQuestionIndex, questionList.length]);
@@ -259,7 +270,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                 const updatedTotalCorrect = totalCorrect + 1;
                 setScore(updatedScore);
                 setTotalCorrect(updatedTotalCorrect);
-    
+
                 setIsCorrect(true);
                 setTimeout(() => {
                     proceedToNextQuestion(updatedScore, updatedTotalCorrect);
@@ -288,6 +299,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     };
 
     const proceedToNextQuestion = async (updatedScore: number, updatedTotalCorrect: number) => {
+        console.log("test")
         if (currentQuestionIndex < questionList.length - 1) {
             setLoading(false);
             setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
@@ -461,7 +473,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
             currentQuestion.match3,
             currentQuestion.match4,
         ];
-
+        
         const count = items.reduce((acc, item, index) => {
             return acc + (expectedMatches[index] === item.id ? 1 : 0);
         }, 0);
@@ -517,6 +529,19 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
         fetchQuestion();
     }
 
+    const closeModal = () => {
+        setModalVisible(false);
+    };
+
+    const openModal = () => {
+        setModalVisible(true);
+    };
+
+    // Divide powerUps into rows of 3 items each
+    for (let i = 0; i < powerUps.length; i += 3) {
+        rows.push(powerUps.slice(i, i + 3));
+    }
+
 
     function onHome() {
         navigation.navigate('Unit', { sectionId, sectionName })
@@ -525,12 +550,12 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     async function saveGameplayLocal(finalScore: number, finalTotalCorrect: number) {
         const userID = await AsyncStorage.getItem('userID');
         if (userID) {
-            let newGameplayPowerUp:PowerUpGameplay[]=[];
+            let newGameplayPowerUp: PowerUpGameplay[] = [];
             powerUps.forEach(p => {
-                let newGP:PowerUpGameplay = 
+                let newGP: PowerUpGameplay =
                 {
                     itemId: p.itemId,
-                    quantity:p.quantity
+                    quantity: p.quantity
                 }
                 newGameplayPowerUp.push(newGP);
             });
@@ -575,16 +600,16 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                 className="border border-white rounded-3xl py-2 px-[24%] min-w-screen mx-12 items-center absolute top-0 mb-4"
                                                 style={{ zIndex: 1 }} // Lower zIndex so it's in the background
                                             >
-                                                <View className="flex-row items-center justify-between gap-x-6">
+                                                <View className="flex-row justify-between items-center gap-x-6">
                                                     <TouchableOpacity onPress={() => navigation.goBack()}>
                                                         <BackIcon className="h-6 w-6 text-white" />
                                                     </TouchableOpacity>
-                                                    <Text className="text-white text-3xl font-black">SECTION {sectionName}</Text>
+                                                    <Text className="text-white text-3xl font-black uppercase">Section {sectionName}</Text>
                                                     <View>
                                                         {hearts > 0 && <HeartComponent hearts={hearts} />}
                                                     </View>
                                                 </View>
-
+                                                {/* <Text className="text-white text-3xl font-black uppercase">Unit 1</Text> */}
                                                 {/* Audio or Image Content */}
                                                 {fileUrls[currentQuestionIndex]?.audioUrl ? (
                                                     <View className="items-center justify-center rounded-xl overflow-hidden mt-4">
@@ -599,16 +624,16 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                         </TouchableOpacity>
                                                     </View>
                                                 ) : fileUrls[currentQuestionIndex]?.imageUrl ? (
-                                                    <View className="items-center justify-center rounded-xl overflow-hidden mt-4 p-4">
+                                                    <View className="items-center justify-center rounded-xl overflow-hidden">
                                                         <Image
                                                             source={{ uri: fileUrls[currentQuestionIndex]?.imageUrl }}
-                                                            className="w-12 h-12 rounded-xl"
+                                                            className="w-36 h-36 rounded-xl"
                                                             resizeMode="contain"
                                                         />
                                                     </View>
                                                 ) : (
                                                     // Invisible placeholder if no audio or image
-                                                    <View style={{ width: 48, height: 48, opacity: 0 }} />
+                                                    <View style={{ width: 56, height: 56, opacity: 0 }} />
                                                 )}
                                             </LinearGradient>
 
@@ -667,10 +692,14 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                                 : 'border-white'} ${disabledChoiceIndex.includes(1) || selectedChoice !== null ? 'opacity-50' : ''}`}
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(1)}
                                                         >
-
-                                                            <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(1) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice1ContentText}</Text>
+                                                            {(questionList[currentQuestionIndex].questionTypeID === 2) && (
+                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(1) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice1ContentText}</Text>
+                                                            )}
+                                                            {(questionList[currentQuestionIndex].questionTypeID === 1) && (
+                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(1) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice1EnglishTranslation}</Text>
+                                                            )}
                                                         </TouchableOpacity>
-                                                        {fileUrls[currentQuestionIndex]?.choice1AudioUrl && questionList[currentQuestionIndex].choice1AudioPath !== null && (
+                                                        {fileUrls[currentQuestionIndex]?.choice1AudioUrl && questionList[currentQuestionIndex].choice1AudioPath !== null && questionList[currentQuestionIndex].questionTypeID === 2 && (
                                                             <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice1AudioUrl, questionList[currentQuestionIndex].questionID) }}
                                                                 disabled={isPlaying}
                                                                 style={{ opacity: isPlaying ? 0.5 : 1 }}>
@@ -691,9 +720,14 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(2)}
                                                         >
 
-                                                            <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(2) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice2ContentText}</Text>
+                                                            {(questionList[currentQuestionIndex].questionTypeID === 2) && (
+                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(2) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice2ContentText}</Text>
+                                                            )}
+                                                            {(questionList[currentQuestionIndex].questionTypeID === 1) && (
+                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(2) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice2EnglishTranslation}</Text>
+                                                            )}
                                                         </TouchableOpacity>
-                                                        {fileUrls[currentQuestionIndex]?.choice2AudioUrl && questionList[currentQuestionIndex].choice2AudioPath !== null && (
+                                                        {fileUrls[currentQuestionIndex]?.choice2AudioUrl && questionList[currentQuestionIndex].choice2AudioPath !== null && questionList[currentQuestionIndex].questionTypeID === 2 && (
                                                             <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice2AudioUrl, questionList[currentQuestionIndex].questionID) }}
                                                                 disabled={isPlaying}
                                                                 style={{ opacity: isPlaying ? 0.5 : 1 }}>
@@ -714,9 +748,14 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(3)}
                                                         >
 
-                                                            <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(3) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice3ContentText}</Text>
+                                                            {(questionList[currentQuestionIndex].questionTypeID === 2) && (
+                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(3) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice3ContentText}</Text>
+                                                            )}
+                                                            {(questionList[currentQuestionIndex].questionTypeID === 1) && (
+                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(3) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice3EnglishTranslation}</Text>
+                                                            )}
                                                         </TouchableOpacity>
-                                                        {fileUrls[currentQuestionIndex]?.choice3AudioUrl && questionList[currentQuestionIndex].choice3AudioPath !== null && (
+                                                        {fileUrls[currentQuestionIndex]?.choice3AudioUrl && questionList[currentQuestionIndex].choice3AudioPath !== null && questionList[currentQuestionIndex].questionTypeID === 2 && (
                                                             <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice3AudioUrl, questionList[currentQuestionIndex].questionID) }}
                                                                 disabled={isPlaying}
                                                                 style={{ opacity: isPlaying ? 0.5 : 1 }}>
@@ -737,9 +776,14 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(4)}
                                                         >
 
-                                                            <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(4) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice4ContentText}</Text>
+                                                            {(questionList[currentQuestionIndex].questionTypeID === 2) && (
+                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(4) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice4ContentText}</Text>
+                                                            )}
+                                                            {(questionList[currentQuestionIndex].questionTypeID === 1) && (
+                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(4) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice4EnglishTranslation}</Text>
+                                                            )}
                                                         </TouchableOpacity>
-                                                        {fileUrls[currentQuestionIndex]?.choice4AudioUrl && questionList[currentQuestionIndex].choice4AudioPath !== null && (
+                                                        {fileUrls[currentQuestionIndex]?.choice4AudioUrl && questionList[currentQuestionIndex].choice4AudioPath !== null && questionList[currentQuestionIndex].questionTypeID === 2 && (
                                                             <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice4AudioUrl, questionList[currentQuestionIndex].questionID) }}
                                                                 disabled={isPlaying}
                                                                 style={{ opacity: isPlaying ? 0.5 : 1 }}>
@@ -831,58 +875,89 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                 </View>
                             )}
 
-                            <View className="absolute bottom-5 rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-                                <View className="flex-row justify-center gap-2 w-[100%]">
-                                    {powerUps.map((powerUp, index) => {
-                                        const imageUrl = getImageUrlByItemId(powerUp.itemId);
-
-                                        const isEnabled = (questionList[currentQuestionIndex].questionTypeID === 1 || questionList[currentQuestionIndex].questionTypeID === 2)
-                                            ? powerUp.itemId !== 5
-                                            : (questionList[currentQuestionIndex].questionTypeID === 3 || questionList[currentQuestionIndex].questionTypeID === 4)
-                                                ? (powerUp.itemId === 1 || powerUp.itemId === 2 || powerUp.itemId === 5)
-                                                : true;
-
-                                        return (
-                                            <TouchableOpacity
-                                                key={index}
-                                                onPress={() => usePowerUp(powerUp)}
-                                                disabled={!isEnabled || selectedChoice !== null}
-                                            >
-                                                <View className="py-2 px-1 items-center relative">
-                                                    {imageUrl ? (
-                                                        <Image
-                                                            source={{ uri: imageUrl }}
-                                                            className="w-10 h-10"
-                                                        />
-                                                    ) : null}
-                                                    <Text className="text-center text-[10px] text-black font-bold bg-gray-200 p-1 rounded-full absolute right-1 bottom-1 z-10">
-                                                        {powerUp.quantity}x
-                                                    </Text>
-
-                                                    {!isEnabled && (
-                                                        <View className="absolute inset-0 bg-gray-500 opacity-50 justify-center items-center rounded-full p-2  mt-1 z-0">
-                                                            <Text className="text-red-600 font-bold text-xl">X</Text>
-                                                        </View>
-                                                    )}
-                                                </View>
-                                            </TouchableOpacity>
-                                        );
-                                    })}
-                                </View>
-
-                                <Modal
-                                    transparent={true}
-                                    visible={showHeartPopup}
-                                    animationType="fade"
-                                    onRequestClose={() => setShowHeartPopup(false)}
-                                >
-                                    <View className="flex-1 justify-center items-center bg-black/40">
-                                        <View className="p-6 rounded-full shadow-lg scale-105">
-                                            <HeartIcon className="h-12 w-12 text-red-500" />
+                            <View className="absolute bottom-5">
+                                <TouchableOpacity onPress={() => openModal()}>
+                                    <View className="items-center">
+                                        <View className="border-2 border-white rounded-full">
+                                            <BagIcon className="text-white h-10 w-10" />
                                         </View>
+                                        <Text className="text-white text-center text-md font-black">Power Ups</Text>
                                     </View>
-                                </Modal>
+                                </TouchableOpacity>
                             </View>
+
+                            <Modal
+                                transparent={true}
+                                visible={showHeartPopup}
+                                animationType="fade"
+                                onRequestClose={() => setShowHeartPopup(false)}
+                            >
+                                <View className="flex-1 justify-center items-center bg-black/40">
+                                    <View className="p-6 rounded-full shadow-lg scale-105">
+                                        <HeartIcon className="h-12 w-12 text-red-500" />
+                                    </View>
+                                </View>
+                            </Modal>
+
+                            <Modal visible={modalVisible} transparent={true} animationType="none" onRequestClose={closeModal}>
+                                <TouchableOpacity className="flex-1 justify-end"
+                                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+                                    onPress={closeModal}>
+                                    <View className=" rounded-t-xl w-full">
+                                        <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-t-xl">
+                                            <View className="p-8 justify-center items-center">
+                                                <Text className="text-3xl text-black mb-2 text-center font-black">Power Ups</Text>
+                                                <View className="flex-col mt-4 items-center">
+                                                    {rows.map((row, rowIndex) => (
+                                                        <View key={rowIndex} className="flex-row justify-center items-center mt-2">
+                                                            {row.map((powerUp, index) => {
+                                                                const imageUrl = getImageUrlByItemId(powerUp.itemId);
+
+                                                                const isEnabled = (questionList[currentQuestionIndex].questionTypeID === 1 || questionList[currentQuestionIndex].questionTypeID === 2)
+                                                                    ? powerUp.itemId !== 5
+                                                                    : (questionList[currentQuestionIndex].questionTypeID === 3 || questionList[currentQuestionIndex].questionTypeID === 4)
+                                                                        ? (powerUp.itemId === 1 || powerUp.itemId === 2 || powerUp.itemId === 5)
+                                                                        : true;
+
+                                                                return (
+                                                                    <TouchableOpacity
+                                                                        key={index}
+                                                                        onPress={() => usePowerUp(powerUp)}
+                                                                        disabled={!isEnabled || selectedChoice !== null}
+                                                                        className="flex-1"
+                                                                    >
+                                                                        <View className="flex-col items-center justify-center mx-2">
+                                                                            <View className="py-2 px-1 items-center relative">
+                                                                                {imageUrl ? (
+                                                                                    <Image
+                                                                                        source={{ uri: imageUrl }}
+                                                                                        className="w-16 h-16"
+                                                                                    />
+                                                                                ) : null}
+
+                                                                                <Text className="text-center text-[10px] text-black font-bold bg-gray-200 p-1 rounded-full absolute right-1 bottom-1 z-10">
+                                                                                    {powerUp.quantity}x
+                                                                                </Text>
+
+                                                                                {!isEnabled && (
+                                                                                    <View className="absolute inset-0 bg-gray-500 opacity-50 justify-center mt-2 items-center rounded-full p-5 z-0">
+                                                                                        <Text className="text-red-600 font-bold text-xl">X</Text>
+                                                                                    </View>
+                                                                                )}
+                                                                            </View>
+                                                                            <Text className="text-center text-black text-md font-bold mt-1 w-[80%]">{powerUp.name}</Text>
+                                                                        </View>
+                                                                    </TouchableOpacity>
+                                                                );
+                                                            })}
+                                                        </View>
+                                                    ))}
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                    </View>
+                                </TouchableOpacity>
+                            </Modal>
                         </>
                     )}
                 </LinearGradient>
