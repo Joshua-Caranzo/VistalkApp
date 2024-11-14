@@ -24,7 +24,7 @@ export type RootStackParamList = {
   UnitContent: {unitId:number, sectionId:number,  sectionName:string};
   Leaderboard:undefined;
   AllTimeLeaderboard:undefined;
-  History: undefined;
+  History: {contentId:number};
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;

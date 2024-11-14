@@ -53,7 +53,6 @@ const Practice: React.FC<Props> = ({navigation}) => {
       } else {
         setContents((prevContents) => [...prevContents, ...newContents]);
       }
-
       if (newContents.length < 10) setHasMore(false);
       if (hasMore) setOffset((prevOffset) => prevOffset + 10);
       stopAndReleaseSound();
@@ -132,6 +131,12 @@ const Practice: React.FC<Props> = ({navigation}) => {
     setSearchText(text);
     fetchContents();
   }
+
+  useEffect(() => {
+    if (contents.length > 0) {
+      random();
+    }
+  }, [contents]);
 
   async function random() {
     if (contents.length > 0) {
@@ -223,14 +228,14 @@ const Practice: React.FC<Props> = ({navigation}) => {
     });
   };
 
-  const navigateToHistory = () => {
-    navigation.navigate("History");
+  const navigateToHistory = (contentId: number) => {
+    navigation.navigate('History', { contentId });
   };
 
   return (
     <SafeAreaView className="flex-1">
       <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
-        <TouchableOpacity className="absolute top-4 right-4" onPress={navigateToHistory}>
+        <TouchableOpacity className="absolute top-4 right-4" disabled = {!currentContent}  onPress={() => navigateToHistory(currentContent?.contentID ?? 0)}>
           <HistoryIcon className="h-8 w-8 text-white" />
         </TouchableOpacity>
         <View className="items-center mt-20 mb-3">

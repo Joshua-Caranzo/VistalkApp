@@ -4,28 +4,44 @@ import BackIcon from "../assets/svg/BackIcon";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 import { PieChart } from "react-native-chart-kit";
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
+import { PronunciationProgressDto, PronunciationProgressListDto } from "./type";
+import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { pronunciationProgressChart, pronunciationProgressList } from "./repo";
 
 type Props = StackScreenProps<RootStackParamList, 'History'>;
 
 const screenWidth = Dimensions.get('window').width;
 
-const History: React.FC<Props> = ({ navigation }) => {
-    const pieData = [
-        { name: 'Category A', population: 30, color: '#FF6384', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-        { name: 'Category B', population: 50, color: '#36A2EB', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-        { name: 'Category C', population: 20, color: '#FFCE56', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-    ];
-
-    const data = [
-        { word: 'Akoy kay estudyante', response: 'Response 1' },
-        { word: 'Word 2', response: 'Response 2' },
-        { word: 'Word 3', response: 'Response 3' },
-        { word: 'Word 4', response: 'Response 4' },
-    ];
+const History: React.FC<Props> = ({ navigation, route }) => {
+    const [pieDataResult, setPieData] = useState<PronunciationProgressDto>();
+    const [currentContentId, setContentId] = useState<number | null>(null);
+    const [list, setList] = useState<PronunciationProgressListDto[]>([]);
+    const { contentId } = route.params;
 
     const [isToggled, setIsToggled] = useState(false);
     const animatedPosition = useRef(new Animated.Value(0)).current;
+
+    const fetchLeaderboardData = async () => {
+        try {
+            const userIdString = await AsyncStorage.getItem('userID');
+            if (userIdString) {
+                const result = await pronunciationProgressChart(parseInt(userIdString), currentContentId);
+                setPieData(result.data);
+                const result2 = await pronunciationProgressList(parseInt(userIdString), currentContentId);
+                setList(result2.data);
+            }
+        } catch (error) {
+            console.error('Error fetching leaderboard data:', error);
+        }
+    };
+
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchLeaderboardData();
+        }, [contentId])
+    );
 
     const handleToggle = () => {
         setIsToggled((prevState) => !prevState);
@@ -35,8 +51,15 @@ const History: React.FC<Props> = ({ navigation }) => {
             duration: 200,
             useNativeDriver: false,
         }).start();
+
+        // Toggle content filter by setting `contentId` to either `currentContentId` or `null`
+        setContentId(isToggled ? null : contentId);
     };
 
+    const pieData = [
+        { name: 'Correct', population: parseInt(pieDataResult?.correct ?? "0"), color: '#FF6384', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+        { name: 'Incorrect', population: parseInt(pieDataResult?.incorrect ?? "0"), color: '#36A2EB', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    ];
     return (
         <SafeAreaView className="flex-1">
             <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
@@ -92,17 +115,15 @@ const History: React.FC<Props> = ({ navigation }) => {
                     <View>
                         <Text className="text-black text-lg font-bold mb-4 w-full px-16">History Words</Text>
 
-                        {/* Table Header */}
                         <View className="flex-row mb-4">
                             <Text className="flex-1 font-bold text-black text-base text-center">Word</Text>
                             <Text className="flex-1 font-bold text-black text-base text-center">Response</Text>
                         </View>
 
-                        {/* Table Rows */}
-                        {data.map((item, index) => (
+                        {list.map((item, index) => (
                             <View key={index} className="flex-row mb-2">
-                                <Text className="flex-1 text-base text-black text-center">{item.word}</Text>
-                                <Text className="flex-1 text-base text-black text-center">{item.response}</Text>
+                                <Text className="flex-1 text-base text-black text-center">{item.contentText}</Text>
+                                <Text className="flex-1 text-base text-black text-center">{item.pronunciationScore}</Text>
                             </View>
                         ))}
                     </View>

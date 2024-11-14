@@ -1,7 +1,7 @@
 import { get } from "$lib/api/baseRepo";
 import type { CallResultDto } from "../../types/types";
 import type { Language } from "../type";
-import type { PowerUpDto, UserDto, UserProfileDto } from "./type";
+import type { PowerUpDto, PronunciationProgressDto, UserDto, UserProfileDto } from "./type";
 
 const baseUrl = import.meta.env.VITE_BASE_API;
 
@@ -43,4 +43,8 @@ export async function getImageUrl(fileName: string): Promise<Blob | null> {
         console.error(`Failed to fetch file:`, error);
         return null;
     }
+}
+
+export async function getPronunciationProgress(userId:number){
+    return await get<CallResultDto<PronunciationProgressDto>>('getPronunciationProgress', {userId});
 }

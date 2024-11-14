@@ -180,5 +180,13 @@ def updateNotifications():
 def checkPronunciation():
     return pronunciation.checkPronunciation()
 
+@app.route('/getPronunciationProgress', methods=['GET'])
+def getPronunciationProgress():
+    return pronunciation.getPronunciationProgress()
+
+@app.route('/getPronunciationList', methods=['GET'])
+def getPronunciationList():
+    return pronunciation.getPronunciationList()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

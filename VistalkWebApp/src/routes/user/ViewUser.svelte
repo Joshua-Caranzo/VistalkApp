@@ -1,9 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import type { UserDto, UserProfileDto } from "./type";
+  import type { PronunciationProgressDto, UserDto, UserProfileDto } from "./type";
   import { onMount } from "svelte";
-    import { getImageUrl, getUserDetails } from "./repo";
+    import { getImageUrl, getPronunciationProgress, getUserDetails } from "./repo";
     import UserScoreChart from "$lib/components/UserScoreChart.svelte";
+    import Piechart from "$lib/components/Piechart.svelte";
 
   export let modelOpen: boolean;
   export let userView: UserDto;
@@ -12,6 +13,8 @@
   let weeklyScores:number[] = [];
   let labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   let imageUrl:string | null = null;
+  let inCorrect: PronunciationProgressDto | undefined;
+  let data: { name: string; y: number }[] = [];
   const dispatch = createEventDispatcher();
 
   function closeModal() {
@@ -37,6 +40,18 @@
             userDetail.weeklyScoreGraph["Saturday"] || 0,
             userDetail.weeklyScoreGraph["Sunday"] || 0,
           ];
+
+          const statusResult = await getPronunciationProgress(userView.userPlayerId);
+          inCorrect = statusResult.data;
+          if(inCorrect.correct)
+            console.log(inCorrect?.correct)
+          console.log(inCorrect?.correct)
+
+          data = inCorrect ? [
+            { name: 'Total Correct Pronunciation', y: parseInt(inCorrect.correct) },
+            { name: 'Total Incorrect Pronunciation', y: parseInt(inCorrect.incorrect) },
+        ] : [];
+        console.log(data)
 
         }
       } catch (error) {
@@ -116,6 +131,11 @@
           <UserScoreChart {weeklyScores} {labels} />
           {/if}
         </div>
+        <div class="bg-white rounded-lg p-4 shadow-lg flex-1">
+          {#if data.length != 0} 
+          <Piechart chartTitle="Correct vs Incorrect Pronunciation" data={data} />
+          {/if}
+      </div>
       </div>
     </div>
   </div>

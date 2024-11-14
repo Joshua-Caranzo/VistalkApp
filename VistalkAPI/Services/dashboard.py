@@ -471,3 +471,35 @@ def getTotalSales():
     }), 200
 
 
+def getPronunciationProgress():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    userId = request.args.get('userId')
+    query = """
+        SELECT 
+            SUM(pronunciationScore = 1) AS correct, 
+            SUM(pronunciationScore = 0) AS incorrect 
+        FROM 
+            pronounciationresult 
+        WHERE 
+            userPlayerID = %s;
+    """
+    cursor.execute(query, (userId,))
+    vistas = cursor.fetchone()
+
+    if not vistas:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': vistas,
+        'data2': None,
+        'totalCount': None 
+    }), 200

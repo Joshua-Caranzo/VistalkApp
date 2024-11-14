@@ -341,6 +341,10 @@ def acceptRecording():
 def rejectRecording():
     return recording.rejectRecording()
 
+@app.route('/getPronunciationProgress', methods=['GET'])
+def getPronunciationProgress():
+    return dashboard.getPronunciationProgress()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
 

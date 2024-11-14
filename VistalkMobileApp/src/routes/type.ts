@@ -276,3 +276,17 @@ export type NotificationsDto =
     message:string;
     isOpened:number;
 }
+
+export type PronunciationProgressDto = 
+{
+    correct:string;
+    incorrect: string;
+}
+
+export type PronunciationProgressListDto = 
+{
+    resultId:number;
+    contentId:number;
+    pronunciationScore: number;
+    contentText:string
+}
