@@ -2,6 +2,7 @@
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { UserDto } from './src/routes/type';
+import { UseHandlerContext } from 'react-native-reanimated';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -23,6 +24,7 @@ export type RootStackParamList = {
   UnitContent: {unitId:number, sectionId:number,  sectionName:string};
   Leaderboard:undefined;
   AllTimeLeaderboard:undefined;
+  History: undefined;
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -44,6 +46,7 @@ export type UnitScreenNavigationProp = NativeStackNavigationProp<RootStackParamL
 export type UnitContentScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'UnitContent'>;
 export type LeaderboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Leaderboard'>;
 export type AllTimeLeaderboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AllTimeLeaderboard'>;
+export type HistoryScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'History'>;
 
 export type MenuScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, keyof RootStackParamList>;
 
