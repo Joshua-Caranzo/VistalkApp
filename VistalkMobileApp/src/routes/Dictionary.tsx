@@ -26,7 +26,7 @@ const Dictionary: React.FC = () => {
       const newContents = result.data;
       if (reset) {
         setContents(newContents);
-        setOffset(10);
+        setOffset(0);
       } else {
         setContents((prevContents) => [...prevContents, ...newContents]);
       }
@@ -37,7 +37,7 @@ const Dictionary: React.FC = () => {
       }
 
 
-      if (hasMore) {
+      if (newContents.length === 10) {
         setOffset((prevOffset) => prevOffset + 10);
       }
     } catch (error) {

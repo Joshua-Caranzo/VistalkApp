@@ -138,7 +138,6 @@ export async function getFromBaseApi<T>(url: string, params?: Record<string, unk
             'Content-Type': 'multipart/form-data',
         },
     };
-
     const response = await mainAxiosInstance.put<T>(url, formData, formConfig);
     return response.data;
 }
