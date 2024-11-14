@@ -85,8 +85,10 @@ const ChangePassword: React.FC<Props> = ({ navigation }) => {
             value={confirmPassword}
           />
 
-          <TouchableOpacity className="bg-white p-2 rounded-lg items-center w-[80%]" onPress={handleSubmit}>
-            <Text className="text-[#AEAEAE] font-bold text-lg">Submit</Text>
+          <TouchableOpacity className="p-2 rounded-xl items-center w-[80%]" style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.4)'
+          }} onPress={handleSubmit}>
+            <Text className="text-white font-black text-lg">Submit</Text>
           </TouchableOpacity>
 
           {!isPasswordValid && (

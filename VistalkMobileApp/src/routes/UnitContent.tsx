@@ -875,7 +875,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                 </View>
                             )}
 
-                            <View className="absolute bottom-5">
+                            <View className="absolute bottom-5 mt-2">
                                 <TouchableOpacity onPress={() => openModal()}>
                                     <View className="items-center">
                                         <View className="border-2 border-white rounded-full">

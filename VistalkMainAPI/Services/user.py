@@ -245,16 +245,37 @@ def saveGamePlay():
         cursor.execute(query_update2, (vCoin, userId))
 
         update_event_logs(userId, powerUps, totalScore)
+        
+    for powerUp in powerUps:
+        itemId = powerUp.get('itemId')
+        quantity = powerUp.get('quantity')
 
-        for powerUp in powerUps:
-            itemId = powerUp.get('itemId')
-            quantity = powerUp.get('quantity')
-            query_update_powerup = """
-                UPDATE userItem 
-                SET quantity = quantity - %s 
-                WHERE userPlayerID = %s AND itemId = %s
-            """
-            cursor.execute(query_update_powerup, (quantity, userId, itemId))
+        
+        selectUserPowerUp = """
+            SELECT * FROM userItem WHERE userPlayerId = %s AND itemId = %s
+        """
+        cursor.execute(selectUserPowerUp, (userId, itemId))
+        
+        
+        powerUpUser = cursor.fetchone()
+        if powerUpUser is None:
+            
+            print(f"No record found for userId {userId} and itemId {itemId}.")
+            continue  
+        print(powerUpUser)
+        currentQuantity = powerUpUser[3]
+        print(currentQuantity)
+        
+        toDeduct = int(currentQuantity) - int(quantity)
+        print(quantity)
+
+        
+        query_update_powerup = """
+            UPDATE userItem 
+            SET quantity = quantity - %s 
+            WHERE userPlayerId = %s AND itemId = %s
+        """
+        cursor.execute(query_update_powerup, (toDeduct, userId, itemId))
 
         query_next_unit = """
             SELECT unitID FROM unit
@@ -588,12 +609,23 @@ def update_event_logs(userId, powerUps, totalScore):
 
         elif taskTypeId == 5:
             
-            query_update_task_type_5 = """
-                UPDATE eventlogs
-                SET currentValue = currentValue + %s
-                WHERE userPlayerId = %s AND dailyTaskId = %s AND eventDate = %s
-            """
-            cursor.execute(query_update_task_type_5, (totalScore, userId, taskId, today))
+            if taskId == daily_task_id:
+                if currentValue >= required_quantity:
+                    query_update_daily_task = """
+                    UPDATE playerDailyTask
+                    SET isCompleted = 1
+                    WHERE userPlayerId = %s AND taskId = %s
+                """
+                cursor.execute(query_update_daily_task, (userId, daily_task_id))
+
+                # Insert a notification if the task was exactly completed
+                if currentValue == required_quantity:
+                    query_insert_message = """
+                        INSERT INTO notifications (userPlayerId, message, isOpened)
+                        VALUES (%s, %s, %s)
+                    """
+                    notification_message = f"Task {daily_task_id} completed!"
+                    cursor.execute(query_insert_message, (userId, notification_message, 0))
 
         
         query_refetch_current_value = """

@@ -14,24 +14,31 @@ import MusicIcon from '../assets/svg/MusicIcon';
 import PotionIcon from '../assets/svg/PotionIcon';
 import SubscriptionIcon from '../assets/svg/SubscriptionIcon';
 import CurrencyIcon from '../assets/svg/CurrencyIcon';
+import { QuestionDetails, UserPowerUp } from './type';
 
 type Props = StackScreenProps<RootStackParamList, 'Shop'>;
 
 interface Shop {
   route: {
     params: {
-      selectedItemDefault?: string; 
+      selectedItemDefault?: string;
     };
   };
 }
 
+type PowerUpURL = {
+  id: number;
+  url: string;
+};
+
 const Shop: React.FC<Props> = ({ route }) => {
-  const selectedItemDefault = route.params.selectedItemDefault || 'Power Ups'; 
-  const [activeScreen, setActiveScreen] = useState<keyof RootStackParamList | null>('Shop');
-  const [selectedItem, setSelectedItem] = useState<string>(selectedItemDefault); 
+  const selectedItemDefault = route.params.selectedItemDefault || 'Power Ups';
+  const [selectedItem, setSelectedItem] = useState<string>(selectedItemDefault);
   const [vCoin, setVcoin] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [powerUps, setPowerUps] = useState<UserPowerUp[]>([]);
+  const [powerUpUrls, setPowerUpUrl] = useState<PowerUpURL[]>([]);
 
   const renderContent = () => {
     switch (selectedItem) {
@@ -40,7 +47,7 @@ const Shop: React.FC<Props> = ({ route }) => {
       case 'Subscription':
         return <Subscription vCoin={vCoin} setVcoin={setVcoin} />;
       case 'Currency':
-        return <Currency vCoin={vCoin} setVcoin={setVcoin} />; 
+        return <Currency vCoin={vCoin} setVcoin={setVcoin} />;
       default:
         return null;
     }
@@ -70,6 +77,11 @@ const Shop: React.FC<Props> = ({ route }) => {
 
     fetchVcoin();
   }, []);
+
+  const getImageUrlByItemId = (itemId: number) => {
+    const powerUpUrlObj = powerUpUrls.find((powerUp) => powerUp.id === itemId);
+    return powerUpUrlObj ? powerUpUrlObj.url : null;
+  };
 
   return (
     <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
@@ -107,7 +119,30 @@ const Shop: React.FC<Props> = ({ route }) => {
       <ScrollView horizontal contentContainerStyle={{ padding: 4 }} className="mb-4 flex-1">
         {renderContent()}
       </ScrollView>
-      <Menu activeScreen={activeScreen} />
+
+      <View className="absolute bottom-30 rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+        <Text className="text-black text-2xl">dshgasdghjghjasd</Text>
+        <View className="flex-row justify-center gap-2 w-[100%]">
+          {powerUps.map((powerUp, index) => {
+            const imageUrl = getImageUrlByItemId(powerUp.itemId);
+
+            return (
+              <View className="py-2 px-1 items-center relative" key={index}>
+                {imageUrl ? (
+                  <Image
+                    source={{ uri: imageUrl }}
+                    className="w-10 h-10"
+                  />
+                ) : null}
+                <Text className="text-center text-[10px] text-black font-bold bg-gray-200 p-1 rounded-full absolute right-1 bottom-1 z-10">
+                  {powerUp.quantity}x
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+      <Menu activeScreen="Shop" />
     </LinearGradient>
   );
 };
