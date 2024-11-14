@@ -1,7 +1,7 @@
 <script lang="ts">
     import { redirectIfLoggedIn } from '$lib/shortcuts';
     import { onMount } from 'svelte';
-    import type { PowerUpDto, UserDto } from './type';
+    import type { PowerUpDto, PronunciationProgressDto, UserDto } from './type';
     import { getUserList, getUserPowerUp } from './repo';
     import type { CallResultDto } from '../../types/types';
     import Pagination from '$lib/components/Pagination.svelte';
@@ -19,7 +19,6 @@
     let isloading:boolean = false;
     let powerUpUrls: Record<number, string> = {};
     let powerUps: PowerUpDto[] = [];
-
     let userListCallResult: CallResultDto<UserDto[]> = {
         message: "",
         data: [],

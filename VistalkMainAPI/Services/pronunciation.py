@@ -135,3 +135,84 @@ def convert_to_flac(audio_file):
     flac_file = "converted_audio.flac"
     audio.export(flac_file, format="flac")
     return flac_file, audio.channels
+
+
+def getPronunciationProgress():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    userId = request.args.get('userId')
+    contentId = request.args.get('contentId')
+    
+    query = """
+        SELECT 
+            SUM(pronunciationScore = 1) AS correct, 
+            SUM(pronunciationScore = 0) AS incorrect 
+        FROM 
+            pronounciationresult 
+        WHERE 
+            userPlayerID = %s
+    """
+    
+    values = [userId]  
+    if contentId is not None:
+        query += " AND contentID = %s"
+        values.append(contentId)
+        
+    cursor.execute(query, tuple(values))  
+    vistas = cursor.fetchone()
+
+    if not vistas:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': vistas,
+        'data2': None,
+        'totalCount': None 
+    }), 200
+
+    
+def getPronunciationList():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    userId = request.args.get('userId')
+    contentId = request.args.get('contentId')
+    
+    query = """
+        SELECT resultId, pr.contentId, c.contentText, pronunciationScore FROM pronounciationresult pr
+        inner join content c on c.contentId =  pr.contentId
+        WHERE 
+            userPlayerID = %s
+    """
+    
+    values = [userId]  
+    if contentId is not None:
+        query += " AND contentID = %s"
+        values.append(contentId)
+    
+    cursor.execute(query, tuple(values))  
+    vistas = cursor.fetchall()  
+
+    if not vistas:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No records found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': vistas,
+        'data2': None,
+        'totalCount': len(vistas)  
+    }), 200

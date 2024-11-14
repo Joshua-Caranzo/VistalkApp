@@ -33,3 +33,9 @@ export type UserProfileDto = {
   expirationDate: Date | null;
   weeklyScoreGraph: { [key: string]: number }; 
 };
+
+export type PronunciationProgressDto = 
+{
+    correct:string;
+    incorrect: string;
+}

@@ -1,5 +1,5 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putFormMainApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp, GamePlayDto, LeaderBoardDto, SelfLeaderBoardDto, DailyTaskDto, NotificationsDto } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp, GamePlayDto, LeaderBoardDto, SelfLeaderBoardDto, DailyTaskDto, NotificationsDto, PronunciationProgressDto, PronunciationProgressListDto } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
 import { SectionListRenderItem } from "react-native";
@@ -239,4 +239,12 @@ export async function updateNotifications(userId: string) {
 
 export async function checkPronunciation(formData: FormData) {
     return await putFormMainApi<CallResultDto<object>>('checkPronunciation', formData);
+}
+
+export async function pronunciationProgressChart(userId: number, contentId:number | null) {
+    return await getFromMainApi<CallResultDto<PronunciationProgressDto>>('getPronunciationProgress', {userId , contentId});
+}
+
+export async function pronunciationProgressList(userId: number, contentId:number | null) {
+    return await getFromMainApi<CallResultDto<PronunciationProgressListDto[]>>('getPronunciationList', {userId , contentId});
 }
