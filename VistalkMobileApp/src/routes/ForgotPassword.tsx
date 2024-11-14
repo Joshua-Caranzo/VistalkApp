@@ -4,6 +4,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import { sendCodetoEmail, verifyCode } from './repo';
 import LinearGradient from 'react-native-linear-gradient';
+import LoaderModal from '../components/LoaderModal';
 
 type Props = StackScreenProps<RootStackParamList, 'ForgotPassword'>;
 
@@ -11,10 +12,15 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [confirmationCode, setConfirmationCode] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
 
   const handleSendCode = async () => {
     if (email) {
+      setIsLoading(true);
+      setLoadingMessage('Sending Verification Code. Please check your Email.');
       const result = await sendCodetoEmail(email);
+      setIsLoading(false);
       if (result.isSuccess == true)
         setIsModalVisible(true);
       else {
@@ -106,6 +112,7 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
           </View>
         </Modal>
       </LinearGradient>
+      <LoaderModal isVisible={isLoading} message={loadingMessage} />
     </SafeAreaView>
   );
 };
