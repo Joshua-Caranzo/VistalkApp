@@ -24,6 +24,7 @@ import Loader from './src/components/Loader';
 import { updateScore } from './src/routes/repo';
 import Leaderboard from './src/routes/Leaderboard';
 import AllTimeLeaderboard from './src/routes/AllTimeLeaderboard';
+import History from './src/routes/History';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -147,6 +148,11 @@ const App: React.FC = () => {
         <Stack.Screen
           name="AllTimeLeaderboard"
           component={AllTimeLeaderboard}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="History"
+          component={History}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

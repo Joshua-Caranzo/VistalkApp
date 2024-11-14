@@ -16,8 +16,11 @@ import RNFS from 'react-native-fs';
 import { Keyboard } from 'react-native';  // Import the Keyboard module
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoaderModal from '../components/LoaderModal';
+import { StackScreenProps } from '@react-navigation/stack';
 
-const Practice: React.FC = () => {
+type Props = StackScreenProps<RootStackParamList, 'Practice'>;
+
+const Practice: React.FC<Props> = ({navigation}) => {
   const [searchText, setSearchText] = useState('');
   const [activeScreen, setActiveScreen] = useState<keyof RootStackParamList | null>('Practice');
   const [contents, setContents] = useState<Content[]>([]);
@@ -219,10 +222,15 @@ const Practice: React.FC = () => {
       syllableSound.play();
     });
   };
+
+  const navigateToHistory = () => {
+    navigation.navigate("History");
+  };
+
   return (
     <SafeAreaView className="flex-1">
       <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
-        <TouchableOpacity className="absolute top-4 right-4">
+        <TouchableOpacity className="absolute top-4 right-4" onPress={navigateToHistory}>
           <HistoryIcon className="h-8 w-8 text-white" />
         </TouchableOpacity>
         <View className="items-center mt-20 mb-3">
