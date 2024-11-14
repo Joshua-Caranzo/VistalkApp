@@ -28,27 +28,27 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
       if (response.isSuccess === true) {
         await AsyncStorage.setItem('userToken', response.data.token);
         await AsyncStorage.setItem('userID', response.data.id);
-        
+
         navigation.navigate('Dashboard')
       } else {
         if (response.message === 'Inactive') {
           Alert.alert(
-              'Login Failed',
-              'Do you want to reactivate your account?',
-              [
-                  {
-                      text: 'No',
-                      onPress: () => console.log('Reactivation declined'),
-                      style: 'cancel',
-                  },
-                  {
-                      text: 'Yes',
-                      onPress: () => handleSendCode(email),
-                  },
-              ],
-              { cancelable: false }
+            'Login Failed',
+            'Do you want to reactivate your account?',
+            [
+              {
+                text: 'No',
+                onPress: () => console.log('Reactivation declined'),
+                style: 'cancel',
+              },
+              {
+                text: 'Yes',
+                onPress: () => handleSendCode(email),
+              },
+            ],
+            { cancelable: false }
           );
-      } 
+        }
         else
           Alert.alert('Login Failed', response.message);
       }
@@ -58,8 +58,7 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
     }
   };
 
-  async function handleSendCode(email:string)
-  {
+  async function handleSendCode(email: string) {
     if (email) {
       setResendModal(false);
       setLoadingMessage('Sending Verification Code. Please check your Email.');
@@ -80,7 +79,7 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
       if (result.isSuccess == true) {
         setIsModalVisible(false);
         const result2 = await reActivateVista(email);
-        if(result2.isSuccess == true)
+        if (result2.isSuccess == true)
           handleLogin();
       } else {
         setResendModal(true);
@@ -96,7 +95,7 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
         <View className="items-center mb-8">
           <Image source={require('../assets/White.png')} className="w-44 h-44" />
           <Text className="text-white text-4xl font-bold" style={{ color: '#ffffff', fontFamily: 'cursive' }}>
-              Vistalk
+            Vistalk
           </Text>
         </View>
         <TextInput
@@ -124,8 +123,8 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
         />
 
         <TouchableOpacity className="p-3 w-[80%] rounded-xl items-center mb-4" style={{
-              backgroundColor: 'rgba(240, 240, 240, 0.4)'
-            }} onPress={handleLogin}>
+          backgroundColor: 'rgba(240, 240, 240, 0.4)'
+        }} onPress={handleLogin}>
           <Text className="text-white text-xl font-black">Login</Text>
         </TouchableOpacity>
 
@@ -135,67 +134,86 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
         >
           <Text className="text-white mt-0 text-right font-bold text-base">Forgot password?</Text>
         </TouchableOpacity>
-        </LinearGradient>
+      </LinearGradient>
 
-        <Modal
-          transparent={true}
-          visible={isModalVisible}
-          animationType="slide"
-          onRequestClose={() => setIsModalVisible(false)}
-        >
-          
-          <View className="flex-1 justify-center items-center bg-[#00000080]">
-            <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
-              <Text className="text-xl font-bold mb-4 text-white">Enter Confirmation Code</Text>
+      <Modal
+        transparent={true}
+        visible={isModalVisible}
+        animationType="slide"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
 
-              <TextInput
-                className="w-full h-12 border border-white border-2 mb-4 px-2 rounded-md bg-transparent text-white"
-                placeholder="Confirmation Code"
-                placeholderTextColor="white"
-                onChangeText={setConfirmationCode}
-                value={confirmationCode}
-                keyboardType="numeric"
-                onFocus={() => setConfirmationCodePlaceHolder('')}
-                onBlur={() => setConfirmationCodePlaceHolder('Confirmation Code')}
-              />
+        <View className="flex-1 justify-center items-center bg-[#00000080]">
+          <View className="w-4/5 p-5 bg-white rounded-lg items-center">
+            <Text className="text-xl font-bold mb-4 text-white">Enter Confirmation Code</Text>
 
-              <View className="flex-row items-center justify-between w-[100%] gap-2">
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleConfirmCode}>
-                  <Text className="text-base text-black">Confirm</Text>
-                </TouchableOpacity>
+            <TextInput
+              className="w-full h-12 border border-white border-2 mb-4 px-2 rounded-md bg-transparent text-white"
+              placeholder="Confirmation Code"
+              placeholderTextColor="white"
+              onChangeText={setConfirmationCode}
+              value={confirmationCode}
+              keyboardType="numeric"
+              onFocus={() => setConfirmationCodePlaceHolder('')}
+              onBlur={() => setConfirmationCodePlaceHolder('Confirmation Code')}
+            />
 
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => setIsModalVisible(false)}>
-                  <Text className="text-base text-black">Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </LinearGradient>
+            <View className="flex-row items-center justify-between w-[100%] gap-x-2">
+              <TouchableOpacity onPress={handleConfirmCode}>
+                <LinearGradient
+                  className="py-2 px-4 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}>
+                  <Text className="text-base font-bold text-white">Confirm</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+              <LinearGradient className="flex py-2 px-5 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                    <Text className="text-base font-bold text-white">Cancel</Text>
+                  </LinearGradient>
+              </TouchableOpacity>
+            </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
 
-        <Modal
-          transparent={true}
-          visible={resendModal}
-          animationType="slide"
-          onRequestClose={() => setResendModal(false)}
-        >
-          
-          <View className="flex-1 justify-center items-center bg-[#00000080]">
-            <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
-              <Text className="text-xl font-bold mb-4 text-white">An error occurred while sending the code. Please try resending it.
-              </Text>
+      <Modal
+        transparent={true}
+        visible={resendModal}
+        animationType="slide"
+        onRequestClose={() => setResendModal(false)}
+      >
 
-              <View className="flex-row items-center justify-between w-[100%] gap-2">
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => handleSendCode(email)}>
-                  <Text className="text-base text-black">Resend</Text>
-                </TouchableOpacity>
+        <View className="flex-1 justify-center items-center bg-[#00000080]">
+          <View className="w-4/5 p-5 rounded-lg items-center">
+            <Text className="text-xl font-bold mb-4 text-white">An error occurred while sending the code. Please try resending it.
+            </Text>
 
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => setResendModal(false)}>
-                  <Text className="text-base text-black">Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </LinearGradient>
+            <View className="flex-row items-center justify-center w-[100%] gap-2">
+              <TouchableOpacity onPress={() => handleSendCode(email)}>
+                <LinearGradient
+                  className="py-2 px-4 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}>
+                  <Text className="text-base font-bold text-white">Resend</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => setResendModal(false)}>
+                <LinearGradient
+                  className="py-2 px-4 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}>
+                  <Text className="text-base font-bold text-white">No</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
 
       <LoaderModal isVisible={isLoading} message={loadingMessage} />
     </SafeAreaView>
