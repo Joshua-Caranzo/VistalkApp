@@ -37,6 +37,13 @@ def save_content():
     english_translation = request.form.get('englishTranslation')
     language_id = int(request.form.get('languageId'))
     content_type_id = int(request.form.get('contentTypeId'))
+    forPronunciation = request.form.get('forPronunciation')
+    print(forPronunciation)
+    if(forPronunciation == 'false'):
+            forPronunciation = 0
+    else:
+            forPronunciation = 1
+            
     is_indictionary = request.form.get('isInDictionary')
     if(is_indictionary == 'false'):
             is_indictionary = 0
@@ -117,8 +124,8 @@ def save_content():
 
         if content_id == 0:
             sql_content = """
-                INSERT INTO content (contentText, englishTranslation, audioPath, languageId, contentTypeId, isInDictionary)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO content (contentText, englishTranslation, audioPath, languageId, contentTypeId, isInDictionary, forPronunciation)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
             cursor.execute(sql_content, (
                 content_text,
@@ -126,7 +133,8 @@ def save_content():
                 audio_path,
                 language_id,
                 content_type_id,
-                is_indictionary
+                is_indictionary,
+                forPronunciation
             ))
             conn.commit()
             content_id = cursor.lastrowid
@@ -176,7 +184,7 @@ def save_content():
         else:
             sql_update_content = """
                 UPDATE content
-                SET contentText = %s, englishTranslation = %s, audioPath = %s, languageId = %s, contentTypeId = %s, isInDictionary = %s
+                SET contentText = %s, englishTranslation = %s, audioPath = %s, languageId = %s, contentTypeId = %s, isInDictionary = %s, forPronunciation = %s
                 WHERE contentId = %s
             """
             
@@ -187,6 +195,7 @@ def save_content():
                 language_id,
                 content_type_id,
                 is_indictionary,
+                forPronunciation,
                 content_id
             ))
             

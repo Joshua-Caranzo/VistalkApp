@@ -93,7 +93,7 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
         <View style={{ 
             position: 'absolute', 
             top: '50%', 
-            left: '53%', 
+            left: '50%', 
             transform: [{ translateX: -95 }, { translateY: -20 }], 
             zIndex: 10  
         }}>
@@ -121,7 +121,7 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
         <View style={{ 
             position: 'absolute', 
             top: '50%', 
-            left: '53%', 
+            left: '50%', 
             transform: [{ translateX: -60 }, { translateY: -20 }], 
             zIndex: 10  
         }}>

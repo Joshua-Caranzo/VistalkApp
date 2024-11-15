@@ -184,7 +184,7 @@ def buySubscription():
     premium_expiry_date = transaction_date + timedelta(days=subscription_days)
     
     updateVCoinQuery = """
-        UPDATE vista SET isPremium = true, premiumExpiry = %s WHERE userPlayerId = %s
+        UPDATE vista SET isPremium = true, premiumExpiry = %s, numberPronounced = NULL WHERE userPlayerId = %s
     """
     cursor.execute(updateVCoinQuery, (premium_expiry_date, user_player_id))
 
