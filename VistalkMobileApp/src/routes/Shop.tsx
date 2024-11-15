@@ -6,7 +6,7 @@ import Subscription from './Subscription';
 import Currency from './Currency';
 import Music from './Music';
 import { RootStackParamList } from '../../types';
-import { getUserVCoin } from './repo';
+import { getPowerupImage, getUserPowerUps, getUserVCoin } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -40,6 +40,57 @@ const Shop: React.FC<Props> = ({ route }) => {
   const [powerUps, setPowerUps] = useState<UserPowerUp[]>([]);
   const [powerUpUrls, setPowerUpUrl] = useState<PowerUpURL[]>([]);
 
+  // Fetching vCoin data and power-ups data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userID = await AsyncStorage.getItem('userID');
+        if (userID) {
+          const result = await getUserVCoin(userID);
+          if (result.isSuccess) {
+            setVcoin(result.data);
+          } else {
+            setError('Failed to fetch vCoin');
+          }
+          // Example: Fetch power-up data here (replace with actual API call)
+          // setPowerUps(fetchedPowerUps);
+          // setPowerUpUrl(fetchedPowerUpUrls);
+        } else {
+          setError('No userID found');
+        }
+      } catch (err) {
+        setError('Failed to fetch data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchPowerUps = async () => {
+        const userID = await AsyncStorage.getItem('userID');
+        if (userID) {
+            const result = await getUserPowerUps(userID);
+            setPowerUps(result.data);
+            const imageUrls = await Promise.all(
+                result.data.map(async (powerUp) => {
+                    if (powerUp.itemId !== 0) {
+                        const url = getPowerupImage(powerUp.filePath);
+                        return { id: powerUp.itemId, url };
+                    }
+                    return null;
+                })
+            );
+
+            setPowerUpUrl(imageUrls.filter((url) => url !== null));
+        }
+    };
+
+    fetchPowerUps();
+}, []);
+
   const renderContent = () => {
     switch (selectedItem) {
       case 'Power Ups':
@@ -52,31 +103,6 @@ const Shop: React.FC<Props> = ({ route }) => {
         return null;
     }
   };
-
-  useEffect(() => {
-    const fetchVcoin = async () => {
-      try {
-        const userID = await AsyncStorage.getItem('userID');
-
-        if (userID) {
-          const result = await getUserVCoin(userID);
-          if (result.isSuccess) {
-            setVcoin(result.data);
-          } else {
-            setError('Failed to fetch vCoin');
-          }
-        } else {
-          setError('No userID found');
-        }
-      } catch (err) {
-        setError('Failed to fetch vCoin');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVcoin();
-  }, []);
 
   const getImageUrlByItemId = (itemId: number) => {
     const powerUpUrlObj = powerUpUrls.find((powerUp) => powerUp.id === itemId);
@@ -120,8 +146,7 @@ const Shop: React.FC<Props> = ({ route }) => {
         {renderContent()}
       </ScrollView>
 
-      <View className="absolute bottom-30 rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-        <Text className="text-black text-2xl">dshgasdghjghjasd</Text>
+      <View className="absolute bottom-[10%] rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
         <View className="flex-row justify-center gap-2 w-[100%]">
           {powerUps.map((powerUp, index) => {
             const imageUrl = getImageUrlByItemId(powerUp.itemId);

@@ -1,4 +1,4 @@
-import { Animated, Dimensions, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Dimensions, SafeAreaView, ScrollView, Text, TouchableOpacity, View, Switch } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import BackIcon from "../assets/svg/BackIcon";
 import { StackScreenProps } from "@react-navigation/stack";
@@ -9,6 +9,7 @@ import { PronunciationProgressDto, PronunciationProgressListDto } from "./type";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { pronunciationProgressChart, pronunciationProgressList } from "./repo";
+import CircleIcon from "../assets/svg/CircleIcon";
 
 type Props = StackScreenProps<RootStackParamList, 'History'>;
 
@@ -43,6 +44,8 @@ const History: React.FC<Props> = ({ navigation, route }) => {
         }, [contentId])
     );
 
+    const handleToggle = (value: boolean) => {
+        setIsToggled(value);
     const handleToggle = () => {
         setIsToggled((prevState) => !prevState);
 
@@ -59,6 +62,12 @@ const History: React.FC<Props> = ({ navigation, route }) => {
         { name: 'Correct', population: parseInt(pieDataResult?.correct ?? "0"), color: '#FF6384', legendFontColor: '#7F7F7F', legendFontSize: 15 },
         { name: 'Incorrect', population: parseInt(pieDataResult?.incorrect ?? "0"), color: '#36A2EB', legendFontColor: '#7F7F7F', legendFontSize: 15 },
     ];
+
+    // Function to determine color based on pronunciation score
+    const getCircleIconColor = (score: number) => {
+        return score === 0 ? 'red' : score === 1 ? 'green' : 'gray'; // Default to gray for other values
+    };
+
     return (
         <SafeAreaView className="flex-1">
             <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
@@ -68,30 +77,24 @@ const History: React.FC<Props> = ({ navigation, route }) => {
                     </TouchableOpacity>
                 </View>
                 <View className="flex-1 mt-2">
-                    <Text className="text-3xl font-black text-white text-center">History</Text>
+                    <Text className="text-4xl font-black text-white text-center">History</Text>
 
                     <View className="flex-row items-center gap-x-2 mt-2 justify-end mr-5">
                         <Text className="text-md text-white">Show Content History only</Text>
-                        <TouchableOpacity onPress={handleToggle} className="ml-4">
-                            <View className={`w-10 h-5 rounded-full item-center ${isToggled ? 'bg-green-500' : 'bg-gray-300'}`}>
-                                <Animated.View
-                                    style={{
-                                        width: 16,
-                                        height: 16,
-                                        backgroundColor: 'white',
-                                        borderRadius: 8,
-                                        marginLeft: animatedPosition,
-                                        alignItems: 'center'
-                                    }}
-                                />
-                            </View>
-                        </TouchableOpacity>
+                        <Switch
+                            value={isToggled}
+                            onValueChange={handleToggle}
+                            trackColor={{ false: '#E0E0E0', true: '#34D399' }} // Customize track color
+                            thumbColor={isToggled ? '#ffffff' : '#BDBDBD'} // Customize thumb color
+                            ios_backgroundColor="#E0E0E0"
+                            style={{ marginLeft: 10 }}
+                        />
                     </View>
                     <View className="">
                         <PieChart
                             data={pieData}
                             width={screenWidth}
-                            height={220}
+                            height={200}
                             chartConfig={{
                                 backgroundColor: '#ffffff',
                                 backgroundGradientFrom: '#f7c188',
@@ -101,34 +104,51 @@ const History: React.FC<Props> = ({ navigation, route }) => {
                             accessor="population"
                             backgroundColor="transparent"
                             paddingLeft="15"
-                            absolute // Shows absolute values instead of percentages
+                            absolute
                         />
                     </View>
-
                 </View>
                 <ScrollView
-                    className="bg-white rounded-xl mb-6 mt-[30%]"
-                    contentContainerStyle={{ paddingHorizontal: 30, paddingVertical: 15 }}
+                    className="bg-white rounded-xl mb-8 h-[16%]"
+                    contentContainerStyle={{
+                        paddingHorizontal: 30,
+                        paddingVertical: 15,
+                    }}
                     showsVerticalScrollIndicator={false}
                 >
-                    <View>
-                        <Text className="text-black text-lg font-bold mb-4 w-full px-16">History Words</Text>
+                    <View className="space-y-3">
+                        <Text className="text-black text-3xl font-bold mb-2 mt-2 text-center px-16">History</Text>
 
-                        <View className="flex-row mb-4">
+                        <View className="flex-row mb-2">
                             <Text className="flex-1 font-bold text-black text-base text-center">Word</Text>
                             <Text className="flex-1 font-bold text-black text-base text-center">Response</Text>
                         </View>
 
                         {list.map((item, index) => (
-                            <View key={index} className="flex-row mb-2">
-                                <Text className="flex-1 text-base text-black text-center">{item.contentText}</Text>
-                                <Text className="flex-1 text-base text-black text-center">{item.pronunciationScore}</Text>
+                            <View
+                                key={index}
+                                className="bg-[#F2F0EF] p-4 rounded-lg shadow-lg mb-4"
+                                style={{
+                                    borderLeftWidth: 4,
+                                    borderLeftColor: getCircleIconColor(item.pronunciationScore) === 'green' ? 'green' : getCircleIconColor(item.pronunciationScore) === 'red' ? 'red' : 'gray',
+                                }}
+                            >
+                                <View className="flex-row items-center justify-between">
+                                    <Text className="flex-1 text-base text-black font-semibold">{item.contentText}</Text>
+                                    <View className="flex-1 flex-row justify-center items-center">
+                                        <CircleIcon
+                                            className={`h-5 w-5 text-${getCircleIconColor(item.pronunciationScore)}-500`}
+                                        />
+                                    </View>
+                                </View>
                             </View>
                         ))}
                     </View>
                 </ScrollView>
+
             </LinearGradient>
         </SafeAreaView>
     );
 };
+
 export default History;
