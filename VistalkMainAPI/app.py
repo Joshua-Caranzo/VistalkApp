@@ -2,10 +2,22 @@ from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
 from Services import language, dailyTask, user, content, shop, payment,section, pronunciation
+from apscheduler.schedulers.background import BackgroundScheduler
+import time
 
 app = Flask(__name__)
 CORS(app)
 
+def start_background_service():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(user.check_all_users_subscriptions, 'interval', hours=1)
+    scheduler.start()
+    try: 
+          while True:
+            time.sleep(3600)  
+    except (KeyboardInterrupt, SystemExit):
+        scheduler.shutdown()
+        
 @app.route('/getLanguages', methods=['GET'])
 def getLanguages():
     return language.get_Language()
@@ -33,6 +45,10 @@ def addfeedback():
 @app.route('/getContent', methods=['GET'])
 def getContent():
     return content.get_Content()
+
+@app.route('/getContentPronunciation', methods=['GET'])
+def get_ContentPronunciation():
+    return content.get_ContentPronunciation()
 
 @app.route('/getContentByID', methods=['GET'])
 def getContentByID():
@@ -188,5 +204,13 @@ def getPronunciationProgress():
 def getPronunciationList():
     return pronunciation.getPronunciationList()
 
+@app.route('/getPronunciationCount', methods=['GET'])
+def getPronunciationCount():
+    return pronunciation.getPronunciationCount()
+
 if __name__ == "__main__":
+    from threading import Thread
+    thread = Thread(target=start_background_service)
+    thread.daemon = True  
+    thread.start()
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

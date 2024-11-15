@@ -15,33 +15,48 @@ def checkPronunciation():
     audio_file = request.files.get('audioFile')
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = """
-        SELECT contentText from content where contentID = %s
-    """
-    cursor.execute(query, (content_id,))
+    
+    
+    cursor.execute("SELECT numberPronounced FROM vista WHERE userPlayerId = %s", (userId,))
+    result = cursor.fetchone()
+    if result['numberPronounced'] != None and result['numberPronounced'] <= 0:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'No credits remaining. Please subscribe or try again tomorrow.',
+            'data': None
+        }), 403  
+
+    
+    cursor.execute("SELECT contentText FROM content WHERE contentID = %s", (content_id,))
     ctext_row = cursor.fetchone()
     ctext = ctext_row['contentText'].lower()
+
     
     if not audio_file:
         return jsonify({'error': 'No audio file provided'}), 400
 
     
     temp_audio_path = save_audio_file(audio_file)
-    
-    
     transcription, average_confidence = pronounciate(temp_audio_path)
     transcription = transcription.lower()
-    score = 0
-    if(transcription == ctext and average_confidence >= 0.75):
-        score = 1
-        
-    insertQuery = """
+    score = 1 if transcription == ctext and average_confidence >= 0.75 else 0
+
+    
+    insert_query = """
         INSERT INTO pronounciationresult (userPlayerID, contentID, pronunciationScore) VALUES (%s, %s, %s)
     """
-    cursor.execute(insertQuery, (userId, content_id, score))
-    conn.commit()
+    cursor.execute(insert_query, (userId, content_id, score))
+
+    if result['numberPronounced'] != None and result['numberPronounced'] >= 1:
+        update_query = """
+            UPDATE vista SET numberPronounced = numberPronounced - 1 WHERE userPlayerId = %s AND numberPronounced > 0
+        """
+        cursor.execute(update_query, (userId,))
     
-    if(transcription == ctext and average_confidence >= 0.75):
+    conn.commit()
+
+    
+    if score == 1:
         return jsonify({
             'isSuccess': True,
             'message': 'Correct',
@@ -57,6 +72,7 @@ def checkPronunciation():
             'data2': None,
             'totalCount': None  
         }), 200
+
 
 def save_audio_file(audio_file):
     
@@ -194,7 +210,7 @@ def getPronunciationList():
     
     values = [userId]  
     if contentId is not None:
-        query += " AND contentID = %s"
+        query += " AND pr.contentID = %s"
         values.append(contentId)
     
     cursor.execute(query, tuple(values))  
@@ -216,3 +232,40 @@ def getPronunciationList():
         'data2': None,
         'totalCount': len(vistas)  
     }), 200
+
+
+def getPronunciationCount():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    userId = request.args.get('userId')
+    
+    query = """
+        SELECT 
+            numberPronounced
+        FROM 
+            vista 
+        WHERE 
+            userPlayerID = %s
+    """    
+    values = [userId] 
+        
+    cursor.execute(query, tuple(values))  
+    vistas = cursor.fetchone()
+
+    if not vistas:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': vistas,
+        'data2': None,
+        'totalCount': None 
+    }), 200
+    

@@ -107,6 +107,7 @@
             audioPath: "",
             contentTypeId: 0,
             isInDictionary: false,
+            forPronunciation:false,
             audio: null,
             file: null,
             isPlaying:false
