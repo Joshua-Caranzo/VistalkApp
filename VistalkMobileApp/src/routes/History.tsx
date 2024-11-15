@@ -50,10 +50,9 @@ const History: React.FC<Props> = ({ navigation, route }) => {
             toValue: isToggled ? 0 : 20,
             duration: 200,
             useNativeDriver: false,
-        }).start();
-
-        // Toggle content filter by setting `contentId` to either `currentContentId` or `null`
-        setContentId(isToggled ? null : contentId);
+        }).start();        // Toggle content filter by setting `contentId` to either `currentContentId` or `null`
+        setContentId(isToggled ? contentId : null);
+        fetchLeaderboardData();
     };
 
     const pieData = [

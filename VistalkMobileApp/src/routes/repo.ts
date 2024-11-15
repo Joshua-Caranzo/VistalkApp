@@ -1,5 +1,5 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putFormMainApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp, GamePlayDto, LeaderBoardDto, SelfLeaderBoardDto, DailyTaskDto, NotificationsDto, PronunciationProgressDto, PronunciationProgressListDto } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp, GamePlayDto, LeaderBoardDto, SelfLeaderBoardDto, DailyTaskDto, NotificationsDto, PronunciationProgressDto, PronunciationProgressListDto, PronunciationType } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
 import { SectionListRenderItem } from "react-native";
@@ -73,6 +73,10 @@ export async function sendReport(userId: number, report: string) {
 
 export async function getContent(searchString: string, offset: number, LIMIT: number) {
     return await getFromMainApi<CallResultDto<Content[]>>('getContent', { searchString, offset, LIMIT });
+}
+
+export async function getPronunciations(searchString: string, offset: number, LIMIT: number) {
+    return await getFromMainApi<CallResultDto<Content[]>>('getContentPronunciation', { searchString, offset, LIMIT });
 }
 
 export async function getContentById(contentId: number) {
@@ -247,4 +251,8 @@ export async function pronunciationProgressChart(userId: number, contentId:numbe
 
 export async function pronunciationProgressList(userId: number, contentId:number | null) {
     return await getFromMainApi<CallResultDto<PronunciationProgressListDto[]>>('getPronunciationList', {userId , contentId});
+}
+
+export async function getPronunciationCount(userId: number) {
+    return await getFromMainApi<CallResultDto<PronunciationType>>('getPronunciationCount', {userId});
 }

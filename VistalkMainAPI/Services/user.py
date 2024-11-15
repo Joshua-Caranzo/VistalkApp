@@ -618,7 +618,7 @@ def update_event_logs(userId, powerUps, totalScore):
                 """
                 cursor.execute(query_update_daily_task, (userId, daily_task_id))
 
-                # Insert a notification if the task was exactly completed
+                
                 if currentValue == required_quantity:
                     query_insert_message = """
                         INSERT INTO notifications (userPlayerId, message, isOpened)
@@ -799,3 +799,61 @@ def updateNotifications():
     finally:
         cursor.close()
         conn.close()
+
+def check_subscription_and_update(userId):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    query = """
+        SELECT isPremium, premiumExpiry, numberPronounced 
+        FROM vista 
+        WHERE userPlayerId = %s
+    """
+    cursor.execute(query, (userId,))
+    result = cursor.fetchone()
+    
+    if result:
+        if result['premiumExpiry']:
+            expiry_date = result['premiumExpiry']
+            current_date = datetime.now()
+
+            if expiry_date < current_date:
+                update_query = """
+                    UPDATE vista 
+                    SET isPremium = 0, premiumExpiry = NULL, numberPronounced = 20 
+                    WHERE userPlayerId = %s
+                """
+                cursor.execute(update_query, (userId,))
+                
+                query_insert_message = """
+                        INSERT INTO notifications (userPlayerId, message, isOpened)
+                        VALUES (%s, %s, %s)
+                    """
+                message = "Your subscription has ended. Please renew to continue enjoying our services."
+                cursor.execute(query_insert_message, (userId, message, 0))
+
+                conn.commit()
+                print(f"User {userId}'s subscription has expired. Values have been reset.")
+                
+            else:
+                print(f"User {userId}'s subscription is still active.")
+        
+        if result['numberPronounced'] is None or result['numberPronounced'] <= 0:
+            print(f"User {userId}'s numberPronounced is either None or <= 0.")
+    
+    else:
+        print(f"User {userId} not found.")
+
+def check_all_users_subscriptions():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    query = """
+        SELECT userPlayerId FROM vista
+    """
+    cursor.execute(query)
+    users = cursor.fetchall()
+
+    for user in users:
+        userId = user['userPlayerId']
+        check_subscription_and_update(userId)

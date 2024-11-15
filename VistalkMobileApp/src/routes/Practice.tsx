@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, Modal } from 'react-native';
 import Menu from '../components/Menu';
 import HistoryIcon from '../assets/svg/HistoryIcon';
 import SearchIcon from '../assets/svg/SearchIcon';
@@ -9,7 +9,7 @@ import MicrophoneIcon from '../assets/svg/MicrophoneIcon';
 import { RootStackParamList } from '../../types';
 import LinearGradient from 'react-native-linear-gradient';
 import { Content, ContentSyllable } from './type';
-import { checkPronunciation, getContent, getContentById, getContentPronunciation, getContentSyllableById, getSyllablePronunciation } from './repo';
+import { checkPronunciation, getContentById, getContentPronunciation, getContentSyllableById, getPronunciationCount, getPronunciations, getSyllablePronunciation } from './repo';
 import Sound from 'react-native-sound';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import RNFS from 'react-native-fs';
@@ -20,7 +20,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 type Props = StackScreenProps<RootStackParamList, 'Practice'>;
 
-const Practice: React.FC<Props> = ({navigation}) => {
+const Practice: React.FC<Props> = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [activeScreen, setActiveScreen] = useState<keyof RootStackParamList | null>('Practice');
   const [contents, setContents] = useState<Content[]>([]);
@@ -40,12 +40,21 @@ const Practice: React.FC<Props> = ({navigation}) => {
   const [pronunciationResult, setPronunciationResult] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
+  const [count, setCount] = useState<number | null>(null)
+  const [countMessage, setShowCountMessage] = useState<string | null>(null);
+
 
   const fetchContents = async (reset = false) => {
     setLoading(true);
     setLoadingMessage("Loading...")
     try {
-      const result = await getContent(searchText, offset, 10);
+      const userIdString = await AsyncStorage.getItem('userID');
+      if (userIdString) {
+        const countResult = await getPronunciationCount(parseInt(userIdString))
+        setCount(countResult.data.numberPronounced)
+
+      }
+      const result = await getPronunciations(searchText, offset, 10);
       const newContents = result.data;
       if (reset) {
         setContents(newContents);
@@ -70,6 +79,10 @@ const Practice: React.FC<Props> = ({navigation}) => {
   }, [searchText]);
 
   const startRecording = async () => {
+    if (count != null && count == 0) {
+      setShowCountMessage("You've reached your daily credit limit. Subscribe to continue, or come back tomorrow to keep learning!");
+      return
+    }
     setIsRecording(true);
     setPronunciationResult(null)
     setMessage(null);
@@ -232,16 +245,24 @@ const Practice: React.FC<Props> = ({navigation}) => {
     navigation.navigate('History', { contentId });
   };
 
+  function closeModal() {
+    setShowCountMessage(null)
+  }
+ 
+  function navigateToSubscription()
+  {
+    closeModal()
+    navigation.navigate('Shop', { selectedItemDefault: 'Subscription' })
+  }
   return (
     <SafeAreaView className="flex-1">
       <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
-        <TouchableOpacity className="absolute top-4 right-4" disabled = {!currentContent}  onPress={() => navigateToHistory(currentContent?.contentID ?? 0)}>
+        <TouchableOpacity className="absolute top-4 right-4" disabled={!currentContent} onPress={() => navigateToHistory(currentContent?.contentID ?? 0)}>
           <HistoryIcon className="h-8 w-8 text-white" />
         </TouchableOpacity>
         <View className="items-center mt-20 mb-3">
           <Text className="text-4xl font-black text-white">Pronounce</Text>
         </View>
-
         <View className="relative w-4/5">
           <View className={`flex flex-row items-center bg-white px-4 mb-2 h-10 ${showDropdown ? 'rounded-t-lg' : 'rounded-lg'}`}>
             <TextInput
@@ -281,7 +302,7 @@ const Practice: React.FC<Props> = ({navigation}) => {
         {currentContent && (
           <View className="flex-1 items-center mt-4">
             <View className="mb-2 items-center">
-            <Text className="text-2xl font-black text-white">Try to Speak this:</Text>
+              <Text className="text-2xl font-black text-white">Try to Speak this:</Text>
               <View className="flex-row items-center">
                 <Text className="text-2xl font-black text-white">{currentContent.contentText}</Text>
                 <TouchableOpacity onPress={() => playSound(fileUrl)}>
@@ -312,7 +333,7 @@ const Practice: React.FC<Props> = ({navigation}) => {
             <TouchableOpacity
               className="rounded-xl p-4 text-base font-black text-white bg-white/40 mt-10"
               onPress={() => check()}
-              disabled = {!audioFile}
+              disabled={!audioFile}
             >
               <Text className="text-white text-lg font-bold">Submit</Text>
             </TouchableOpacity>
@@ -323,12 +344,43 @@ const Practice: React.FC<Props> = ({navigation}) => {
         <View className="absolute bottom-0 w-full">
           <Menu activeScreen={activeScreen} />
         </View>
-        
+
       </LinearGradient>
       <LoaderModal isVisible={loading} message={loadingMessage} />
 
+      <Modal
+        transparent={true}
+        visible={countMessage != null}
+        animationType="fade"
+        onRequestClose={closeModal}
+      >
+        <TouchableOpacity
+          className="flex-1 bg-black bg-opacity-50 justify-center items-center"
+          onPress={closeModal}
+        >
+          <View className="bg-white p-6 rounded-lg w-4/5 shadow-lg">
+            <Text className="text-center text-lg text-gray-800 mb-4">
+              {countMessage}
+            </Text>
+            <TouchableOpacity style={{
+              backgroundColor: 'white',
+              paddingVertical: 10,
+              paddingHorizontal: 16,
+              borderRadius: 50,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.3,
+              shadowRadius: 5,
+              elevation: 5,
+            }} onPress={() => navigateToSubscription}>
+              <Text className="text-[#f7c188] font-bold text-lg text-center">
+                Subscribe</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
-    
+
   );
 };
 
