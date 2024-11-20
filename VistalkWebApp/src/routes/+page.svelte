@@ -81,51 +81,18 @@
         goto("/donate");
     }
 </script>
+
 <svelte:head>
-	<title>Vistalk</title>
+    <title>Vistalk</title>
 </svelte:head>
 {#if isLoading}
     <div></div>
 {:else if !$loggedInUser}
-<header class="fixed top-0 w-full z-50 bg-gradient-to-r from-[#6addd0] to-[#f7c188]">
-    <nav class="text-black py-4 w-[85%] px-4 md:px-20 flex justify-between items-center max-w-8xl mx-auto">
-        <div class="flex justify-center items-center">
-            <img src="FinalLogo.png" alt="Logo" class="h-12 md:h-12 rounded-full">
-            <h2 class="text-3xl ml-2 font-bold" style="color: #ffffff; font-family: 'Dancing Script', cursive;">Vistalk</h2>
-        </div>
-        <div class="flex justify-center items-center">
-            <ul class="flex">
-                <li class="mr-4">
-                    <span class="hover:underline font-bold cursor-pointer text-white text-xl" on:click={() => scrollToSection('about-us')}>About Us</span>
-                </li>
-            </ul>
-            <ul class="flex">
-                <li class="ml-4">
-                    <span class="hover:underline font-bold cursor-pointer text-white text-xl" on:click={() => scrollToSection('the-developers')}>The Developers</span>
-                </li>
-            </ul>
-        </div>
-        <div class="flex justify-center items-center">
-            <button on:click={() => goto('/login')} class="bg-white hover:text-[#f7c188] font-bold py-2 px-4 rounded-full">Log In</button>
-        </div>
-    </nav>
-</header>
-
-<section class="bg-gradient-to-r from-[#6addd0] to-[#f7c188] h-90 md:h-120 px-4 pt-32 relative">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center h-full md:py-24">
-        <div class="text-center md:text-left">
-            <h2 class="text-4xl md:text-3xl font-bold mb-4">ALL-IN-ONE GATEWAY TO MASTERING VISAYAN COMMUNICATION</h2>
-            <p class="text-xl md:text-xl w-[70%] mb-4">
-                Vistalk is a language learning app designed to break down language barriers, making communication easier and more enjoyable for everyone.
-            </p>
-                    </div>
-        <div class="mt-8 md:mt-0">
-            <img src="Group 1.png" alt="Image" class="w-full h-auto max-w-lg md:max-w-xl">
-        </div>
-    </div>
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center h-full gap-2">
-        <button
-            class="bg-white font-bold py-2 px-4 rounded-full mt-4 flex items-center justify-center relative overflow-hidden group"
+    <header
+        class="fixed top-0 w-full z-50 bg-gradient-to-r from-[#6addd0] to-[#f7c188]"
+    >
+        <nav
+            class="text-black py-4 w-[85%] px-4 md:px-20 flex justify-between items-center max-w-8xl mx-auto"
         >
             <div class="flex justify-center items-center">
                 <img
