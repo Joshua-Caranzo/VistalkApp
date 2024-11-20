@@ -144,11 +144,11 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
       >
 
         <View className="flex-1 justify-center items-center bg-[#00000080]">
-          <View className="w-4/5 p-5 bg-white rounded-lg items-center">
-            <Text className="text-xl font-bold mb-4 text-white">Enter Confirmation Code</Text>
+          <View className="w-4/5 p-5 bg-white rounded-xl items-center">
+            <Text className="text-xl font-black mb-4 text-black">Enter Confirmation Code</Text>
 
             <TextInput
-              className="w-full h-12 border border-white border-2 mb-4 px-2 rounded-md bg-transparent text-white"
+              className="w-full h-12 border border-gray-500 border-2 mb-4 px-2 rounded-md bg-transparent text-black"
               placeholder="Confirmation Code"
               placeholderTextColor="white"
               onChangeText={setConfirmationCode}
@@ -158,7 +158,7 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
               onBlur={() => setConfirmationCodePlaceHolder('Confirmation Code')}
             />
 
-            <View className="flex-row items-center justify-between w-[100%] gap-x-2">
+            <View className="flex-row items-center justify-center w-[100%] gap-x-2">
               <TouchableOpacity onPress={handleConfirmCode}>
                 <LinearGradient
                   className="py-2 px-4 rounded-xl items-center" colors={['#6addd0', '#f7c188']}

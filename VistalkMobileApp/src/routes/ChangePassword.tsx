@@ -92,7 +92,7 @@ const ChangePassword: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
 
           {!isPasswordValid && (
-            <Text className="text-red-500 mt-4">
+            <Text className="text-red-500 mt-4 text-center">
               Password must be at least 8 characters long, include an uppercase letter, a number, and a special character.
             </Text>
           )}

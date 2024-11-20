@@ -196,16 +196,20 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
         >
           
           <View className="flex-1 justify-center items-center bg-[#00000080]">
-            <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
-              <Text className="text-xl font-bold mb-4 text-white">{error}
+            <View className="w-4/5 p-5 rounded-xl items-center bg-white">
+              <Text className="text-xl font-bold mb-4 text-black text-center">{error}
               </Text>
 
-              <View className="flex-row items-center justify-between w-[100%] gap-2">
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => navigation.navigate('Register')}>
-                  <Text className="text-base text-black">Okay</Text>
+              <View className="flex-row items-center justify-center w-[100%] gap-2">
+                <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                  <LinearGradient className="flex py-2 px-4 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                  <Text className="text-base text-white">Okay</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
-            </LinearGradient>
+            </View>
           </View>
         </Modal>
     </SafeAreaView>

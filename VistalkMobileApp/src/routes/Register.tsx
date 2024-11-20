@@ -250,11 +250,11 @@ const Register: React.FC<Props> = ({ navigation }) => {
         >
           
           <View className="flex-1 justify-center items-center bg-[#00000080]">
-            <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
-              <Text className="text-xl font-bold mb-4 text-white">Enter Confirmation Code</Text>
+            <View className="w-4/5 p-5 rounded-xl items-center bg-white">
+              <Text className="text-xl font-black mb-4 text-black">Enter Confirmation Code</Text>
 
               <TextInput
-                className="w-full h-12 border border-white border-2 mb-4 px-2 rounded-md bg-transparent text-white"
+                className="w-full h-12 border border-gray-500 border-2 mb-4 px-2 rounded-md bg-transparent text-black"
                 placeholder="Confirmation Code"
                 placeholderTextColor="white"
                 onChangeText={setConfirmationCode}
@@ -265,10 +265,12 @@ const Register: React.FC<Props> = ({ navigation }) => {
               />
 
               <View className="flex-row items-center justify-center w-[100%] gap-2">
-                <TouchableOpacity className="flex py-2 px-4 rounded-xl items-center" style={{
-                backgroundColor: 'rgba(240, 240, 240, 0.4)'
-              }} onPress={handleConfirmCode}>
-                  <Text className="text-base text-white">Confirm</Text>
+                <TouchableOpacity onPress={handleConfirmCode}>
+                  <LinearGradient className="flex py-2 px-4 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                        <Text className="text-base text-white">Confirm</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => setIsModalVisible(false)}>
@@ -279,7 +281,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
                   </LinearGradient>  
                 </TouchableOpacity>
               </View>
-            </LinearGradient>
+            </View>
           </View>
         </Modal>
 
@@ -291,20 +293,28 @@ const Register: React.FC<Props> = ({ navigation }) => {
         >
           
           <View className="flex-1 justify-center items-center bg-[#00000080]">
-            <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
-              <Text className="text-xl font-bold mb-4 text-white">An error occurred while sending the code. Please try resending it.
+            <View className="w-4/5 p-5 rounded-xl items-center bg-white">
+              <Text className="text-xl font-bold mb-4 text-black font-bold text-center">An error occurred while sending the code. Please try resending it.
               </Text>
 
-              <View className="flex-row items-center justify-between w-[100%] gap-2">
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleSendCode}>
-                  <Text className="text-base text-black">Resend</Text>
+              <View className="flex-row items-center justify-center w-[100%] gap-2">
+                <TouchableOpacity onPress={handleSendCode}>
+                  <LinearGradient className="flex py-2 px-4 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                  <Text className="text-base text-white">Resend</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
 
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => setResendModal(false)}>
-                  <Text className="text-base text-black">Cancel</Text>
+                <TouchableOpacity onPress={() => setResendModal(false)}>
+                  <LinearGradient className="flex py-2 px-4 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                  <Text className="text-base text-white">Cancel</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
-            </LinearGradient>
+            </View>
           </View>
         </Modal>
 
