@@ -74,7 +74,7 @@ const SetNewPassword: React.FC<Props> = ({ route, navigation }) => {
           </View>
 
           {!isPasswordValid && (
-            <Text className="text-red mt-2">
+            <Text className="text-red-500 text-center mt-2">
               Password must be at least 8 characters long, include an uppercase letter, a number, and a special character.
             </Text>
           )}
