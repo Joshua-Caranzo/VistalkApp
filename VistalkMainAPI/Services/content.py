@@ -5,24 +5,25 @@ def get_Content():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    
+    languageId = int(request.args.get('languageId'))  
+
     searchString = request.args.get('searchString', '')
     print(searchString)
     offset = int(request.args.get('offset', 0))  
     limit = int(request.args.get('limit', 10))   
     print(offset)
     
-    query = "SELECT * FROM content WHERE isInDictionary = 1"
+    query = "SELECT * FROM content WHERE languageID = %s AND isInDictionary = 1 AND isActive = 1"
 
     
     if searchString and searchString != "" and searchString != " ":
         query += " AND (contentText LIKE %s OR englishTranslation LIKE %s)"
         likePattern = f"%{searchString}%"
         cursor.execute(query + " ORDER BY contentText LIMIT %s OFFSET %s", 
-                       (likePattern , likePattern, limit, offset))
+                       (languageId, likePattern , likePattern, limit, offset))
     else:
         cursor.execute(query + " ORDER BY contentText LIMIT %s OFFSET %s", 
-                       (limit, offset))
+                       (languageId, limit, offset))
 
     
     content = cursor.fetchall()
@@ -52,24 +53,25 @@ def get_ContentPronunciation():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    
+    languageId = request.args.get('languageId')
+
     searchString = request.args.get('searchString', '')
     print(searchString)
     offset = int(request.args.get('offset', 0))  
     limit = int(request.args.get('limit', 10))   
     print(offset)
     
-    query = "SELECT * FROM content WHERE isInDictionary = 1 AND forPronunciation = 1"
+    query = "SELECT * FROM content WHERE languageId = %s AND isInDictionary = 1 AND forPronunciation = 1 and isActive = 1"
 
     
     if searchString and searchString != "" and searchString != " ":
         query += " AND (contentText LIKE %s OR englishTranslation LIKE %s)"
         likePattern = f"%{searchString}%"
         cursor.execute(query + " ORDER BY contentText LIMIT %s OFFSET %s", 
-                       (likePattern , likePattern, limit, offset))
+                       (languageId, likePattern , likePattern, limit, offset))
     else:
         cursor.execute(query + " ORDER BY contentText LIMIT %s OFFSET %s", 
-                       (limit, offset))
+                       (languageId, limit, offset))
 
     
     content = cursor.fetchall()
@@ -159,7 +161,7 @@ def getContentSyllableByID():
             'message': 'No syllables found for the given contentId',
             'data': [],
             'totalCount': 0
-        }), 404
+        }), 200
     
 def getContentExampleByID():
     contentId = request.args.get('contentId')
@@ -192,7 +194,7 @@ def getContentExampleByID():
             'message': 'No examples found for the given contentId',
             'data': [],
             'totalCount': 0
-        }), 404
+        }), 200
     
 def getContentDefinitionByID():
     contentId = request.args.get('contentId')
@@ -225,11 +227,12 @@ def getContentDefinitionByID():
             'message': 'No definitions found for the given contentId',
             'data': [],
             'totalCount': 0
-        }), 404
+        }), 200
     
 def getContentPronunciation():
     fileName = request.args.get('fileName')
     timestamp = request.args.get('t')
+    print(timestamp)
     try:
         return send_from_directory(PronunciationDirectory, fileName)
     except FileNotFoundError:

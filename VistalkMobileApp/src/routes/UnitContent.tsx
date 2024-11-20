@@ -86,6 +86,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     const [totalCorrect, setTotalCorrect] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(false);
     const rows = [];
+    const [reward, setReward] = useState<number>(0);
 
     useBackButtonHandler(navigation, 'Unit', { sectionId: sectionId, sectionName: sectionName });
 
@@ -158,16 +159,14 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
 
             return () => clearInterval(timerId);
         } else if (timeLeft === 0) {
-            console.log(currentQuestionIndex)
-            console.log(questionList.length)
 
             if (currentQuestionIndex < questionList.length - 1) {
-                setDisabledChoiceIndex([]);
                 setHearts((prevHearts) => {
                     if (prevHearts <= 1) {
                         setShowGameOver(true);
                         return 0;
                     } else {
+                        setDisabledChoiceIndex([]);
                         return prevHearts - 1;
                     }
                 });
@@ -178,9 +177,9 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                 setCurrentQuestionIndex(prevIndex => prevIndex + 1);
                 setTimeLeft(15);
             }
-            else{
+            else {
                 setShowGameOver(true);
-                return ;
+                return;
             }
         }
     }, [timerRunning, timeLeft, currentQuestionIndex, questionList.length]);
@@ -299,7 +298,6 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     };
 
     const proceedToNextQuestion = async (updatedScore: number, updatedTotalCorrect: number) => {
-        console.log("test")
         if (currentQuestionIndex < questionList.length - 1) {
             setLoading(false);
             setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
@@ -462,18 +460,23 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
         setClairVoyance(false);
         setCorrectAnswer(false);
     }
+
     async function submit(items: Item[]) {
+        console.log(items)
         setTimerRunning(false);
         setIsPlaying(true);
         setLoading(true);
         const currentQuestion = questionList[currentQuestionIndex];
+        console.log(currentQuestion)
+
         const expectedMatches = [
             currentQuestion.match1,
             currentQuestion.match2,
             currentQuestion.match3,
             currentQuestion.match4,
         ];
-        
+        console.log(expectedMatches)
+
         const count = items.reduce((acc, item, index) => {
             return acc + (expectedMatches[index] === item.id ? 1 : 0);
         }, 0);
@@ -502,11 +505,11 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                     return 0;
                 } else {
                     setTimeout(() => {
+                        proceedToNextQuestion(score, totalCorrect);
                         setDisabledChoiceIndex([]);
                         setCorrectAnswer(false);
                         setIsCorrect(null);
                         setSelectedChoice(null);
-                        proceedToNextQuestion(score, totalCorrect);
                     }, 2000);
                     return prevHearts - 1;
                 }
@@ -568,7 +571,9 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                 totalScore: finalScore,
                 powerUps: newGameplayPowerUp
             };
-            await saveGamePlay(newGamePlay)
+            const result = await saveGamePlay(newGamePlay)
+            setReward(result.data)
+            console.log(result.data)
         }
     }
     const radius = 24;
@@ -579,9 +584,8 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     return (
         <SafeAreaView className="flex-1">
 
-            {showCongratlulation && (<Congratulations score={score} onHome={onHome} onRestart={onRestart} isVisible={showCongratlulation} />)}
+            {showCongratlulation && (<Congratulations score={score} onHome={onHome} onRestart={onRestart} coins={reward} isVisible={showCongratlulation} />)}
             {!showGameOver ? (
-
                 <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
                     {isLoading ? (
                         <Loader isVisible={isLoading} />
@@ -685,18 +689,26 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
 
                                                         <TouchableOpacity
                                                             onPress={() => checkAnswer(questionList[currentQuestionIndex].choice1 ?? 0)}
-                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice1
-                                                                ? isCorrect
-                                                                    ? 'bg-green-600 border border-1 border-green-600'
-                                                                    : 'bg-[#FF0000] border border-1 border-[#FF0000]'
-                                                                : 'border-white'} ${disabledChoiceIndex.includes(1) || selectedChoice !== null ? 'opacity-50' : ''}`}
+                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg 
+        ${selectedChoice !== null && questionList[currentQuestionIndex].choice1 === questionList[currentQuestionIndex].correctChoice && selectedChoice !== questionList[currentQuestionIndex].choice1
+                                                                    ? 'bg-green-600 border-green-600'
+                                                                    : selectedChoice === questionList[currentQuestionIndex].choice1
+                                                                        ? isCorrect
+                                                                            ? 'bg-green-600 border-green-600'
+                                                                            : 'bg-[#FF0000] border-[#FF0000]'
+                                                                        : 'border-white'} 
+        ${disabledChoiceIndex.includes(1) || selectedChoice !== null ? 'opacity-50' : ''}`}
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(1)}
                                                         >
                                                             {(questionList[currentQuestionIndex].questionTypeID === 2) && (
-                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(1) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice1ContentText}</Text>
+                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(1) ? 'text-gray-400' : 'text-black'}`}>
+                                                                    {questionList[currentQuestionIndex].choice1ContentText}
+                                                                </Text>
                                                             )}
                                                             {(questionList[currentQuestionIndex].questionTypeID === 1) && (
-                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(1) ? 'text-gray-400' : 'text-black'}`}>{questionList[currentQuestionIndex].choice1EnglishTranslation}</Text>
+                                                                <Text className={`items-start text-base font-bold ${disabledChoiceIndex.includes(1) ? 'text-gray-400' : 'text-black'}`}>
+                                                                    {questionList[currentQuestionIndex].choice1EnglishTranslation}
+                                                                </Text>
                                                             )}
                                                         </TouchableOpacity>
                                                         {fileUrls[currentQuestionIndex]?.choice1AudioUrl && questionList[currentQuestionIndex].choice1AudioPath !== null && questionList[currentQuestionIndex].questionTypeID === 2 && (
@@ -706,17 +718,22 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                                 <SpeakerIcon className="h-8 w-8 ml-2 text-black" />
                                                             </TouchableOpacity>
                                                         )}
+
                                                     </View>
                                                 )}
                                                 {!disabledChoiceIndex.includes(2) && (
                                                     <View className="flex-row items-center py-2 px-4 rounded-2xl mb-4 w-[80%] bg-white">
                                                         <TouchableOpacity
                                                             onPress={() => checkAnswer(questionList[currentQuestionIndex].choice2 ?? 0)}
-                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice2
-                                                                ? isCorrect
-                                                                    ? 'bg-green-600 border border-1 border-green-600'
-                                                                    : 'bg-[#FF0000] border border-1 border-[#FF0000]'
-                                                                : 'border-white'}  ${selectedChoice !== null ? 'opacity-50' : ''}`}
+                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg 
+                                                                ${selectedChoice !== null && questionList[currentQuestionIndex].choice2 === questionList[currentQuestionIndex].correctChoice && selectedChoice !== questionList[currentQuestionIndex].choice2
+                                                                    ? 'bg-green-600 border-green-600'
+                                                                    : selectedChoice === questionList[currentQuestionIndex].choice2
+                                                                        ? isCorrect
+                                                                            ? 'bg-green-600 border-green-600'
+                                                                            : 'bg-[#FF0000] border-[#FF0000]'
+                                                                        : 'border-white'} 
+                                                                ${disabledChoiceIndex.includes(2) || selectedChoice !== null ? 'opacity-50' : ''}`}
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(2)}
                                                         >
 
@@ -740,11 +757,15 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                     <View className="flex-row items-center py-2 px-4 rounded-2xl mb-4 w-[80%] bg-white">
                                                         <TouchableOpacity
                                                             onPress={() => checkAnswer(questionList[currentQuestionIndex].choice3 ?? 0)}
-                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice3
-                                                                ? isCorrect
-                                                                    ? 'bg-green-600 border border-1 border-green-600'
-                                                                    : 'bg-[#FF0000] border border-1 border-[#FF0000]'
-                                                                : 'border-white'}  ${disabledChoiceIndex.includes(3) || selectedChoice !== null ? 'opacity-50' : ''} `}
+                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg 
+                                                                ${selectedChoice !== null && questionList[currentQuestionIndex].choice3 === questionList[currentQuestionIndex].correctChoice && selectedChoice !== questionList[currentQuestionIndex].choice3
+                                                                    ? 'bg-green-600 border-green-600'
+                                                                    : selectedChoice === questionList[currentQuestionIndex].choice3
+                                                                        ? isCorrect
+                                                                            ? 'bg-green-600 border-green-600'
+                                                                            : 'bg-[#FF0000] border-[#FF0000]'
+                                                                        : 'border-white'} 
+                                                                ${disabledChoiceIndex.includes(3) || selectedChoice !== null ? 'opacity-50' : ''}`}
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(3)}
                                                         >
 
@@ -768,11 +789,15 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                     <View className="flex-row items-center py-2 px-4 rounded-2xl mb-4 w-[80%] bg-white">
                                                         <TouchableOpacity
                                                             onPress={() => checkAnswer(questionList[currentQuestionIndex].choice4 ?? 0)}
-                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice4
-                                                                ? isCorrect
-                                                                    ? 'bg-green-600 border border-1 border-green-600'
-                                                                    : 'bg-[#FF0000] border border-1 border-[#FF0000]'
-                                                                : 'border-white'}  ${disabledChoiceIndex.includes(4) || selectedChoice !== null ? 'opacity-50' : ''} `}
+                                                            className={`flex-1 py-2 px-3 border border-1 rounded-lg 
+                                                                ${selectedChoice !== null && questionList[currentQuestionIndex].choice4 === questionList[currentQuestionIndex].correctChoice && selectedChoice !== questionList[currentQuestionIndex].choice4
+                                                                    ? 'bg-green-600 border-green-600'
+                                                                    : selectedChoice === questionList[currentQuestionIndex].choice4
+                                                                        ? isCorrect
+                                                                            ? 'bg-green-600 border-green-600'
+                                                                            : 'bg-[#FF0000] border-[#FF0000]'
+                                                                        : 'border-white'} 
+                                                                ${disabledChoiceIndex.includes(4) || selectedChoice !== null ? 'opacity-50' : ''}`}
                                                             disabled={selectedChoice !== null || disabledChoiceIndex.includes(4)}
                                                         >
 
@@ -798,6 +823,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                         {(questionList[currentQuestionIndex].questionTypeID === 3) && (
                                             <View className="flex-1">
                                                 <MatchComponent
+                                                    key={`match-${currentQuestionIndex}-3`}
                                                     showCorrectAnswer={showCorrectAnswer}
                                                     clairVoyageDone={clairVoyageDone}
                                                     questionList={questionList}
@@ -837,6 +863,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                         {(questionList[currentQuestionIndex].questionTypeID === 4) && (
                                             <View className="flex-1">
                                                 <MatchComponent
+                                                    key={`match-${currentQuestionIndex}-4`}
                                                     showCorrectAnswer={showCorrectAnswer}
                                                     questionList={questionList}
                                                     clairVoyageDone={clairVoyageDone}
@@ -853,17 +880,17 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                                         },
                                                         {
                                                             id: questionList[currentQuestionIndex].match3 ?? 0,
-                                                            name: questionList[currentQuestionIndex].match4EnglishTranslation ?? ''
+                                                            name: questionList[currentQuestionIndex].match3EnglishTranslation ?? ''
                                                         },
                                                         {
                                                             id: questionList[currentQuestionIndex].match4 ?? 0,
-                                                            name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
+                                                            name: questionList[currentQuestionIndex].match4EnglishTranslation ?? ''
                                                         }
                                                     ]}
                                                     fixedItems={[
                                                         questionList[currentQuestionIndex].word1ContentText ?? '',
-                                                        questionList[currentQuestionIndex].word3ContentText ?? '',
                                                         questionList[currentQuestionIndex].word2ContentText ?? '',
+                                                        questionList[currentQuestionIndex].word3ContentText ?? '',
                                                         questionList[currentQuestionIndex].word4ContentText ?? ''
                                                     ]}
                                                     onSubmit={submit}

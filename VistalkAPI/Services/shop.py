@@ -94,9 +94,6 @@ def save_item():
                 isImplemented
             ))
 
-        conn.commit()
-        return jsonify({'isSuccess': True, "message": "Item saved successfully"}), 201
-
     elif item_typeId == 2:
         vcoin_price = float(request.form.get('vcoinPrice'))
         is_premium = request.form.get('isPremium')
@@ -166,9 +163,6 @@ def save_item():
                 musicGenre
             ))
 
-        conn.commit()
-        return jsonify({'isSuccess': True, "message": "Item saved successfully"}), 201
-
     elif item_typeId == 3:
         item_id = int(request.form.get('coinBagId'))
         price = float(request.form.get('moneyPrice'))
@@ -201,9 +195,22 @@ def save_item():
                 bagName
             ))
 
+    if not is_update and item_id is not None: 
+        print('here')
+        cursor.execute("SELECT userID FROM user WHERE isActive = 1 and isPlayer = 1")
+        active_users = cursor.fetchall()
+
+        user_item_inserts = [
+            (user[0], item_id, 0) for user in active_users
+        ]
+        cursor.executemany(
+            "INSERT INTO userItem (userPlayerID, itemID, quantity) VALUES (%s, %s, %s)",
+            user_item_inserts
+        )
+
         conn.commit()
         return jsonify({'isSuccess': True, "message": "Item saved successfully"}), 201
-
+    
     else:
         return jsonify({'isSuccess': False, "message": "Invalid itemTypeID provided"}), 400
 

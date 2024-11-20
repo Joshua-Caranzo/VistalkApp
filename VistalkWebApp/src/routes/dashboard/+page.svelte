@@ -114,7 +114,9 @@
     }
 
 </script>
-
+<svelte:head>
+  <title>Dashboard</title>
+</svelte:head>
 <div>
     <div class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
         <p class="font-['Helvetica'] text-black text-xl font-bold">Dashboard</p>

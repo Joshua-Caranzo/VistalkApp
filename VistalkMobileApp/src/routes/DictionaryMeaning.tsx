@@ -42,16 +42,20 @@ const DictionaryMeaning: React.FC<Props> = ({ route, navigation }) => {
         }
 
         const syllableResult = await getContentSyllableById(contentId);
-        setContentSyllables(syllableResult.data);
+        if (syllableResult.data)
+          setContentSyllables(syllableResult.data);
 
         const syllableUrls = syllableResult.data.map(syllable => getSyllablePronunciation(syllable.audioPath));
-        setSyllableFileUrls(syllableUrls);
+        if (syllableUrls)
+          setSyllableFileUrls(syllableUrls);
 
         const definitionResult = await getContentDefinitionById(contentId);
-        setContentDefinitions(definitionResult.data);
+        if (definitionResult.data)
+          setContentDefinitions(definitionResult.data);
 
         const exampleResult = await getContentExampleById(contentId);
-        setContentExamples(exampleResult.data);
+        if (exampleResult)
+          setContentExamples(exampleResult.data);
       } catch (err) {
         console.error('Failed to fetch content:', err);
         setError('Failed to fetch contents');
@@ -69,7 +73,7 @@ const DictionaryMeaning: React.FC<Props> = ({ route, navigation }) => {
 
   const playSound = (fileUrl: string | null) => {
     if (!fileUrl) return;
-
+    console.log(fileUrl)
     const sound = new Sound(fileUrl, '', (error: Error | null) => {
       if (error) {
         console.error('Failed to load sound', error);

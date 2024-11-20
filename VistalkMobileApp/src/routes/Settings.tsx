@@ -150,11 +150,11 @@ const Settings: React.FC<Props> = ({ navigation }) => {
           }} onPress={() => setIsReportModalVisible(true)}>
             <Text className="text-white text-center text-lg font-black">Send Report</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" style={{
+          {/* <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" style={{
             backgroundColor: 'rgba(240, 240, 240, 0.4)'
           }}>
             <Text className="text-white text-center text-lg font-black">Change Language</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity className="w-4/5 p-3 bg-white rounded-xl" style={{
             backgroundColor: 'rgba(240, 240, 240, 0.4)'
           }} onPress={handleSignOut}>

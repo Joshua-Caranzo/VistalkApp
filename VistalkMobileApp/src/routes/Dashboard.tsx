@@ -262,7 +262,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                     strokeDashoffset={(Math.PI / 2) * ((circleSize / 2) - 5)}
                   />
                 </Svg>
-                <Text className="text-2xl text-white font-black absolute">
+                <Text className="text-lg text-white font-black absolute">
                   {Math.round((section.completedUnitCount / section.unitCount) * 100) || 0}%
                 </Text>
               </View>
@@ -296,7 +296,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                   {currentSection?.description}
                 </Text>
                 <View className="pb-4 px-10">
-                  <TouchableOpacity onPress={() => navigateToUnit()}>
+                  <TouchableOpacity onPress={() => {closeModal();navigateToUnit()}}>
                     <LinearGradient colors={['#6addd0', '#f7c188']} start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }} className="bg-gray-600 py-2 px-14 rounded-2xl self-center">
                       <Text className="text-lg text-white font-bold">Let's Begin</Text>

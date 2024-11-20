@@ -7,6 +7,7 @@
     import '../app.css';
     import type { LoggedInUser } from '../types/types';
     import { initAuth } from '$lib/auth/auth';
+    import { page } from '$app/stores';
 
     let user: LoggedInUser | null = null;
     let isLoading = true;

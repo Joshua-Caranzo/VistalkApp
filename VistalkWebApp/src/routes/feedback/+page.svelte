@@ -77,6 +77,10 @@
     }
 </script>
 
+<svelte:head>
+	<title>Feed Back</title>
+</svelte:head>
+
 {#if openModal == true}
     <!-- ViewFeedback component can be added here if needed -->
 {/if}

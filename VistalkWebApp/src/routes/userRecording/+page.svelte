@@ -142,6 +142,10 @@
     }
 </script>
 
+<svelte:head>
+	<title>User Recordings</title>
+</svelte:head>
+
 <div
     class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg"
 >

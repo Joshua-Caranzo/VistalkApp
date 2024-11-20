@@ -106,7 +106,7 @@ def getUserPowerUp():
     userID = request.args.get('userID')
 
     query = """
-            Select * from powerUp where isImplemented = 1"""
+            Select p.* from powerUp p inner join item i on i.itemID = p.itemID where p.isImplemented = 1 and i.isActive = 1"""
     cursor.execute(query)
     powerUps = cursor.fetchall()
 
@@ -207,6 +207,7 @@ def saveGamePlay():
         }), 404
 
     existing_total_score = current_total_score[0]
+    vCoin = 0
 
     if totalScore > existing_total_score:
         dailyScore(userId, totalScore)
@@ -225,7 +226,6 @@ def saveGamePlay():
 
         totalPercentage = (totalCorrectAnswer / totalItems) * 100
 
-        vCoin = 0
         if totalPercentage <= 70:
             vCoin = np.random.randint(10, 20)
         elif 71 <= totalPercentage <= 90:
@@ -296,7 +296,7 @@ def saveGamePlay():
         return jsonify({
             'isSuccess': True,
             'message': 'Saved Successfully',
-            'data': [],
+            'data': vCoin,
             'data2': None,
             'totalCount': 0
         }), 200
@@ -304,7 +304,7 @@ def saveGamePlay():
         return jsonify({
             'isSuccess': False,
             'message': 'Current totalScore is greater than or equal to the new totalScore. Update not performed.',
-            'data': [],
+            'data': vCoin,
             'data2': None,
             'totalCount': 0
         }), 200
@@ -609,23 +609,12 @@ def update_event_logs(userId, powerUps, totalScore):
 
         elif taskTypeId == 5:
             
-            if taskId == daily_task_id:
-                if currentValue >= required_quantity:
-                    query_update_daily_task = """
-                    UPDATE playerDailyTask
-                    SET isCompleted = 1
-                    WHERE userPlayerId = %s AND taskId = %s
-                """
-                cursor.execute(query_update_daily_task, (userId, daily_task_id))
-
-                
-                if currentValue == required_quantity:
-                    query_insert_message = """
-                        INSERT INTO notifications (userPlayerId, message, isOpened)
-                        VALUES (%s, %s, %s)
-                    """
-                    notification_message = f"Task {daily_task_id} completed!"
-                    cursor.execute(query_insert_message, (userId, notification_message, 0))
+            query_update_task_type_5 = """
+                UPDATE eventlogs
+                SET currentValue = currentValue + %s
+                WHERE userPlayerId = %s AND dailyTaskId = %s AND eventDate = %s
+            """
+            cursor.execute(query_update_task_type_5, (totalScore, userId, taskId, today))
 
         
         query_refetch_current_value = """

@@ -2,6 +2,9 @@
 from flask import request, jsonify, send_from_directory
 import os
 from db import get_db_connection, PronunciationDirectory, SyllableDirectory
+import random
+import string
+import time
 
 PronunciationFolder = PronunciationDirectory
 Syllables =  SyllableDirectory
@@ -77,7 +80,9 @@ def save_content():
         }
         syllable_audio_file = request.files.get(f'syllables[{index}].audioFile')
         if syllable_audio_file:
-            safe_filename = f"{syllable['syllableText'].replace(' ', '_')}.wav"
+            random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+            timestamp = int(time.time())
+            safe_filename = f"{syllable['syllableText'].replace(' ', '_')}_{timestamp}_{random_string}.wav"
             syllable['audioPath'] = safe_filename
             syllable_audio_path = os.path.join(Syllables, safe_filename)
             syllable_audio_file.save(syllable_audio_path)

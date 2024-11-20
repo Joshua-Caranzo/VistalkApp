@@ -89,7 +89,9 @@
 
     async function setInactive(id:number){ await sectionInactive(id); getSectionDisplay();}
 </script>
-
+<svelte:head>
+	<title>Section</title>
+</svelte:head>
 {#if showModal}
     <AddSection modelOpen = {showModal} {isAdd} {section} languageID={currentValue} on:close={closeModal} on:refresh={getSectionDisplay}></AddSection>
 {/if}

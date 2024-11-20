@@ -99,7 +99,6 @@ const Shop: React.FC<Props> = ({ route }) => {
   
     fetchPowerUps();
   }, []);
-  
 
   const renderContent = () => {
     switch (selectedItem) {

@@ -4,7 +4,7 @@
   import { getContents, getContentsAll, getLanguages, saveAudio } from "./repo";
   import type { Content, Language } from "./types";
   import ContentList from "./ContentList.svelte";
-    import { goto } from "$app/navigation";
+  import { goto } from "$app/navigation";
 
   let isRecording = false;
   let isPlaying = false;
@@ -172,10 +172,14 @@
     messageString = null;
     currentAudio = null;
   }
-  function home(){
-        goto('/')
-    }
+  function home() {
+    goto("/");
+  }
 </script>
+
+<svelte:head>
+  <title>Donate</title>
+</svelte:head>
 
 {#if showSearch}
   <ContentList
@@ -189,10 +193,11 @@
   class="bg-gradient-to-r from-[#6addd0] to-[#f7c188] min-h-screen flex items-center justify-center flex-col"
 >
   <button
-  on:click={home}
+    on:click={home}
     class="absolute top-5 left-5 bg-white rounded-full py-2 px-4 overflow-hidden group"
   >
     <div class="flex items-center justify-center gap-x-2">
+
       <div class="group">
         <svg
         width="1.2rem" height="1.2rem"

@@ -169,7 +169,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
               </Text>
             </View>
 
-            {requiredFields.name &&  <Text className="text-red-500 mb-2 text-left w-[80%]">Name is required</Text>
+            {requiredFields.name && <Text className="text-red-500 mb-2 text-left w-[80%]">Name is required</Text>
             }
             <TextInput
               className="w-[80%] h-13 border-2 border-white mb-5 px-2.5 rounded-xl bg-transparent text-white"
@@ -231,7 +231,11 @@ const Register: React.FC<Props> = ({ navigation }) => {
             >
               <Text className={"text-white text-xl font-bold"}>Create</Text>
             </TouchableOpacity>
-
+            <TouchableOpacity className="p-3 w-[80%] rounded-xl items-center mb-4" style={{
+              backgroundColor: 'rgba(240, 240, 240, 0.4)'
+            }} onPress={() => navigation.navigate('Home')}>
+              <Text className="text-white text-xl font-black">Go Back</Text>
+            </TouchableOpacity>
             <TouchableOpacity
               className="w-[80%] items-end"
               onPress={() => navigation.navigate('LogIn')}

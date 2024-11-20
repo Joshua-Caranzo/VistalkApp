@@ -30,6 +30,7 @@ interface MatchComponentProps {
 interface MatchComponentState {
     draggableData: Item[];
     results: boolean[];
+    loading: boolean; // Add loading state
 }
 
 class MatchComponent extends Component<MatchComponentProps, MatchComponentState> {
@@ -40,8 +41,9 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
         this.state = {
             draggableData: this.jumbleArray(props.draggableItems),
             results: new Array(props.fixedItems.length).fill(false),
+            loading: false, // Initialize loading as false
         };
-        console.log(this.state.draggableData)
+        console.log('reset');
     }
 
     jumbleArray(array: Item[]): Item[] {
@@ -59,6 +61,8 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
     };
 
     handleSubmit = () => {
+        this.setState({ loading: true });
+
         const { draggableData } = this.state;
         const { questionList, currentQuestionIndex } = this.props;
         const currentQuestion = questionList[currentQuestionIndex];
@@ -67,6 +71,7 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
             currentQuestion[`match${index + 1}`] === item.id
         );
         this.setState({ results: newResults });
+
         this.props.onSubmit(draggableData);
     };
 
@@ -89,8 +94,8 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
     }
 
     render() {
-        const { fixedItems, showCorrectAnswer, isLoading } = this.props;
-        const { draggableData, results } = this.state;
+        const { fixedItems, showCorrectAnswer } = this.props;
+        const { draggableData, results, loading } = this.state;
 
         return (
             <GestureHandlerRootView className="flex-1">
@@ -116,7 +121,6 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
                                             </View>
                                         )}
                                         keyExtractor={(item) => item}
-                                        className=""
                                     />
                                 </View>
 
@@ -127,8 +131,8 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
                                         renderItemContent={({ item }, { viewState }) => (
                                             <View
                                                 className={`p-3 bg-white rounded-lg my-1 border items-center ${viewState?.dragStatus === DraxViewDragStatus.Dragging
-                                                        ? 'border border-black'
-                                                        : 'border border-white'
+                                                    ? 'border border-black'
+                                                    : 'border border-white'
                                                     }`}
                                             >
                                                 <Text className="text-black text-center text-justify">
@@ -138,16 +142,18 @@ class MatchComponent extends Component<MatchComponentProps, MatchComponentState>
                                         )}
                                         onItemReorder={this.handleItemReorder}
                                         keyExtractor={(item) => item.id.toString()}
-                                        className=""
                                     />
                                 </View>
                             </View>
                             <TouchableOpacity
                                 onPress={this.handleSubmit}
-                                disabled={isLoading}
+                                disabled={loading} // Disable button based on loading state
                             >
                                 <View className="w-[40%] mb-12 px-6 py-2 bg-white rounded-xl">
-                                    <Text className="text-base text-[#AEAEAE] text-center font-bold">Submit</Text>
+                                    <Text className={`text-base text-center font-bold ${loading ? 'text-gray-500' : 'text-[#000000]'}`}>
+                                        {'Submit'}
+                                    </Text>
+
                                 </View>
                             </TouchableOpacity>
                         </View>

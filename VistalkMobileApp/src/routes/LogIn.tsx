@@ -127,7 +127,11 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
         }} onPress={handleLogin}>
           <Text className="text-white text-xl font-black">Login</Text>
         </TouchableOpacity>
-
+        <TouchableOpacity className="p-3 w-[80%] rounded-xl items-center mb-4" style={{
+          backgroundColor: 'rgba(240, 240, 240, 0.4)'
+        }} onPress={() => navigation.navigate('Home')}>
+          <Text className="text-white text-xl font-black">Go Back</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           className="w-4/5 items-end"
           onPress={() => navigation.navigate('ForgotPassword')}
@@ -169,11 +173,11 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-              <LinearGradient className="flex py-2 px-5 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}>
-                    <Text className="text-base font-bold text-white">Cancel</Text>
-                  </LinearGradient>
+                <LinearGradient className="flex py-2 px-5 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}>
+                  <Text className="text-base font-bold text-white">Cancel</Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>

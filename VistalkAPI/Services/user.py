@@ -99,12 +99,12 @@ def createVista():
         userId = cursor.lastrowid
 
         vistaQuery = """
-        INSERT INTO vista (userPlayerId, vCoin, currentLanguageId) 
-        VALUES (%s, %s, %s)
+        INSERT INTO vista (userPlayerId, vCoin, currentLanguageId, numberPronounced) 
+        VALUES (%s, %s, %s,%s)
         """
-        cursor.execute(vistaQuery, (userId, 0, languageId))
+        cursor.execute(vistaQuery, (userId, 0, languageId, 20))
         conn.commit()
-
+        print('user error')
         
         sectionQuery = """
         SELECT u.unitId, u.unitNumber
@@ -163,6 +163,7 @@ def createVista():
             cursor.execute(eventLogQuery, (taskId, userId, 0, taskDate))
         
         conn.commit()
+        print('otheres')
 
         
         subject = "Welcome to Vistalk"
@@ -477,23 +478,24 @@ def editVistaProfile():
         """
         cursor.execute(update_query, (name, email, userID))
         print("next here")
-        user_images_dir = UserImages
-        if not os.path.exists(user_images_dir):
-            os.makedirs(user_images_dir)
-        
-        file_extension = os.path.splitext(file.filename)[1]
-        new_file_name = f"{name}_{userID}{file_extension}"
-        file_path = os.path.join(user_images_dir, new_file_name)
-        
-        with open(file_path, 'wb') as f:
-            f.write(file.read())
-        
-        image_update_query = """
-            UPDATE user
-            SET ImagePath = %s
-            WHERE userID = %s
-        """
-        cursor.execute(image_update_query, (new_file_name, userID))
+        if(file != None):
+            user_images_dir = UserImages
+            if not os.path.exists(user_images_dir):
+                os.makedirs(user_images_dir)
+            
+            file_extension = os.path.splitext(file.filename)[1]
+            new_file_name = f"{name}_{userID}{file_extension}"
+            file_path = os.path.join(user_images_dir, new_file_name)
+            
+            with open(file_path, 'wb') as f:
+                f.write(file.read())
+            
+            image_update_query = """
+                UPDATE user
+                SET ImagePath = %s
+                WHERE userID = %s
+            """
+            cursor.execute(image_update_query, (new_file_name, userID))
         
         conn.commit()
         return jsonify({
@@ -504,6 +506,7 @@ def editVistaProfile():
         }), 200
     
     except Exception as e:
+        print(e)
         conn.rollback()
         return jsonify({
             'isSuccess': False,

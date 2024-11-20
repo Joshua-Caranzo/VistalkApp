@@ -34,7 +34,7 @@ def get_choices():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     query = """
-        SELECT * FROM content where languageID = %s
+        SELECT * FROM content where languageID = %s and isActive = 1
     """
     values = [langID,]
 
@@ -42,7 +42,6 @@ def get_choices():
     contents = cursor.fetchall()
     count_query = "SELECT COUNT(*) as total FROM content WHERE languageID = %s"
     countvalues = [langID]
-
     cursor.execute(count_query, tuple(countvalues))
     total_count = cursor.fetchone()['total']
 

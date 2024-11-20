@@ -24,13 +24,14 @@ const History: React.FC<Props> = ({ navigation, route }) => {
     const [isToggled, setIsToggled] = useState(false);
     const animatedPosition = useRef(new Animated.Value(0)).current;
 
-    const fetchLeaderboardData = async () => {
+    const fetchLeaderboardData = async (toggled: boolean) => {
         try {
+            console.log(toggled);
             const userIdString = await AsyncStorage.getItem('userID');
             if (userIdString) {
-                const result = await pronunciationProgressChart(parseInt(userIdString), currentContentId);
+                const result = await pronunciationProgressChart(parseInt(userIdString), toggled ? contentId : null);
                 setPieData(result.data);
-                const result2 = await pronunciationProgressList(parseInt(userIdString), currentContentId);
+                const result2 = await pronunciationProgressList(parseInt(userIdString), toggled ? contentId : null);
                 setList(result2.data);
             }
         } catch (error) {
@@ -40,32 +41,33 @@ const History: React.FC<Props> = ({ navigation, route }) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            fetchLeaderboardData();
+            fetchLeaderboardData(false);
         }, [contentId])
     );
 
-    const handleToggle = (value: boolean) => {
-        setIsToggled(value);
     const handleToggle = () => {
-        setIsToggled((prevState) => !prevState);
+        const newState = !isToggled;
+        setIsToggled(newState);
 
         Animated.timing(animatedPosition, {
-            toValue: isToggled ? 0 : 20,
+            toValue: newState ? 20 : 0,
             duration: 200,
             useNativeDriver: false,
-        }).start();        // Toggle content filter by setting `contentId` to either `currentContentId` or `null`
-        setContentId(isToggled ? contentId : null);
-        fetchLeaderboardData();
+        }).start();
+
+        setContentId(newState ? contentId : null);
+        fetchLeaderboardData(newState); 
     };
 
+
     const pieData = [
-        { name: 'Correct', population: parseInt(pieDataResult?.correct ?? "0"), color: '#FF6384', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-        { name: 'Incorrect', population: parseInt(pieDataResult?.incorrect ?? "0"), color: '#36A2EB', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+        { name: 'Correct', population: parseInt(pieDataResult?.correct ?? "0"), color: '#5CAC3C', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+        { name: 'Incorrect', population: parseInt(pieDataResult?.incorrect ?? "0"), color: 'red', legendFontColor: '#7F7F7F', legendFontSize: 15 },
     ];
 
-    // Function to determine color based on pronunciation score
+
     const getCircleIconColor = (score: number) => {
-        return score === 0 ? 'red' : score === 1 ? 'green' : 'gray'; // Default to gray for other values
+        return score === 0 ? 'red' : score === 1 ? 'green' : 'gray';
     };
 
     return (
@@ -84,8 +86,8 @@ const History: React.FC<Props> = ({ navigation, route }) => {
                         <Switch
                             value={isToggled}
                             onValueChange={handleToggle}
-                            trackColor={{ false: '#E0E0E0', true: '#34D399' }} // Customize track color
-                            thumbColor={isToggled ? '#ffffff' : '#BDBDBD'} // Customize thumb color
+                            trackColor={{ false: '#E0E0E0', true: '#34D399' }}
+                            thumbColor={isToggled ? '#ffffff' : '#BDBDBD'}
                             ios_backgroundColor="#E0E0E0"
                             style={{ marginLeft: 10 }}
                         />
