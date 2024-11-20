@@ -43,6 +43,7 @@ export type Content =
     languageID:number;
     contentTypeId:number;
     isInDictionary: boolean;
+    forPronunciation:boolean;
     audio:HTMLAudioElement | null;
     file:File | null;
     isPlaying:boolean

@@ -395,7 +395,6 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                       ) : (
                         <Text className="text-center text-gray-500 mt-4">No daily tasks today.</Text>
                       )}
-
                     </View>
                   </TouchableWithoutFeedback>
                 </ScrollView>
@@ -418,9 +417,9 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
           onPress={closeNotification}
         >
           <View className="flex-1 justify-center items-center bg-opacity-50">
-            <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-xl">
+            <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-xl ">
 
-              <View className="bg-white rounded-2xl px-8 py-6 w-11/12 max-w-md shadow-lg">
+              <View className="bg-white rounded-2xl py-3 px-6 shadow-lg" style={{ maxHeight: 360 }}>
                 <Text className="text-2xl font-black mb-4 text-black text-center">Notifications</Text>
                 <ScrollView contentContainerStyle={{ maxHeight: 400 }}>
                   {notifications.length > 0 ? (

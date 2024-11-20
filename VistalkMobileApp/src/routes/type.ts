@@ -290,3 +290,8 @@ export type PronunciationProgressListDto =
     pronunciationScore: number;
     contentText:string
 }
+
+export type PronunciationType = 
+{
+    numberPronounced:number | null;
+}

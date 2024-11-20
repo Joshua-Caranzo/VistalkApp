@@ -48,6 +48,53 @@ def get_Content():
     }), 200
 
 
+def get_ContentPronunciation():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    
+    searchString = request.args.get('searchString', '')
+    print(searchString)
+    offset = int(request.args.get('offset', 0))  
+    limit = int(request.args.get('limit', 10))   
+    print(offset)
+    
+    query = "SELECT * FROM content WHERE isInDictionary = 1 AND forPronunciation = 1"
+
+    
+    if searchString and searchString != "" and searchString != " ":
+        query += " AND (contentText LIKE %s OR englishTranslation LIKE %s)"
+        likePattern = f"%{searchString}%"
+        cursor.execute(query + " ORDER BY contentText LIMIT %s OFFSET %s", 
+                       (likePattern , likePattern, limit, offset))
+    else:
+        cursor.execute(query + " ORDER BY contentText LIMIT %s OFFSET %s", 
+                       (limit, offset))
+
+    
+    content = cursor.fetchall()
+    print(content)
+    
+    if not content:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No content found',
+            'data': [],
+            'totalCount': 0
+        }), 200
+
+    
+    cursor.execute("SELECT COUNT(*) AS total FROM content WHERE isInDictionary = 1")
+    total_count = cursor.fetchone()['total']
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': content,
+        'totalCount': total_count  
+    }), 200
+
+
 def getContentByID():
     contentId = request.args.get('contentId')
     if not contentId:
