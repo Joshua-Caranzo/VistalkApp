@@ -71,6 +71,11 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
           }} onPress={handleSendCode}>
             <Text className="text-white font-bold text-xl">Send Code</Text>
           </TouchableOpacity>
+          <TouchableOpacity className="p-3 w-[90%] rounded-xl items-center mb-4" style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.4)'
+          }} onPress={() => navigation.navigate('Home')}>
+            <Text className="text-white text-xl font-black">Go Back</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Modal for entering confirmation code */}

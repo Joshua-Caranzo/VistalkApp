@@ -77,12 +77,12 @@
         goto('/donate')
     }
 </script>
-
+<svelte:head>
+	<title>Vistalk</title>
+</svelte:head>
 {#if isLoading}
     <div></div>
-{:else if $loggedInUser}
-    <p>Welcome, {$loggedInUser.name}!</p>
-{:else}
+{:else if !$loggedInUser}
 <header class="fixed top-0 w-full z-50 bg-gradient-to-r from-[#6addd0] to-[#f7c188]">
     <nav class="text-black py-4 w-[85%] px-4 md:px-20 flex justify-between items-center max-w-8xl mx-auto">
         <div class="flex justify-center items-center">

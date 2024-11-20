@@ -169,7 +169,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
               </Text>
             </View>
 
-            {requiredFields.name &&  <Text className="text-red-500 mb-2 text-left w-[80%]">Name is required</Text>
+            {requiredFields.name && <Text className="text-red-500 mb-2 text-left w-[80%]">Name is required</Text>
             }
             <TextInput
               className="w-[80%] h-13 border-2 border-white mb-5 px-2.5 rounded-xl bg-transparent text-white"
@@ -231,7 +231,11 @@ const Register: React.FC<Props> = ({ navigation }) => {
             >
               <Text className={"text-white text-xl font-bold"}>Create</Text>
             </TouchableOpacity>
-
+            <TouchableOpacity className="p-3 w-[80%] rounded-xl items-center mb-4" style={{
+              backgroundColor: 'rgba(240, 240, 240, 0.4)'
+            }} onPress={() => navigation.navigate('Home')}>
+              <Text className="text-white text-xl font-black">Go Back</Text>
+            </TouchableOpacity>
             <TouchableOpacity
               className="w-[80%] items-end"
               onPress={() => navigation.navigate('LogIn')}
@@ -243,70 +247,70 @@ const Register: React.FC<Props> = ({ navigation }) => {
       </KeyboardAvoidingView>
 
       <Modal
-          transparent={true}
-          visible={isModalVisible}
-          animationType="slide"
-          onRequestClose={() => setIsModalVisible(false)}
-        >
-          
-          <View className="flex-1 justify-center items-center bg-[#00000080]">
-            <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
-              <Text className="text-xl font-bold mb-4 text-white">Enter Confirmation Code</Text>
+        transparent={true}
+        visible={isModalVisible}
+        animationType="slide"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
 
-              <TextInput
-                className="w-full h-12 border border-white border-2 mb-4 px-2 rounded-md bg-transparent text-white"
-                placeholder="Confirmation Code"
-                placeholderTextColor="white"
-                onChangeText={setConfirmationCode}
-                value={confirmationCode}
-                keyboardType="numeric"
-                onFocus={() => setConfirmationCodePlaceHolder('')}
-                onBlur={() => setConfirmationCodePlaceHolder('Confirmation Code')}
-              />
+        <View className="flex-1 justify-center items-center bg-[#00000080]">
+          <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
+            <Text className="text-xl font-bold mb-4 text-white">Enter Confirmation Code</Text>
 
-              <View className="flex-row items-center justify-center w-[100%] gap-2">
-                <TouchableOpacity className="flex py-2 px-4 rounded-xl items-center" style={{
+            <TextInput
+              className="w-full h-12 border border-white border-2 mb-4 px-2 rounded-md bg-transparent text-white"
+              placeholder="Confirmation Code"
+              placeholderTextColor="white"
+              onChangeText={setConfirmationCode}
+              value={confirmationCode}
+              keyboardType="numeric"
+              onFocus={() => setConfirmationCodePlaceHolder('')}
+              onBlur={() => setConfirmationCodePlaceHolder('Confirmation Code')}
+            />
+
+            <View className="flex-row items-center justify-center w-[100%] gap-2">
+              <TouchableOpacity className="flex py-2 px-4 rounded-xl items-center" style={{
                 backgroundColor: 'rgba(240, 240, 240, 0.4)'
               }} onPress={handleConfirmCode}>
-                  <Text className="text-base text-white">Confirm</Text>
-                </TouchableOpacity>
+                <Text className="text-base text-white">Confirm</Text>
+              </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-                  <LinearGradient className="flex py-2 px-4 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}>
-                      <Text className="text-base text-white">Cancel</Text>
-                  </LinearGradient>  
-                </TouchableOpacity>
-              </View>
-            </LinearGradient>
-          </View>
-        </Modal>
+              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                <LinearGradient className="flex py-2 px-4 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}>
+                  <Text className="text-base text-white">Cancel</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
+        </View>
+      </Modal>
 
-        <Modal
-          transparent={true}
-          visible={resendModal}
-          animationType="slide"
-          onRequestClose={() => setResendModal(false)}
-        >
-          
-          <View className="flex-1 justify-center items-center bg-[#00000080]">
-            <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
-              <Text className="text-xl font-bold mb-4 text-white">An error occurred while sending the code. Please try resending it.
-              </Text>
+      <Modal
+        transparent={true}
+        visible={resendModal}
+        animationType="slide"
+        onRequestClose={() => setResendModal(false)}
+      >
 
-              <View className="flex-row items-center justify-between w-[100%] gap-2">
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleSendCode}>
-                  <Text className="text-base text-black">Resend</Text>
-                </TouchableOpacity>
+        <View className="flex-1 justify-center items-center bg-[#00000080]">
+          <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
+            <Text className="text-xl font-bold mb-4 text-white">An error occurred while sending the code. Please try resending it.
+            </Text>
 
-                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => setResendModal(false)}>
-                  <Text className="text-base text-black">Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </LinearGradient>
-          </View>
-        </Modal>
+            <View className="flex-row items-center justify-between w-[100%] gap-2">
+              <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleSendCode}>
+                <Text className="text-base text-black">Resend</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => setResendModal(false)}>
+                <Text className="text-base text-black">Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
+        </View>
+      </Modal>
 
       <LoaderModal isVisible={isLoading} message={loadingMessage} />
     </SafeAreaView>

@@ -246,7 +246,7 @@ def deleteDailyTask():
 def get_powerUps():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = "SELECT * FROM powerup WHERe isImplemented = 1"
+    query = "SELECT p.* FROM powerup p inner join item i on i.itemId = p.itemID WHERe isImplemented = 1 and isActive = 1"
     cursor.execute(query)
     powerUps = cursor.fetchall()
     if not powerUps:

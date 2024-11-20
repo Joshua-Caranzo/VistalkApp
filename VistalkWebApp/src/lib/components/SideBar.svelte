@@ -97,7 +97,7 @@
                 </a>
                 <a
                     class="nav-link {activePage === '/user' ? 'active' : ''}"
-                    on:click={() => goto("/user")}
+                    href="/user"
                 >
                     <i class="fas fa-user"></i>
                     {#if isExpanded}
@@ -108,8 +108,8 @@
                     class="nav-link {activePage === '/contents'
                         ? 'active'
                         : ''}"
-                    on:click={() => goto("/contents")}
-                >
+                    href="/contents"
+                    >
                     <i class="fas fa-book"></i>
                     {#if isExpanded}
                         <span class="nav-text">Contents</span>
@@ -170,7 +170,8 @@
 
                 <a
                     class="nav-link {activePage === '/userRecording' ? 'active' : ''}"
-                    on:click={() => goto("/userRecording")}
+                    on:click={() => {console.log("recording");
+                                    goto("/userRecording")}}
                 >
                     <i class="fas fa-microphone"></i>
                     {#if isExpanded}

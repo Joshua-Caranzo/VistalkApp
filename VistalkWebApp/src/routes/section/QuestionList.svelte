@@ -318,7 +318,9 @@ async function setInactive(questionID:number, unitID:number){
 }
 
 </script>
-
+<svelte:head>
+	<title>Questions</title>
+</svelte:head>
 {#if showModal}
     <AddQuestionPopup {languageId} {questionTypes} {unitId} {showModal} on:close={closeModal} on:refresh={refresh}></AddQuestionPopup>
 {/if}

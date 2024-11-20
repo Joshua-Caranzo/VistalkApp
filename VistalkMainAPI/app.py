@@ -66,7 +66,7 @@ def getContentExampleByID():
 def getContentSyllableByID():
     return content.getContentSyllableByID()
 
-@app.route('/getContentPronunciation', methods=['GET'])
+@app.route('/getSoundContentPronunciation', methods=['GET'])
 def getContentPronunciation():
     return content.getContentPronunciation()
 

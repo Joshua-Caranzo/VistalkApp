@@ -186,7 +186,9 @@
         refresh();
     }
   </script>
-  
+<svelte:head>
+	<title>Shop</title>
+</svelte:head>  
 
 {#if openModal == true}
     <AddItem modelOpen={openModal} {isAdd} {coinBag} {backgroundMusic} {powerUp} {fileUrl} currentType={itemTypeID} on:close={modalClose} on:refresh={refresh}> </AddItem>

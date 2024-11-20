@@ -232,6 +232,9 @@
 
 </script>
 
+<svelte:head>
+  <title>Contents</title>
+</svelte:head>
 
 {#if modelOpen}
     <AddContent modelOpen={modelOpen} {isAdd} languageId={currentValue} {content} on:close={closeModal} on:refresh={refresh}></AddContent>

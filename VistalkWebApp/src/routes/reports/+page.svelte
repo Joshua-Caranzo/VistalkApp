@@ -66,7 +66,9 @@
 
     async function setResponded(id:number){ await reportResponded(id); refresh();}
 </script>
-
+<svelte:head>
+	<title>Reports</title>
+</svelte:head>
 <div
     class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg"
 >

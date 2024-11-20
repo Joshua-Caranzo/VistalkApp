@@ -1,6 +1,7 @@
 
 from db import get_db_connection, QuestionFiles
 from flask import request, jsonify, send_from_directory
+import random
 
 def get_Sections():
     langID = request.args.get('languageId')
@@ -204,13 +205,52 @@ def getUnitQuestions():
             content mm4 ON qm.match4 = mm4.contentID
         WHERE 
             q.unitID = %s 
-            AND q.isActive = TRUE;
+            AND q.isActive = TRUE
+        ORDER BY RAND()
+        LIMIT 15;
     """
     values = [unitId]
 
     cursor.execute(query, tuple(values))
     questions = cursor.fetchall()
 
+    for question in questions:
+        if question['questionChoiceID'] is not None:
+            choices = [
+                {
+                    "choiceID": question['choice1'],
+                    "contentText": question['choice1ContentText'],
+                    "englishTranslation": question['choice1EnglishTranslation'],
+                    "audioPath": question['choice1AudioPath'],
+                },
+                {
+                    "choiceID": question['choice2'],
+                    "contentText": question['choice2ContentText'],
+                    "englishTranslation": question['choice2EnglishTranslation'],
+                    "audioPath": question['choice2AudioPath'],
+                },
+                {
+                    "choiceID": question['choice3'],
+                    "contentText": question['choice3ContentText'],
+                    "englishTranslation": question['choice3EnglishTranslation'],
+                    "audioPath": question['choice3AudioPath'],
+                },
+                {
+                    "choiceID": question['choice4'],
+                    "contentText": question['choice4ContentText'],
+                    "englishTranslation": question['choice4EnglishTranslation'],
+                    "audioPath": question['choice4AudioPath'],
+                },
+            ]
+            random.shuffle(choices)
+
+            # Update the question with shuffled choices
+            for i, choice in enumerate(choices, start=1):
+                question[f'choice{i}'] = choice['choiceID']
+                question[f'choice{i}ContentText'] = choice['contentText']
+                question[f'choice{i}EnglishTranslation'] = choice['englishTranslation']
+                question[f'choice{i}AudioPath'] = choice['audioPath']
+                
     if not questions:
         return jsonify({
             'isSuccess': True,
@@ -224,7 +264,7 @@ def getUnitQuestions():
                 'message': 'Successfully Retrieved',
                 'data': questions,
                 'data2': None,
-                'totalCount': 1
+                'totalCount': len(questions)
             }), 200
 
 def getQuestionFiles():

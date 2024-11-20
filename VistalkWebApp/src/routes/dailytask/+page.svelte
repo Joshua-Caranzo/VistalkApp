@@ -134,6 +134,10 @@
     }
 </script>
 
+<svelte:head>
+  <title>Daily Task</title>
+</svelte:head>
+
 {#if openModal == true}
     <AddDailyTask modalOpen={openModal} {isAdd} {dailyTask} {powerUps} on:close={modalClose} on:refresh={refresh}></AddDailyTask>
 {/if}

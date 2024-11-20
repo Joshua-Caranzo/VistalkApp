@@ -22,7 +22,7 @@ const GameOver: React.FC<GameOverProps> = ({ score, onRestart, onHome }) => {
               <View className="bg-[#FAF9F6] rounded-t-xl w-full">
                 <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-t-xl">
                   <View className="p-10 items-center">
-                    <Text className="text-4xl font-black text-red-500 mb-4 uppercase">Game Over</Text>
+                    <Text className="text-2xl font-black text-red-500 mb-4 uppercase">Game Over</Text>
                     <View className="relative items-center mb-4">
                       <Text className="text-xl font-black text-gray-600 mb-2 uppercase">Your Score</Text>
                       <View className="w-[80%] border rounded-xl py-2 px-8">

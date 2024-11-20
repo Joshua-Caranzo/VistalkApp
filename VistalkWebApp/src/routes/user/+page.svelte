@@ -74,6 +74,10 @@
     <ViewUser modelOpen={openModal} {userView} on:close={closeModal}></ViewUser>
 {/if}
 
+<svelte:head>
+	<title>User</title>
+</svelte:head>
+
 <div class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-black text-xl font-bold">User List</p>
     <div class="flex-grow flex justify-center">

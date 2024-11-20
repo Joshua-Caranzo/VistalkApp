@@ -14,7 +14,7 @@ def getPowerUps():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     query = """Select i.*, p.name, p.description from item i inner join powerup p on p.itemId = i.ItemId
-                where i.itemTypeId = 1 and i.isActive = true"""
+                where i.itemTypeId = 1 and i.isActive = true and p.IsImplemented = 1"""
     cursor.execute(query)
     powerUps = cursor.fetchall()
     if not powerUps:

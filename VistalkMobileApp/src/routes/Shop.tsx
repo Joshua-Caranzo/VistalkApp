@@ -40,7 +40,7 @@ const Shop: React.FC<Props> = ({ route }) => {
   const [powerUps, setPowerUps] = useState<UserPowerUp[]>([]);
   const [powerUpUrls, setPowerUpUrl] = useState<PowerUpURL[]>([]);
 
-  // Fetching vCoin data and power-ups data
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -52,9 +52,9 @@ const Shop: React.FC<Props> = ({ route }) => {
           } else {
             setError('Failed to fetch vCoin');
           }
-          // Example: Fetch power-up data here (replace with actual API call)
-          // setPowerUps(fetchedPowerUps);
-          // setPowerUpUrl(fetchedPowerUpUrls);
+
+
+
         } else {
           setError('No userID found');
         }
@@ -70,26 +70,26 @@ const Shop: React.FC<Props> = ({ route }) => {
 
   useEffect(() => {
     const fetchPowerUps = async () => {
-        const userID = await AsyncStorage.getItem('userID');
-        if (userID) {
-            const result = await getUserPowerUps(userID);
-            setPowerUps(result.data);
-            const imageUrls = await Promise.all(
-                result.data.map(async (powerUp) => {
-                    if (powerUp.itemId !== 0) {
-                        const url = getPowerupImage(powerUp.filePath);
-                        return { id: powerUp.itemId, url };
-                    }
-                    return null;
-                })
-            );
+      const userID = await AsyncStorage.getItem('userID');
+      if (userID) {
+        const result = await getUserPowerUps(userID);
+        setPowerUps(result.data);
+        const imageUrls = await Promise.all(
+          result.data.map(async (powerUp) => {
+            if (powerUp.itemId !== 0) {
+              const url = getPowerupImage(powerUp.filePath);
+              return { id: powerUp.itemId, url };
+            }
+            return null;
+          })
+        );
 
-            setPowerUpUrl(imageUrls.filter((url) => url !== null));
-        }
+        setPowerUpUrl(imageUrls.filter((url) => url !== null));
+      }
     };
 
     fetchPowerUps();
-}, []);
+  }, []);
 
   const renderContent = () => {
     switch (selectedItem) {

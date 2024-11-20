@@ -103,6 +103,11 @@
     async function setInactive(id:number){ await unitInactive(id); refresh();}
 
 </script>
+
+<svelte:head>
+	<title>Unit</title>
+</svelte:head>
+
 {#if showModal == true}
     <AddUnit modelOpen = {showModal} {unit} {isAdd} on:close={closeModal} on:refresh={refresh}></AddUnit>
 {/if}

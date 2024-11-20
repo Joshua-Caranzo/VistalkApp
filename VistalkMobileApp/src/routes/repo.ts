@@ -71,12 +71,12 @@ export async function sendReport(userId: number, report: string) {
     return await postToMainApi<CallResultDto<object>>('/addreport', { userId, report });
 }
 
-export async function getContent(searchString: string, offset: number, LIMIT: number) {
-    return await getFromMainApi<CallResultDto<Content[]>>('getContent', { searchString, offset, LIMIT });
+export async function getContent(languageId: number, searchString: string, offset: number, LIMIT: number) {
+    return await getFromMainApi<CallResultDto<Content[]>>('getContent', { languageId, searchString, offset, LIMIT });
 }
 
-export async function getPronunciations(searchString: string, offset: number, LIMIT: number) {
-    return await getFromMainApi<CallResultDto<Content[]>>('getContentPronunciation', { searchString, offset, LIMIT });
+export async function getPronunciations(languageId: number, searchString: string, offset: number, LIMIT: number) {
+    return await getFromMainApi<CallResultDto<Content[]>>('getContentPronunciation', {languageId,searchString, offset, LIMIT });
 }
 
 export async function getContentById(contentId: number) {
@@ -97,7 +97,7 @@ export async function getContentDefinitionById(contentId: number) {
 
 export function getContentPronunciation(fileName: string): string {
     const timestamp = Date.now();
-    return `${baseUrl}/getContentPronunciation?fileName=${fileName}&t=${timestamp}`;
+    return `${baseUrl}/getSoundContentPronunciation?fileName=${fileName}&t=${timestamp}`;
 }
 
 export function getSyllablePronunciation(fileName: string): string {
@@ -194,7 +194,7 @@ export async function saveGamePlay(gamePlay: GamePlayDto) {
     formData.append('totalCorrectAnswer', gamePlay.totalCorrectAnswer.toString());
     formData.append('totalScore', gamePlay.totalScore.toString());
     formData.append('powerUps', JSON.stringify(gamePlay.powerUps));
-    return await putFormMainApi<CallResultDto<object>>('saveGamePlay', formData);
+    return await putFormMainApi<CallResultDto<number>>('saveGamePlay', formData);
 }
 
 export async function getLeaderBoards() {
@@ -245,14 +245,14 @@ export async function checkPronunciation(formData: FormData) {
     return await putFormMainApi<CallResultDto<object>>('checkPronunciation', formData);
 }
 
-export async function pronunciationProgressChart(userId: number, contentId:number | null) {
-    return await getFromMainApi<CallResultDto<PronunciationProgressDto>>('getPronunciationProgress', {userId , contentId});
+export async function pronunciationProgressChart(userId: number, contentId: number | null) {
+    return await getFromMainApi<CallResultDto<PronunciationProgressDto>>('getPronunciationProgress', { userId, contentId });
 }
 
-export async function pronunciationProgressList(userId: number, contentId:number | null) {
-    return await getFromMainApi<CallResultDto<PronunciationProgressListDto[]>>('getPronunciationList', {userId , contentId});
+export async function pronunciationProgressList(userId: number, contentId: number | null) {
+    return await getFromMainApi<CallResultDto<PronunciationProgressListDto[]>>('getPronunciationList', { userId, contentId });
 }
 
 export async function getPronunciationCount(userId: number) {
-    return await getFromMainApi<CallResultDto<PronunciationType>>('getPronunciationCount', {userId});
+    return await getFromMainApi<CallResultDto<PronunciationType>>('getPronunciationCount', { userId });
 }

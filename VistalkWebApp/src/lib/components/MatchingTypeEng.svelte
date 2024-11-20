@@ -93,7 +93,7 @@
         style="opacity: {modelOpen ? 1 : 0}; transform: {modelOpen ? 'translateY(0)' : 'translateY(4rem)'};">
       <div class="flex items-center justify-between space-x-4">
         <h1 class="text-xl font-medium text-gray-800">
-          Matching Type Native
+          Matching Type (English Matches)
         </h1>
         <button on:click={closeModal} class="text-gray-600 focus:outline-none hover:text-gray-700">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
