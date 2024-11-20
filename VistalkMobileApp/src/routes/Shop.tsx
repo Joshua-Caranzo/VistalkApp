@@ -35,11 +35,11 @@ const Shop: React.FC<Props> = ({ route }) => {
   const selectedItemDefault = route.params.selectedItemDefault || 'Power Ups';
   const [selectedItem, setSelectedItem] = useState<string>(selectedItemDefault);
   const [vCoin, setVcoin] = useState<number>(0);
+  const [quantityPower, setquantityPower] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [powerUps, setPowerUps] = useState<UserPowerUp[]>([]);
   const [powerUpUrls, setPowerUpUrl] = useState<PowerUpURL[]>([]);
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,9 +52,6 @@ const Shop: React.FC<Props> = ({ route }) => {
           } else {
             setError('Failed to fetch vCoin');
           }
-
-
-
         } else {
           setError('No userID found');
         }
@@ -70,24 +67,36 @@ const Shop: React.FC<Props> = ({ route }) => {
 
   useEffect(() => {
     const fetchPowerUps = async () => {
-      const userID = await AsyncStorage.getItem('userID');
-      if (userID) {
-        const result = await getUserPowerUps(userID);
-        setPowerUps(result.data);
-        const imageUrls = await Promise.all(
-          result.data.map(async (powerUp) => {
-            if (powerUp.itemId !== 0) {
-              const url = getPowerupImage(powerUp.filePath);
-              return { id: powerUp.itemId, url };
-            }
-            return null;
-          })
-        );
-
-        setPowerUpUrl(imageUrls.filter((url) => url !== null));
+      try {
+        const userID = await AsyncStorage.getItem('userID');
+        if (userID) {
+          const result = await getUserPowerUps(userID);
+          if (result.isSuccess) {
+            setPowerUps(result.data);
+            const imageUrls = await Promise.all(
+              result.data.map(async (powerUp) => {
+                if (powerUp.itemId !== 0) {
+                  const url = getPowerupImage(powerUp.filePath);
+                  return { id: powerUp.itemId, url };
+                }
+                return null;
+              })
+            );
+  
+            setPowerUpUrl(imageUrls.filter((url) => url !== null));
+          } else {
+            setError('Failed to fetch PowerUps');
+          }
+        } else {
+          setError('No userID found');
+        }
+      } catch (err) {
+        setError('Failed to fetch data');
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
-
+  
     fetchPowerUps();
   }, []);
 

@@ -332,21 +332,30 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                     <View>
                       {dailyTasks.length > 0 ? (
                         dailyTasks.map((task) => (
-                          <LinearGradient colors={['#f7c188', '#6addd0']}
+                          <LinearGradient
+                            key={task.taskID}
+                            colors={task.isClaimed ? ['#A9A9A9', '#A9A9A9'] : ['#f7c188', '#6addd0']}
                             start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }} key={task.taskID} className="flex-row items-center mb-4 py-3 px-4 justify-between rounded-xl">
+                            end={{ x: 1, y: 0 }}
+                            className="flex-row items-center mb-4 py-3 px-4 justify-between rounded-xl"
+                          >
                             <View className="flex-row items-center">
                               <View className="w-4 h-4 bg-gray-100 rounded-md justify-center items-center mr-4">
-                                {task.isCompleted == true && (
+                                {task.isCompleted && (
                                   <Svg className="w-4 h-4" viewBox="0 0 24 24">
-                                    <Path fill="#000000" d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41z" />
+                                    <Path
+                                      fill="#000000"
+                                      d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41z"
+                                    />
                                   </Svg>
                                 )}
                               </View>
                               <View>
                                 <Text className="text-md text-gray-700 font-bold">{task.taskName}</Text>
-
-                                <TouchableOpacity onPress={() => toggleDescription(task.taskID)} className="flex-row items-center">
+                                <TouchableOpacity
+                                  onPress={() => toggleDescription(task.taskID)}
+                                  className="flex-row items-center"
+                                >
                                   <Text className="text-md text-gray-700 font-bold">Description</Text>
                                   <Svg
                                     className="ml-1 w-4 h-4"
@@ -356,9 +365,10 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                                     <Path fill="#000000" d="M7 10l5 5 5-5H7z" />
                                   </Svg>
                                 </TouchableOpacity>
-
                                 {expandedTasks[task.taskID] && (
-                                  <Text className="text-sm text-gray-600 mt-1 w-24">{task.taskDescription}</Text>
+                                  <Text className="text-sm text-gray-600 mt-1 w-24">
+                                    {task.taskDescription}
+                                  </Text>
                                 )}
                                 <View className="flex-row items-center">
                                   <Text className="text-md text-gray-700 font-bold">Reward:</Text>

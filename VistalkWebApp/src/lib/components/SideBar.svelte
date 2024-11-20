@@ -172,6 +172,7 @@
                     class="nav-link {activePage === '/userRecording' ? 'active' : ''}"
                     on:click={() => {console.log("recording");
                                     goto("/userRecording")}}
+
                 >
                     <i class="fas fa-microphone"></i>
                     {#if isExpanded}
@@ -184,12 +185,30 @@
                 class="bg-white font-bold py-2 rounded-full mt-4 flex justify-center relative overflow-hidden group transition duration-300 ease-in-out logout-button"
                 on:click={handleLogout}
             >
-                <i class="fas fa-sign-out-alt text-black"></i>
+                <div class="group">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="1.2rem"
+                        height="1.2rem"
+                        viewBox="0 0 24 24"
+                        class="transition duration-300 ease-in-out fill-black group-hover:fill-[#99BC85]"
+                    >
+                        <path
+                            d="M11 20a1 1 0 0 0-1-1H5V5h5a1 1 0 1 0 0-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5a1 1 0 0 0 1-1"
+                            clip-rule="evenodd"
+                        />
+                        <path
+                            d="M21.714 12.7a1 1 0 0 0 .286-.697v-.006a1 1 0 0 0-.293-.704l-4-4a1 1 0 1 0-1.414 1.414L18.586 11H9a1 1 0 1 0 0 2h9.586l-2.293 2.293a1 1 0 0 0 1.414 1.414l4-4z"
+                        />
+                    </svg>
+                </div>
+
                 {#if isExpanded}
                     <span
                         class="text-black transition duration-300 ease-in-out group-hover:text-transparent bg-gradient-to-r from-[#99BC85] to-[#f7c188] bg-clip-text ml-4"
-                        >Log Out</span
                     >
+                        Log Out
+                    </span>
                 {/if}
             </button>
         </div>

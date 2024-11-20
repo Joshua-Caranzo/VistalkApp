@@ -49,7 +49,7 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
 
   if (loading) {
     return (
-      <Loader isVisible={loading} message='Fetching User Details' />
+      <Loader isVisible={loading}/>
     );
   }
 
