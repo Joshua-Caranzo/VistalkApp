@@ -31,7 +31,7 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
         const result = await getUserDetails(Number(userID));
         setUserDetails(result.data);
         if (result.data.imagePath) {
-          setFileUrl(getUserImageUrl(result.data.imagePath));
+          setFileUrl(result.data.imagePath);
         }
       }
       setLoading(false);

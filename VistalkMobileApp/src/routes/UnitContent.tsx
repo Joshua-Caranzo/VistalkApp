@@ -323,7 +323,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                 const imageUrls = await Promise.all(
                     result.data.map(async (powerUp) => {
                         if (powerUp.itemId !== 0) {
-                            const url = getPowerupImage(powerUp.filePath);
+                            const url = powerUp.filePath;
                             return { id: powerUp.itemId, url };
                         }
                         return null;
