@@ -52,31 +52,21 @@
 
         for (const c of contentList) {
             if (c.fileName && c.fileName.toLowerCase().endsWith(".wav")) {
-                const file = await getRecordingByFileName(
-                    c.fileName,
-                    languageId,
-                    c.contentId,
-                    c.contentText,
-                );
-                if (file) {
-                    const url = URL.createObjectURL(file);
-                    c.audio = new Audio(url);
+                const url = c.filePath;
+                c.audio = new Audio(url);
 
-                    c.audio.addEventListener("ended", () => {
-                        c.isPlaying = false;
-                        const index = contentList.findIndex(
-                            (content) => content.id,
-                        );
-                        if (index !== -1) {
-                            contentList[index] = {
-                                ...contentList[index],
-                                isPlaying: false,
-                            };
-                        }
-                    });
-                } else {
-                    c.audio = null;
-                }
+                c.audio.addEventListener("ended", () => {
+                    c.isPlaying = false;
+                    const index = contentList.findIndex(
+                        (content) => content.id,
+                    );
+                    if (index !== -1) {
+                        contentList[index] = {
+                            ...contentList[index],
+                            isPlaying: false,
+                        };
+                    }
+                });
             } else {
                 console.warn(
                     `Skipping ${c.fileName}: Not a valid WAV file or audioPath is null.`,
@@ -143,7 +133,7 @@
 </script>
 
 <svelte:head>
-	<title>User Recordings</title>
+    <title>User Recordings</title>
 </svelte:head>
 
 <div
@@ -259,8 +249,30 @@
                             {/if}
                         </td>
                         <td class="px-4 py-2">
-                            <button on:click={() => acceptData(c.id)}> <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg> </button>
-                            <button on:click={() => rejectData(c.id)}> <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 24 24"><path fill="currentColor" d="M7 11v2h10v-2zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8"/></svg> </button>
+                            <button on:click={() => acceptData(c.id)}>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="1.2rem"
+                                    height="1.2rem"
+                                    viewBox="0 0 24 24"
+                                    ><path
+                                        fill="currentColor"
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z"
+                                    /></svg
+                                >
+                            </button>
+                            <button on:click={() => rejectData(c.id)}>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="1.2rem"
+                                    height="1.2rem"
+                                    viewBox="0 0 24 24"
+                                    ><path
+                                        fill="currentColor"
+                                        d="M7 11v2h10v-2zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8"
+                                    /></svg
+                                >
+                            </button>
                         </td>
                     </tr>
                 {/each}

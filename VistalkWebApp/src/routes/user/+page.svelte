@@ -45,9 +45,7 @@
         powerUps = userList[0]?.powerUps || [];
 
         const filePromises = powerUps.map(async (powerUp) => {
-            const fileBlob = await getItemFileByFileName(powerUp.filePath, 1);
-            const newFile = new Blob();
-            const imageUrl = URL.createObjectURL(fileBlob || newFile);
+            const imageUrl = powerUp.filePath;
             powerUpUrls[powerUp.itemId] = imageUrl;
         });
 
