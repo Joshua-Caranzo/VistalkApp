@@ -47,7 +47,7 @@ const PowerUps: React.FC<PowerUpsProps> = ({ vCoin, setVcoin, userPowerUps, setU
         const imageUrls = await Promise.all(
           result.data.map(async (powerUp: PowerUp) => {
             if (powerUp.isActive) {
-              const url = getPowerupImage(powerUp.filePath);
+              const url = powerUp.filePath;
               return { id: powerUp.itemID, url };
             }
             return null;

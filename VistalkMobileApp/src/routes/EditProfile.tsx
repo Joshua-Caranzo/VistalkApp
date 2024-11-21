@@ -29,7 +29,7 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
         setName(result.data.name);
         setEmail(result.data.email);
         if (result.data.imagePath) {
-          const newFileUrl = getUserImageUrl(result.data.imagePath);
+          const newFileUrl = result.data.imagePath;
           setFileUrl(newFileUrl);
         }
       }

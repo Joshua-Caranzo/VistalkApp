@@ -76,7 +76,7 @@ const Shop: React.FC<Props> = ({ route }) => {
             const imageUrls = await Promise.all(
               result.data.map(async (powerUp) => {
                 if (powerUp.itemId !== 0) {
-                  const url = getPowerupImage(powerUp.filePath);
+                  const url = powerUp.filePath;
                   return { id: powerUp.itemId, url };
                 }
                 return null;
@@ -158,7 +158,7 @@ const Shop: React.FC<Props> = ({ route }) => {
       <View className="absolute bottom-[10%] rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
         <View className="flex-row justify-center gap-2 w-[100%]">
           {powerUps.map((powerUp, index) => {
-            const imageUrl = getImageUrlByItemId(powerUp.itemId);
+            const imageUrl =powerUp.filePath;
 
             return (
               <View className="py-2 px-1 items-center relative" key={index}>
