@@ -28,7 +28,7 @@ def checkPronunciation():
         }), 403  
 
     
-    cursor.execute("SELECT contentText FROM content WHERE contentID = %s", (content_id,))
+    cursor.execute("SELECT contenttext FROM content WHERE contentID = %s", (content_id,))
     ctext_row = cursor.fetchone()
     if ctext_row:
         ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contentText']).lower()
@@ -297,7 +297,7 @@ def update_event_logs(userId):
     
     query_fetch_daily_tasks = """
         SELECT pdt.taskId, dt.quantity as requiredQuantity 
-        FROM playerDailyTask pdt
+        FROM playerdailytask pdt
         INNER JOIN dailyTask dt ON pdt.taskId = dt.taskId
         WHERE pdt.userPlayerId = %s AND dt.taskDate = %s
     """
@@ -340,7 +340,7 @@ def update_event_logs(userId):
             print('loop',daily_task)
 
             query_update_daily_task = """
-                        UPDATE playerDailyTask
+                        UPDATE playerdailytask
                         SET isCompleted = 1
                         WHERE userPlayerId = %s AND taskId = %s
                     """

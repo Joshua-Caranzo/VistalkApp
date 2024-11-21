@@ -176,7 +176,7 @@ def getUnitQuestions():
         FROM 
             question q 
         LEFT JOIN 
-            questionChoice qc ON qc.questionId = q.questionId
+            questionchoice qc ON qc.questionId = q.questionId
         LEFT JOIN 
             content cc1 ON qc.choice1 = cc1.contentID
         LEFT JOIN 
@@ -186,7 +186,7 @@ def getUnitQuestions():
         LEFT JOIN 
             content cc4 ON qc.choice4 = cc4.contentID
         LEFT JOIN 
-            questionMatchingType qm ON qm.questionId = q.questionID
+            questionmatchingtype qm ON qm.questionId = q.questionID
         LEFT JOIN 
             content wm1 ON qm.word1 = wm1.contentID
         LEFT JOIN 

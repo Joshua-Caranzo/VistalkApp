@@ -143,7 +143,7 @@ def getContentSyllableByID():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
-    query = "SELECT * FROM contentSyllable WHERE contentId = %s ORDER BY orderNumber"
+    query = "SELECT * FROM contentsyllable WHERE contentId = %s ORDER BY orderNumber"
     cursor.execute(query, (contentId,))
     
     results = cursor.fetchall()
