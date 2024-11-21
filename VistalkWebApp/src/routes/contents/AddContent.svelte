@@ -9,6 +9,7 @@
     export let languageId: number;
     export let content:ContentDto;
   
+    let isLoading: boolean =  false;
     let contentTypes: ContentType[] = [];
     let syllables = content.syllables;
     let syllableOrderNumber = content.syllables.length > 0 
@@ -181,6 +182,7 @@
     }
 
     async function saveContent() {
+      isLoading = true;
       if(content.content.contentText !== "" && content.content.contentTypeId !== 0){
           content.syllables = syllables;
 
@@ -201,7 +203,7 @@
           });
           await saveMainContent(content);
       }
-
+      isLoading = false;
       dispatch('refresh');
       dispatch('close');
     }
@@ -586,11 +588,11 @@
 
           <div class="flex justify-end gap-4 mt-6">
             <button 
-                disabled={content.content.contentTypeId === 0 || content.content.contentText === ""}
+                disabled={content.content.contentTypeId === 0 || content.content.contentText === "" || isLoading === true} 
                 class={`relative border-2 ${content.content.contentTypeId === 0 || content.content.contentText === "" ? 'border-gray-300 bg-gray-200 text-gray-400 cursor-not-allowed' : 'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white'} px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50`} 
                 style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
                 on:click={saveContent}>
-                {isAdd ? "Save" : "Update"}
+                {isLoading ? "Saving..." : "Save"}
             </button>
         </div>
         

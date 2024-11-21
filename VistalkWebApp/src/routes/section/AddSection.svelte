@@ -9,6 +9,8 @@
     export let section:Section;
     export let languageID:number;
 
+    let isLoading: boolean = false;
+
     const dispatch = createEventDispatcher();
     onMount(async () => {
       await redirectIfLoggedIn(''); 
@@ -21,6 +23,7 @@
 
     async function addSection()
     {
+        isLoading = true;
         section.languageID = languageID;
         let response = await saveSection(section);
         if(response.isSuccess == true)
@@ -31,6 +34,7 @@
         }
         else
         {
+            isLoading = false;
             alert(response.message);
         }
     }
@@ -105,10 +109,10 @@
             </div>
             
             <div class="flex justify-end mt-6">
-              <button on:click={addSection} type="button"  style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
+              <button on:click={addSection} type="button" disabled={isLoading} style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
 
               class={'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50'}>
-                Save Section
+                {isLoading ? "Saving..." : "Save Section"}
               </button>
             </div>
           </form>

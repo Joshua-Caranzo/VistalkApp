@@ -14,6 +14,7 @@
   export let currentType:number;
 
   let itemTypes: ItemType[] = [];
+  let isLoading: boolean = false;
 
   function handleFile(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -58,6 +59,7 @@
   }
 
   async function saveItem() {
+    isLoading = true;
         if(currentType == 1) {
           powerUp.itemTypeID = currentType;
           const result = await savePowerup(powerUp);
@@ -69,6 +71,7 @@
       else if(currentType == 3) {
           const result = await saveCoinbag(coinBag,currentType);
       }
+      isLoading = false;
       closeModal();
     }
 
@@ -237,9 +240,9 @@
             </div>
         {/if}
             <div class="flex justify-end mt-6">
-              <button on:click={saveItem} type="button"style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
+              <button on:click={saveItem} disabled={isLoading} type="button"style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
               class={'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50'} >
-                Save Item
+                {isLoading ? "Saving....": "Save Item"}
               </button>
             </div>
           </form>
