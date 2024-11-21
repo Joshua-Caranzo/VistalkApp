@@ -103,7 +103,7 @@ const Shop: React.FC<Props> = ({ route }) => {
   const renderContent = () => {
     switch (selectedItem) {
       case 'Power Ups':
-        return <PowerUps vCoin={vCoin} setVcoin={setVcoin} />;
+        return <PowerUps vCoin={vCoin} setVcoin={setVcoin} userPowerUps = {powerUps} setUserPowerUp = {setPowerUps}/>;
       case 'Subscription':
         return <Subscription vCoin={vCoin} setVcoin={setVcoin} />;
       case 'Currency':
