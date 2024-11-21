@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Modal } from 'react-native';
-import { PowerUp } from './type';
+import { PowerUp, UserPowerUp } from './type';
 import { getPowerupImage, getPowerUps, buyPowerUp, getUserVCoin } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AddIcon from '../assets/svg/AddIcon';
@@ -15,9 +15,11 @@ type FileUrl = {
 type PowerUpsProps = {
   vCoin: number;
   setVcoin: React.Dispatch<React.SetStateAction<number>>;
+  userPowerUps: UserPowerUp[]
+  setUserPowerUp: React.Dispatch<React.SetStateAction<UserPowerUp[]>>;
 };
 
-const PowerUps: React.FC<PowerUpsProps> = ({ vCoin, setVcoin }) => {
+const PowerUps: React.FC<PowerUpsProps> = ({ vCoin, setVcoin, userPowerUps, setUserPowerUp }) => {
   const [powerUps, setPowerUps] = useState<PowerUp[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +110,33 @@ const PowerUps: React.FC<PowerUpsProps> = ({ vCoin, setVcoin }) => {
       const userID = await AsyncStorage.getItem('userID');
       if (userID)
         buyPowerUp(userID, selectedPowerUp.itemID, quantity).then(() => {
+
           setVcoin(prev => prev - totalPrice);
+
+          setUserPowerUp((prevUserPowerUps) => {
+            const updatedPowerUps = [...prevUserPowerUps];
+            const powerUpIndex = updatedPowerUps.findIndex(
+              (powerUp) => powerUp.itemId === selectedPowerUp.itemID
+            );
+
+            if (powerUpIndex !== -1) {
+              // Update the quantity of the existing power-up
+              updatedPowerUps[powerUpIndex].quantity += quantity;
+            } else {
+              // Add the new power-up to the list
+              updatedPowerUps.push({
+                itemId: selectedPowerUp.itemID,
+                name: selectedPowerUp.name,
+                quantity: quantity,
+                filePath: selectedPowerUp.filePath,
+                userPlayerId: Number(userID),
+                description: selectedPowerUp.description
+              });
+            }
+
+            return updatedPowerUps;
+          });
+
           setModalVisible(false);
         });
     }

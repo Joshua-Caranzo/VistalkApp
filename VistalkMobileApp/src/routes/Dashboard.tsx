@@ -15,6 +15,7 @@ import DailyTaskIcon from '../assets/svg/DailyTaskIcon';
 import NotificationIcon from '../assets/svg/NotificationIcon';
 import ProfileIcon from '../assets/svg/ProfileIcon';
 import LockIcon from '../assets/svg/LockIcon';
+import CheckIcon from '../assets/svg/CheckIcon';
 
 type Props = StackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -296,7 +297,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                   {currentSection?.description}
                 </Text>
                 <View className="pb-4 px-10">
-                  <TouchableOpacity onPress={() => {closeModal();navigateToUnit()}}>
+                  <TouchableOpacity onPress={() => { closeModal(); navigateToUnit() }}>
                     <LinearGradient colors={['#6addd0', '#f7c188']} start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }} className="bg-gray-600 py-2 px-14 rounded-2xl self-center">
                       <Text className="text-lg text-white font-bold">Let's Begin</Text>
@@ -341,14 +342,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                           >
                             <View className="flex-row items-center">
                               <View className="w-4 h-4 bg-gray-100 rounded-md justify-center items-center mr-4">
-                                {task.isCompleted && (
-                                  <Svg className="w-4 h-4" viewBox="0 0 24 24">
-                                    <Path
-                                      fill="#000000"
-                                      d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41z"
-                                    />
-                                  </Svg>
-                                )}
+                               
                               </View>
                               <View>
                                 <Text className="text-md text-gray-700 font-bold">{task.taskName}</Text>
