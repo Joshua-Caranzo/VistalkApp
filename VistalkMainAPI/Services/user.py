@@ -49,7 +49,7 @@ def getUserDetails():
 
     
     score_query = """
-        SELECT dateDaily, score FROM dailyScore
+        SELECT dateDaily, score FROM dailyscore
         WHERE userPlayerId = %s AND dateDaily BETWEEN %s AND %s
         ORDER BY dateDaily ASC
     """
@@ -142,7 +142,7 @@ def checkUserPowerUps(cursor, userID, powerUps, userPowerUps):
     for powerUp in powerUps:
         if powerUp['itemID'] not in userPowerUpIds:
             insert_query = """
-                INSERT INTO userItem (userPlayerId, itemId, quantity) 
+                INSERT INTO useritem (userPlayerId, itemId, quantity) 
                 VALUES (%s, %s, 0)
             """
             cursor.execute(insert_query, (userID, powerUp['itemID']))
@@ -252,7 +252,7 @@ def saveGamePlay():
 
         
         selectUserPowerUp = """
-            SELECT * FROM userItem WHERE userPlayerId = %s AND itemId = %s
+            SELECT * FROM useritem WHERE userPlayerId = %s AND itemId = %s
         """
         cursor.execute(selectUserPowerUp, (userId, itemId))
         
@@ -271,7 +271,7 @@ def saveGamePlay():
 
         
         query_update_powerup = """
-            UPDATE userItem 
+            UPDATE useritem 
             SET quantity = quantity - %s 
             WHERE userPlayerId = %s AND itemId = %s
         """
@@ -319,7 +319,7 @@ def getLeaderBoards():
     
     query = """
         SELECT u.userId as id, u.name, u.imagePath, 
-               (SELECT SUM(score) FROM dailyScore ds 
+               (SELECT SUM(score) FROM dailyscore ds 
                 WHERE ds.userPlayerId = v.userPlayerID 
                 AND ds.dateDaily BETWEEN %s AND %s) as totalScoreWeekly 
         FROM vista v 
@@ -355,7 +355,7 @@ def dailyScore(user_player_id, score):
     cursor = conn.cursor()
 
     select_query = """
-            SELECT id FROM dailyScore 
+            SELECT id FROM dailyscore 
             WHERE userPlayerId = %s AND dateDaily = %s
         """
     cursor.execute(select_query, (user_player_id, dateNow))
@@ -363,14 +363,14 @@ def dailyScore(user_player_id, score):
 
     if record:
         update_query = """
-                UPDATE dailyScore 
+                UPDATE dailyscore 
                 SET score = score + %s 
                 WHERE id = %s
             """
         cursor.execute(update_query, (score, record[0]))
     else:
         insert_query = """
-                INSERT INTO dailyScore (score, userPlayerId, dateDaily) 
+                INSERT INTO dailyscore (score, userPlayerId, dateDaily) 
                 VALUES (%s, %s, %s)
             """
         cursor.execute(insert_query, (score, user_player_id, dateNow))
@@ -411,7 +411,7 @@ def getSelfRank():
         LEFT JOIN (
             SELECT userPlayerId,
                    SUM(score) AS totalScoreWeekly
-            FROM dailyScore
+            FROM dailyscore
             WHERE dateDaily BETWEEN %s AND %s
             GROUP BY userPlayerId
         ) ds ON ds.userPlayerId = v.userPlayerId
@@ -468,7 +468,7 @@ def getLeaderBoardsAllTime():
 
     query = """
         SELECT u.userId as id, u.name, u.imagePath, 
-               (SELECT SUM(score) FROM dailyScore ds 
+               (SELECT SUM(score) FROM dailyscore ds 
                 WHERE ds.userPlayerId = v.userPlayerID) as totalScoreWeekly 
         FROM vista v 
         INNER JOIN user u ON u.UserID = v.userPlayerID 
@@ -513,7 +513,7 @@ def getSelfRankAllTime():
         LEFT JOIN (
             SELECT userPlayerId,
                    SUM(score) AS totalScoreWeekly
-            FROM dailyScore
+            FROM dailyscore
             GROUP BY userPlayerId
         ) ds ON ds.userPlayerId = v.userPlayerId
         WHERE u.userId = %s;
@@ -549,7 +549,7 @@ def update_event_logs(userId, powerUps, totalScore):
     query_fetch_event_logs = """
         SELECT dt.powerUpId, dt.taskTypeId, dt.taskId, el.currentValue
         FROM eventlogs el
-        INNER JOIN dailyTask dt ON el.dailyTaskId = dt.taskId
+        INNER JOIN dailytask dt ON el.dailyTaskId = dt.taskId
         inner join playerdailytask pdt on pdt.taskID = dt.taskId
         WHERE el.eventDate = %s AND el.userPlayerId = %s and pdt.isCompleted = 0
     """
@@ -559,8 +559,8 @@ def update_event_logs(userId, powerUps, totalScore):
     
     query_fetch_daily_tasks = """
         SELECT pdt.taskId, dt.quantity as requiredQuantity 
-        FROM playerDailyTask pdt
-        INNER JOIN dailyTask dt ON pdt.taskId = dt.taskId
+        FROM playerdailytask pdt
+        INNER JOIN dailytask dt ON pdt.taskId = dt.taskId
         WHERE pdt.userPlayerId = %s AND dt.taskDate = %s
     """
     cursor.execute(query_fetch_daily_tasks, (userId, today))
@@ -584,7 +584,7 @@ def update_event_logs(userId, powerUps, totalScore):
 
         elif taskTypeId == 2:
             current_quantity_query = """
-                SELECT quantity FROM userItem WHERE userPlayerID = %s AND itemId = %s
+                SELECT quantity FROM useritem WHERE userPlayerID = %s AND itemId = %s
             """
             cursor.execute(current_quantity_query, (userId, powerUpId))
             current_quantity = cursor.fetchone()
@@ -635,7 +635,7 @@ def update_event_logs(userId, powerUps, totalScore):
             if taskId == daily_task_id and currentValue >= required_quantity:
                 
                 query_update_daily_task = """
-                    UPDATE playerDailyTask
+                    UPDATE playerdailytask
                     SET isCompleted = 1
                     WHERE userPlayerId = %s AND taskId = %s
                 """
@@ -692,7 +692,7 @@ def claim_reward():
     cursor = conn.cursor()
 
     query_fetch_reward = """
-        SELECT rewardCoins FROM dailyTask WHERE taskId = %s
+        SELECT rewardCoins FROM dailytask WHERE taskId = %s
     """
     cursor.execute(query_fetch_reward, (taskId,))
     reward = cursor.fetchone()
@@ -710,7 +710,7 @@ def claim_reward():
     reward_amount = reward[0]
 
     query_update_player_daily_task = """
-        UPDATE playerDailyTask
+        UPDATE playerdailytask
         SET isClaimed = 1
         WHERE userPlayerId = %s AND taskId = %s
     """

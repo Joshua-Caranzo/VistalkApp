@@ -1,5 +1,5 @@
-from db import get_db_connection, QuestionFiles
-from flask import request, jsonify, send_from_directory
+from db import get_db_connection
+from flask import request, jsonify
 from datetime import date
 
 def getDailyTasks():
@@ -9,7 +9,7 @@ def getDailyTasks():
     cursor = conn.cursor(dictionary=True)
     query = """SELECT pdt.*, dt.rewardcoins, dt.tasktypeId, dtt.typeName as taskName, dt.taskDate,pdt.userplayerID, dtt.description as taskDescription, dt.quantity as totalValue, el.currentValue
                FROM eventlogs el
-				INNER JOIN playerDailyTask pdt on el.dailyTaskid = pdt.taskID
+				INNER JOIN playerdailytask pdt on el.dailyTaskid = pdt.taskID
                INNER JOIN dailytask dt ON dt.taskId = pdt.taskId 
                INNER JOIN dailytasktype dtt ON dtt.id = dt.tasktypeId
                WHERE el.userplayerID = %s and pdt.userPlayerId = %s AND dt.taskDate = %s and el.eventDate = %s AND dtt.isImplemented = 1;"""

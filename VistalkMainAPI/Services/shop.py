@@ -200,7 +200,7 @@ def buySubscription():
 def getCoinBags():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = """SELECT * FROM vistalkdb.coinbag where isActive = 1"""
+    query = """SELECT * FROM coinbag where isActive = 1"""
     cursor.execute(query)
     coinBags = cursor.fetchall()
     if not coinBags:
@@ -235,7 +235,7 @@ def buyCoinBag():
     conn = get_db_connection()
     cursor = conn.cursor()
   
-    query_coin_bag = """SELECT quantity, moneyPrice FROM coinBag WHERE coinBagId = %s"""
+    query_coin_bag = """SELECT quantity, moneyPrice FROM coinbag WHERE coinBagId = %s"""
     cursor.execute(query_coin_bag, (coinBagId,))
     coinBag = cursor.fetchone()
 
