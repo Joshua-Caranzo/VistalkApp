@@ -14,7 +14,7 @@
 
   let filteredChoices: Content[] = [];
   let dropdownVisibility = Array(leftQueries.length).fill(false);
-
+  let isLoading: boolean = false;
   function closeModal() {
     dispatch('close');
   }
@@ -42,6 +42,7 @@
   }
 
   async function saveContent() {
+    isLoading = true;
     mainQuestion.word1 = selectedChoices[0]?.contentID ?? 0;
     mainQuestion.word2 = selectedChoices[1]?.contentID ?? 0;
     mainQuestion.word3 = selectedChoices[2]?.contentID ?? 0;
@@ -50,6 +51,7 @@
     mainQuestion.match2 = mainQuestion.word2;
     mainQuestion.match3 = mainQuestion.word3;
     mainQuestion.match4 = mainQuestion.word4;
+    isLoading = false;
     await save_questionMatch(mainQuestion);
     closeModal();
   }
@@ -157,10 +159,11 @@
           <button 
               on:click={saveContent}
               type="button" 
+              disabled={isLoading}
               style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
               class={'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50'} 
           >
-            Save Question
+            {isLoading ? "Saving..." : "Save Question"}
           </button>
         </div>
       </form>
