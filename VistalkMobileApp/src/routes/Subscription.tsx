@@ -5,6 +5,7 @@ import { buySubscription, getSubscriptions, getUserVCoin, paymongoRedirect } fro
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import Svg, { Path, Text as SvgText, Image as SvgImage } from 'react-native-svg';
+import CheckIcon from '../assets/svg/CheckIcon';
 
 
 type SusbcriptionProps = {
@@ -80,19 +81,41 @@ const Subscription: React.FC<SusbcriptionProps> = ({ vCoin, setVcoin }) => {
   };
 
   return (
-    <View className="flex flex-row gap-32 items-center p-[100px] mb-24">
+    <View className="flex flex-row gap-24 items-center p-[26px] mb-24">
+      {/*       <Image source={require('../assets/White.png')} className="w-24 h-24 mb-6 bg-gray-400 p-4 rounded-full" /> */}
       {subscriptions.map((subscription, index) => (
         <View key={index} className="items-center">
-          <LinearGradient colors={['rgba(169, 204, 27, 0.45)', 'rgba(54, 68, 0, 0.45)']} className="items-center justify-center rounded-lg p-4 mb-4 border border-white">
-            <Image source={require('../assets/White.png')} className="w-24 h-24 mb-6 bg-gray-400 p-4 rounded-full" />
-            <Text className="text-2xl font-bold text-white w-32 text-center">{subscription.subscriptionName}</Text>
-          </LinearGradient>
-
-          <TouchableOpacity onPress={() => handleOpenModal(subscription)}>
-            <LinearGradient colors={['#F8F6F4', '#8399A2']} className="rounded-xl py-3 px-4">
-              <Text className="text-base font-black text-white">₱ {subscription.price}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          <View className="items-center justify-center rounded-3xl p-6 mb-4 bg-gray-400">
+            <Text className="text-lg font-black text-white w-32 text-center">{subscription.subscriptionName}</Text>
+            <Text className="text-white font-black text-2xl text-center mt-2">₱ {subscription.price}</Text>
+            <View className="border-b-2 border-white mx-2 px-12 mt-2 mb-2"></View>
+            <View className="relative justify-center space-y-2 mt-2">
+              <View className="flex-row items-center space-x-2">
+                <View className="bg-white p-1 rounded-full">
+                  <CheckIcon className="text-gray-400 h-4 w-4" />
+                </View>
+                <Text className="text-white text-base font-bold">Ad Free</Text>
+              </View>
+              <View className="flex-row items-center space-x-2">
+                <View className="bg-white p-1 rounded-full">
+                  <CheckIcon className="text-gray-400 h-4 w-4" />
+                </View>
+                <Text className="text-white text-base font-bold">Unlock Premium Section</Text>
+              </View>
+              <View className="flex-row items-center space-x-2">
+                <View className="bg-white p-1 rounded-full">
+                  <CheckIcon className="text-gray-400 h-4 w-4" />
+                </View>
+                <Text className="text-white text-base font-bold">Unlimited Pronunciation Practice</Text>
+              </View>
+            </View>
+            <TouchableOpacity onPress={() => handleOpenModal(subscription)}>
+              <View className="rounded-xl py-3 px-4 mt-2" style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.4)'}}>
+                <Text className="text-base font-black text-white">Buy</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>))}
 
       {selectedSubcription && (

@@ -342,7 +342,9 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                           >
                             <View className="flex-row items-center">
                               <View className="w-4 h-4 bg-gray-100 rounded-md justify-center items-center mr-4">
-                               
+                                {task.isCompleted == true && (
+                                  <CheckIcon className="text-black w-4 h-4" />
+                                )}
                               </View>
                               <View>
                                 <Text className="text-md text-gray-700 font-bold">{task.taskName}</Text>
