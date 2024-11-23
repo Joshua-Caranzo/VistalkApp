@@ -16,6 +16,7 @@ import NotificationIcon from '../assets/svg/NotificationIcon';
 import ProfileIcon from '../assets/svg/ProfileIcon';
 import LockIcon from '../assets/svg/LockIcon';
 import CheckIcon from '../assets/svg/CheckIcon';
+import LoaderModal from '../components/LoaderModal';
 
 type Props = StackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -36,6 +37,9 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   const [notifications, setNotifications] = useState<NotificationsDto[]>([]);
   const [notificationCount, setNotifCount] = useState<number>(0);
   const [userId, setUserID] = useState<string>("");
+  const [isBuying, setIsBuying] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>("");
+
   const toggleDescription = (taskID: number) => {
     setExpandedTasks((prev) => ({
       ...prev,
@@ -135,8 +139,11 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   };
 
   async function claimRewardDashboard(taskId: number) {
+    setIsBuying(true);
+    setLoadingMessage("Please wait...");
     await claimReward(userId, taskId);
     fetchUserData();
+    setIsBuying(false);
   }
 
   const getTextSizeClass = (title: string) => {
@@ -440,7 +447,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
           </View>
         </TouchableOpacity>
       </Modal>
-
+      <LoaderModal isVisible={isBuying} message={loadingMessage} />
       <Menu activeScreen={activeScreen} />
     </LinearGradient>
   );

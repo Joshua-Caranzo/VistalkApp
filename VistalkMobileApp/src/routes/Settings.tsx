@@ -10,6 +10,7 @@ import { Path, Svg } from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
 import BackIcon from '../assets/svg/BackIcon';
 import Menu from '../components/Menu';
+import LoaderModal from '../components/LoaderModal';
 
 type Props = StackScreenProps<RootStackParamList, 'Settings'>;
 
@@ -21,6 +22,8 @@ const Settings: React.FC<Props> = ({ navigation }) => {
   const [reportText, setReportText] = useState('');
   const [isRateModalVisible, setIsRateModalVisible] = useState(false);
   const [rating, setRating] = useState(0);
+  const [isSubmit, setIsSubmit] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>("");
   const [activeScreen] = useState<keyof RootStackParamList | null>('Settings');
 
   const handleDeactivateAccount = () => {
@@ -40,7 +43,10 @@ const Settings: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleCancelDeactivate = () => {
+    setIsSubmit(true);
+    setLoadingMessage("Please wait...");
     setIsModalVisible(false);
+    setIsSubmit(false);
   };
 
   const handleSignOut = async () => {
@@ -52,6 +58,8 @@ const Settings: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleSendFeedback = async () => {
+    setIsSubmit(true);
+    setLoadingMessage("Please wait...");
     if (!feedbackText.trim()) {
       Alert.alert('Error', 'Please enter feedback before sending.');
       return;
@@ -68,6 +76,8 @@ const Settings: React.FC<Props> = ({ navigation }) => {
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to send feedback.');
+    }finally{
+      setIsSubmit(false);
     }
   };
 
@@ -76,6 +86,8 @@ const Settings: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleSendReport = async () => {
+    setIsSubmit(true);
+    setLoadingMessage("Please wait...");
     if (!reportText.trim()) {
       Alert.alert('Error', 'Please enter a report before sending.');
       return;
@@ -92,6 +104,8 @@ const Settings: React.FC<Props> = ({ navigation }) => {
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to send report.');
+    }finally{
+      setIsSubmit(false);
     }
   };
 
@@ -203,7 +217,7 @@ const Settings: React.FC<Props> = ({ navigation }) => {
             <View className="bg-white p-6 w-[80%] rounded-xl items-center">
               <Text className="text-xl text-black font-black mb-3">Send Feedback</Text>
               <TextInput
-                className="w-[100%] h-36 border border-gray-500 rounded-md border-1 p-5 mb-4"
+                className="w-[100%] h-36 border border-gray-500 text-black rounded-md border-1 p-5 mb-4"
                 multiline
                 numberOfLines={4}
                 placeholder="Enter your feedback here..."
@@ -243,7 +257,7 @@ const Settings: React.FC<Props> = ({ navigation }) => {
             <View className="bg-white p-6 w-[80%] rounded-xl items-center">
               <Text className="text-xl font-black mb-3 text-black">Send Report</Text>
               <TextInput
-                className="w-[100%] h-36 border border-gray-500 rounded-md border-1 p-5 mb-4"
+                className="w-[100%] h-36 border border-gray-500 text-black rounded-md border-1 p-5 mb-4"
                 multiline
                 numberOfLines={4}
                 placeholder="Enter your report here..."
@@ -294,6 +308,7 @@ const Settings: React.FC<Props> = ({ navigation }) => {
             </View>
           </View>
         </Modal>
+        <LoaderModal isVisible={isSubmit} message={loadingMessage} />
         <Menu activeScreen={activeScreen} />
       </LinearGradient>
     </SafeAreaView>

@@ -8,6 +8,7 @@ import { UserProfileDto } from './type';
 import { Path, Svg } from 'react-native-svg';
 import BackIcon from '../assets/svg/BackIcon';
 import LinearGradient from 'react-native-linear-gradient';
+import LoaderModal from '../components/LoaderModal';
 
 type Props = StackScreenProps<RootStackParamList, 'ChangePassword'>;
 
@@ -17,7 +18,8 @@ const ChangePassword: React.FC<Props> = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [userDetails, setUserDetails] = useState<UserProfileDto>();
-
+  const [isSubmit, setIsSubmit] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>("");
 
   const validatePassword = (password: string) => {
     const hasUpperCase = /[A-Z]/.test(password);
@@ -28,6 +30,8 @@ const ChangePassword: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleSubmit = async () => {
+    setIsSubmit(true);
+    setLoadingMessage("Please wait...");
     if (newPassword === confirmPassword) {
       const userID = await AsyncStorage.getItem('userID');
       const userResult = await getUserDetails(Number(userID));
@@ -45,6 +49,7 @@ const ChangePassword: React.FC<Props> = ({ navigation }) => {
     } else {
       Alert.alert('Passwords do not match');
     }
+    setIsSubmit(false);
   };
 
   return (
@@ -97,6 +102,7 @@ const ChangePassword: React.FC<Props> = ({ navigation }) => {
             </Text>
           )}
         </View>
+        <LoaderModal isVisible={isSubmit} message={loadingMessage} />
       </LinearGradient>
     </SafeAreaView>
   );
