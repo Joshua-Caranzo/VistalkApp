@@ -9,6 +9,8 @@ import tempfile
 from db import get_db_connection
 import re
 from datetime import datetime,date, timedelta
+import json
+
 def checkPronunciation():
     data = request.form
     content_id = int(data.get('contentId', 0))
@@ -31,7 +33,7 @@ def checkPronunciation():
     cursor.execute("SELECT contenttext FROM content WHERE contentID = %s", (content_id,))
     ctext_row = cursor.fetchone()
     if ctext_row:
-        ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contentText']).lower()
+        ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contenttext']).lower()
 
     
     if not audio_file:
@@ -39,10 +41,20 @@ def checkPronunciation():
 
     
     temp_audio_path = save_audio_file(audio_file)
-    transcription, average_confidence = pronounciate(temp_audio_path)
+    result = pronounciate(temp_audio_path)
+    if result is None:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Incorrect',
+            'data': None,
+            'data2': None,
+            'totalCount': None  
+        }), 200
+        
+    transcription, average_confidence = result
     transcription = re.sub(r'[^a-zA-Z0-9]', '', transcription).lower()
 
-    score = 1 if transcription == ctext and average_confidence >= 0.75 else 0
+    score = 1 if transcription == ctext and average_confidence >= 0.60 else 0
 
     
     insert_query = """
@@ -88,18 +100,11 @@ def save_audio_file(audio_file):
     return temp_audio_path
 
 def pronounciate(audio_file):
-    client_file = "sa_vistalk.json"
-    credentials = service_account.Credentials.from_service_account_file(client_file)
+    credentials_info = json.loads(os.getenv("GOOGLE_CLOUD_CREDENTIALS"))
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
     client = speech.SpeechClient(credentials=credentials)
     
-    
-    languageId = 1
-    languageCode = ""
-    if(languageId == 1):
-        languageCode = "fil-PH"
-    elif(languageId == 2):
-        languageCode = "es-ES"
-
+    languageCode = "fil-PH"
     
     if not audio_file.lower().endswith('.flac'):
         audio_file, channels = convert_to_flac(audio_file)
@@ -287,7 +292,7 @@ def update_event_logs(userId):
     query_fetch_event_logs = """
         SELECT dt.powerUpId, dt.taskTypeId, dt.taskId, el.currentValue
         FROM eventlogs el
-        INNER JOIN dailyTask dt ON el.dailyTaskId = dt.taskId
+        INNER JOIN dailytask dt ON el.dailyTaskId = dt.taskId
         inner join playerdailytask pdt on pdt.taskID = dt.taskId
         WHERE el.eventDate = %s AND el.userPlayerId = %s and pdt.isCompleted = 0
     """
@@ -298,7 +303,7 @@ def update_event_logs(userId):
     query_fetch_daily_tasks = """
         SELECT pdt.taskId, dt.quantity as requiredQuantity 
         FROM playerdailytask pdt
-        INNER JOIN dailyTask dt ON pdt.taskId = dt.taskId
+        INNER JOIN dailytask dt ON pdt.taskId = dt.taskId
         WHERE pdt.userPlayerId = %s AND dt.taskDate = %s
     """
     cursor.execute(query_fetch_daily_tasks, (userId, today))

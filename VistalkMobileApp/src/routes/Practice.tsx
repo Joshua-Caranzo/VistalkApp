@@ -136,14 +136,14 @@ const Practice: React.FC<Props> = ({ navigation }) => {
     setCurrentContent(contentResult.data);
 
     if (contentResult.data.audioPath) {
-      const newFileUrl = getContentPronunciation(contentResult.data.audioPath);
+      const newFileUrl = contentResult.data.audioPath;
       setFileUrl(newFileUrl);
     }
 
     const syllableResult = await getContentSyllableById(id);
     setContentSyllables(syllableResult.data);
 
-    const syllableUrls = syllableResult.data.map(syllable => getSyllablePronunciation(syllable.audioPath));
+    const syllableUrls = syllableResult.data.map(syllable => syllable.audioPath);
     setSyllableFileUrls(syllableUrls);
   }
 

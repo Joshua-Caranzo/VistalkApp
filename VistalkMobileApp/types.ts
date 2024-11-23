@@ -25,6 +25,7 @@ export type RootStackParamList = {
   Leaderboard:undefined;
   AllTimeLeaderboard:undefined;
   History: {contentId:number};
+  ChangeLanguage:  undefined;
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -47,6 +48,7 @@ export type UnitContentScreenNavigationProp = NativeStackNavigationProp<RootStac
 export type LeaderboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Leaderboard'>;
 export type AllTimeLeaderboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AllTimeLeaderboard'>;
 export type HistoryScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'History'>;
+export type ChageLanguageScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ChangeLanguage'>;
 
 export type MenuScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, keyof RootStackParamList>;
 

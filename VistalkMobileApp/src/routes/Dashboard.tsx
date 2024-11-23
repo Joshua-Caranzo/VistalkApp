@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ImageBackground, TouchableOpacity, Image, ScrollView, Modal, BackHandler, TouchableWithoutFeedback } from 'react-native';
 import Menu from '../components/Menu';
 import Svg, { Circle, Path } from 'react-native-svg';
-import { LeaderboardScreenNavigationProp, RootStackParamList, UnitScreenNavigationProp } from '../../types';
+import { RootStackParamList, UnitScreenNavigationProp } from '../../types';
 import { claimReward, getDailyTasks, getNotifications, getSections, getUserDetails, getUserImageUrl, getUserLanguage, updateNotifications } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DailyTaskDto, Languages, NotificationsDto, SectionDetails, UserProfileDto } from './type';
@@ -68,7 +68,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
 
       setSections(sectionResult.data)
       if (userResult.data.imagePath) {
-        setFileUrl(getUserImageUrl(userResult.data.imagePath));
+        setFileUrl(userResult.data.imagePath);
       }
 
       const dailyTaskResult = await getDailyTasks(Number(userID));

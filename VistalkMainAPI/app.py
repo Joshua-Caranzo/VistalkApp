@@ -102,10 +102,10 @@ def getSubscriptions():
 def paymentSubscription():
     return payment.paymongoredirect()
 
-""" @app.route('/paymongowebhooks', methods=['POST'])
+@app.route('/webhooks', methods=['POST'])
 def paymongo_webhook():
-    return payment.paymongo_webhook()
- """
+    return payment.handle_webhook()
+ 
 
 @app.route('/buySubscription', methods=['POST'])
 def buySubscription():
@@ -207,6 +207,14 @@ def getPronunciationList():
 @app.route('/getPronunciationCount', methods=['GET'])
 def getPronunciationCount():
     return pronunciation.getPronunciationCount()
+
+@app.route('/updateUserLanguage', methods=['PUT'])
+def updateUserLanguage():
+    return user.updateUserLanguage()
+
+@app.route('/poolSubscription', methods=['GET'])
+def poolSubscription():
+    return payment.poolSubscription()
 
 if __name__ == "__main__":
     from threading import Thread

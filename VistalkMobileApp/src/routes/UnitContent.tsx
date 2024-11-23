@@ -106,24 +106,24 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                     let choice4AudioUrl = null;
 
                     if (q.audioPath != null) {
-                        audioUrl = await getQuestionFiles(q.audioPath);
+                        audioUrl = q.audioPath;
                     }
 
                     if (q.imagePath != null) {
-                        imageUrl = await getQuestionFiles(q.imagePath);
+                        imageUrl = q.imagePath;
                     }
 
                     if (q.choice1AudioPath != null) {
-                        choice1AudioUrl = await getContentPronunciation(q.choice1AudioPath);
+                        choice1AudioUrl = q.choice1AudioPath;
                     }
                     if (q.choice2AudioPath != null) {
-                        choice2AudioUrl = await getContentPronunciation(q.choice2AudioPath);
+                        choice2AudioUrl = q.choice2AudioPath;
                     }
                     if (q.choice3AudioPath != null) {
-                        choice3AudioUrl = await getContentPronunciation(q.choice3AudioPath);
+                        choice3AudioUrl = q.choice3AudioPath;
                     }
                     if (q.choice4AudioPath != null) {
-                        choice4AudioUrl = await getContentPronunciation(q.choice4AudioPath);
+                        choice4AudioUrl = q.choice4AudioPath;
                     }
 
                     return {

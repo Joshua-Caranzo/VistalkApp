@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Modal, Linking, Alert } from 'react-native';
-import { SubscriptionDto } from './type';
-import { buySubscription, getSubscriptions, getUserVCoin, paymongoRedirect } from './repo';
+import { SubscriptionDto, UserProfileDto } from './type';
+import { buySubscription, getSubscriptions, getUserDetails, getUserVCoin, paymongoRedirect, poolSubscription } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
-import Svg, { Path, Text as SvgText, Image as SvgImage } from 'react-native-svg';
 import CheckIcon from '../assets/svg/CheckIcon';
-
+import LoaderModal from '../components/LoaderModal';
 
 type SusbcriptionProps = {
   vCoin: number;
@@ -19,6 +18,9 @@ const Subscription: React.FC<SusbcriptionProps> = ({ vCoin, setVcoin }) => {
   const [error, setError] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedSubcription, setSelectedSubscription] = useState<SubscriptionDto | null>(null);
+  const [userDetails, setUserDetails] = useState<UserProfileDto>();
+  const [socket, setSocket] = useState<any>(null);
+  const [loadingMessage, setLoadingMessage] = useState<string>("");
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -52,37 +54,52 @@ const Subscription: React.FC<SusbcriptionProps> = ({ vCoin, setVcoin }) => {
   };
 
   const handleBuy = async () => {
+
     if (selectedSubcription) {
       const userID = await AsyncStorage.getItem('userID');
       if (userID) {
-        try {
-          const result = await paymongoRedirect(selectedSubcription.price, selectedSubcription.subscriptionName);
-          if (result.url) {
-            Linking.openURL(result.url);
+        const result = await paymongoRedirect(selectedSubcription.price, selectedSubcription.subscriptionName);
+        if (result.url) {
+          Linking.openURL(result.url);
+          setModalVisible(false);
+          setLoading(true)
+          setLoadingMessage("Please wait...")
+          const maxPollingTime = setTimeout(() => {
+            clearInterval(pollInterval);
+            setError('Polling timed out. Please try again.');
+          }, 100000);
 
-            setModalVisible(false);
-            setTimeout(async () => {
-              const paymentSuccess = true;
-              if (paymentSuccess) {
-                await buySubscription(userID, selectedSubcription.id);
-                Alert.alert("Payment Success", "Your payment was successful!");
-              } else {
-                Alert.alert("Payment Failed", "There was a problem with your payment. Please try again.");
-              }
-            }, 10000);
-          } else {
-            setError('Failed to initiate payment');
-          }
-        } catch (err) {
-          setError('Payment failed');
+
+          const pollInterval = setInterval(async () => {
+            const poolResult = await poolSubscription(Number(userID));
+
+            if (poolResult.data === true) {
+
+              await buySubscription(userID, selectedSubcription.id);
+              clearInterval(pollInterval);
+              clearTimeout(maxPollingTime);
+              setLoading(false)
+              Alert.alert(
+                "Congratulations",
+                "You are now a subscriber!",
+                [{ text: "OK" }]
+              );
+            }
+          }, 1000);
+        } else {
+          setError('Failed to initiate payment');
+          setLoading(false)
         }
       }
+
     }
   };
 
+
+
   return (
     <View className="flex flex-row gap-24 items-center p-[26px] mb-24">
-      {/*       <Image source={require('../assets/White.png')} className="w-24 h-24 mb-6 bg-gray-400 p-4 rounded-full" /> */}
+      <LoaderModal isVisible={loading} message={loadingMessage} />
       {subscriptions.map((subscription, index) => (
         <View key={index} className="items-center">
           <View className="items-center justify-center rounded-3xl p-6 mb-4 bg-gray-400">
@@ -111,7 +128,8 @@ const Subscription: React.FC<SusbcriptionProps> = ({ vCoin, setVcoin }) => {
             </View>
             <TouchableOpacity onPress={() => handleOpenModal(subscription)}>
               <View className="rounded-xl py-3 px-4 mt-2" style={{
-            backgroundColor: 'rgba(240, 240, 240, 0.4)'}}>
+                backgroundColor: 'rgba(240, 240, 240, 0.4)'
+              }}>
                 <Text className="text-base font-black text-white">Buy</Text>
               </View>
             </TouchableOpacity>

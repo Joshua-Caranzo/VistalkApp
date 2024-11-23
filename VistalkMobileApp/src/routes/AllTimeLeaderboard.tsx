@@ -34,7 +34,7 @@ const AllTimeLeaderboard: React.FC<Props> = ({ navigation }) => {
                     setLeaderBoardData(top10Data);
                     top10Data.forEach((user, index) => {
                         if (user.imagePath) {
-                            const userImageUrl = getUserImageUrl(user.imagePath);
+                            const userImageUrl = user.imagePath;
                             setFileUrl(prevFileUrl => [...prevFileUrl, { index, url: userImageUrl }]);
                         }
                     });
@@ -42,7 +42,7 @@ const AllTimeLeaderboard: React.FC<Props> = ({ navigation }) => {
                       const userRankResult = await getSelfRankAllTime(Number(userIdString)); 
                       setUserRank(userRankResult.data);
                       if (userRankResult.data.imagePath) {
-                        const userImageUrl = getUserImageUrl(userRankResult.data.imagePath);
+                        const userImageUrl = userRankResult.data.imagePath;
                         setFile(userImageUrl);
                     }
                 }

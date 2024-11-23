@@ -1,5 +1,9 @@
 import requests
-from flask import request, jsonify, send_from_directory
+from flask import request, jsonify
+import hmac
+import hashlib
+from datetime import datetime
+from db import get_db_connection
 
 def paymongoredirect():
     try:
@@ -36,13 +40,72 @@ def paymongoredirect():
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": "An error occurred"}), 500
+
+def handle_webhook():
+    try:
+
+        data = request.json
+        event_type = data['data']['attributes']['type']
+        
+        if event_type == "payment.paid":
+            user_email = data['data']['attributes']['data']['attributes']['billing']['email']
+            
+            connection = get_db_connection()
+            cursor = connection.cursor()
+            print(user_email)
+
+            sql_query = """SELECT userID FROM user WHERE email = %s"""
+            cursor.execute(sql_query, (user_email,))
+            user_id = cursor.fetchone()
+            print(user_id)
+            if user_id:
+                user_id = user_id[0]  
+                print(user_id)
+
+                update_query = """
+                    UPDATE vista
+                    SET isPremium = 1, premiumDate = %s
+                    WHERE userPlayerId = %s
+                """
+                cursor.execute(update_query, (datetime.now(), user_id))
+                connection.commit()
+            
+            return jsonify({"message": "Webhook handled successfully"}), 200
+        else:
+            return jsonify({"message": "Event not handled"}), 200
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": "An error occurred"}), 500
     
-""" def paymongo_webhook():
-    data = request.json
-    if data.get('status') == 'paid':
-        payment_id = data.get('id')
+def poolSubscription():
+    userId = request.args.get('userId')
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    sql_query = """SELECT isPremium, premiumDate FROM vista WHERE userPlayerId = %s"""
+    cursor.execute(sql_query, (userId,))
 
-        SocketIO.emit('paymentStatus', {'status': 'paid'}, room=payment_id)
+        
+    result = cursor.fetchone()
 
-        return jsonify({'message': 'Payment received and notified'}), 200
-    return jsonify({'message': 'Payment not completed'}), 400 """
+        
+    if result:
+        is_premium, premium_date = result
+
+            
+        if is_premium and premium_date and premium_date >= datetime.now():
+            return jsonify({
+            'isSuccess': True,
+            'message': 'Subscribed',
+            'data': True,
+            'data2': None,
+            'totalCount': 0
+        }), 200
+        else:
+            return jsonify({
+            'isSuccess': True,
+            'message': 'Not Subscribed',
+            'data': False,
+            'data2': None,
+            'totalCount': 0
+        }), 200   
