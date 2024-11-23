@@ -20,6 +20,7 @@ const Subscription: React.FC<SusbcriptionProps> = ({ vCoin, setVcoin }) => {
   const [selectedSubcription, setSelectedSubscription] = useState<SubscriptionDto | null>(null);
   const [userDetails, setUserDetails] = useState<UserProfileDto>();
   const [socket, setSocket] = useState<any>(null);
+  const [isBuying, setIsBuying] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
 
   useEffect(() => {
@@ -54,52 +55,61 @@ const Subscription: React.FC<SusbcriptionProps> = ({ vCoin, setVcoin }) => {
   };
 
   const handleBuy = async () => {
-
     if (selectedSubcription) {
+      setIsBuying(true);
+      setLoadingMessage("Please wait...");
       const userID = await AsyncStorage.getItem('userID');
       if (userID) {
-        const result = await paymongoRedirect(selectedSubcription.price, selectedSubcription.subscriptionName);
-        if (result.url) {
-          Linking.openURL(result.url);
-          setModalVisible(false);
-          setLoading(true)
-          setLoadingMessage("Please wait...")
-          const maxPollingTime = setTimeout(() => {
-            clearInterval(pollInterval);
-            setError('Polling timed out. Please try again.');
-          }, 100000);
-
-
-          const pollInterval = setInterval(async () => {
-            const poolResult = await poolSubscription(Number(userID));
-
-            if (poolResult.data === true) {
-
-              await buySubscription(userID, selectedSubcription.id);
+        try {
+          const result = await paymongoRedirect(selectedSubcription.price, selectedSubcription.subscriptionName);
+          if (result.url) {
+            Linking.openURL(result.url);
+            setModalVisible(false);
+            setLoading(true)
+            setLoadingMessage("Please wait...")
+            const maxPollingTime = setTimeout(() => {
               clearInterval(pollInterval);
-              clearTimeout(maxPollingTime);
-              setLoading(false)
-              Alert.alert(
-                "Congratulations",
-                "You are now a subscriber!",
-                [{ text: "OK" }]
-              );
-            }
-          }, 1000);
-        } else {
-          setError('Failed to initiate payment');
-          setLoading(false)
+              setError('Polling timed out. Please try again.');
+            }, 100000);
+
+
+            const pollInterval = setInterval(async () => {
+              const poolResult = await poolSubscription(Number(userID));
+
+              if (poolResult.data === true) {
+
+                await buySubscription(userID, selectedSubcription.id);
+                clearInterval(pollInterval);
+                clearTimeout(maxPollingTime);
+                Alert.alert(
+                  "Congratulations",
+                  "You are now a subscriber!",
+                  [{ text: "OK" }]
+                );
+              }
+            }, 1000);
+          } else {
+            setError('Failed to initiate payment');
+          }
+        } catch (err) {
+          setError('Payment failed');
+        } finally {
+          setIsBuying(false)
         }
       }
-
     }
   };
 
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
 
+  if (error) {
+    return <Text>{error}</Text>;
+  }
 
   return (
     <View className="flex flex-row gap-24 items-center p-[26px] mb-24">
-      <LoaderModal isVisible={loading} message={loadingMessage} />
       {subscriptions.map((subscription, index) => (
         <View key={index} className="items-center">
           <View className="items-center justify-center rounded-3xl p-6 mb-4 bg-gray-400">

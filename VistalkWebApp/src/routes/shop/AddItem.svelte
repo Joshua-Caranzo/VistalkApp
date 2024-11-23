@@ -133,21 +133,7 @@
                 <label for="username" class="block text-sm text-black capitalize dark:text-black">VCoin Price</label>
               <input autocomplete="off" bind:value={powerUp.vcoinPrice}  placeholder="Powerup Price" type="number" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
             </div>
-
-            <div class="mt-2">  
-                <label class="inline-flex items-center cursor-pointer">
-                    <input bind:checked={powerUp.isPremium}  type="checkbox" class="sr-only peer">
-                      <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 
-                      peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
-                      peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                      after:start-[2px] after:bg-white after:border-gray-300 after:border 
-                      after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 
-                      peer-checked:bg-gradient-to-r peer-checked:from-[#6addd0] peer-checked:to-[#f7c188]">
-                  </div>
-                      <span class="ms-3 text-sm font-medium text-black dark:text-black">Premium Item</span>
-                  </label>
-            </div>
-
+            
             <div class="mt-2">  
               <label class="inline-flex items-center cursor-pointer">
                   <input bind:checked={powerUp.isImplemented}  type="checkbox" class="sr-only peer">

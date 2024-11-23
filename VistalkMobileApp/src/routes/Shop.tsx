@@ -93,7 +93,7 @@ const Shop: React.FC<Props> = ({ route }) => {
       } catch (err) {
         setError('Failed to fetch data');
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
   

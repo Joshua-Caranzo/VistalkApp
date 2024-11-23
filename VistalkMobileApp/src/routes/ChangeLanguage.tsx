@@ -18,6 +18,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Visayas from '../assets/svg/Visayas';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../components/Loader';
+import LoaderModal from '../components/LoaderModal';
 
 type Props = StackScreenProps<RootStackParamList, 'ChangeLanguage'>;
 
@@ -28,6 +29,8 @@ const ChangeLanguage: React.FC<Props> = ({navigation}) => {
     const [selectedLanguage, setSelectedLanguage] = useState<Languages>();
     const [isModalVisible, setModalVisible] = useState<boolean>(false);
     const [showError, setShowError] = useState<boolean>(false);
+    const [isSubmit, setIsSubmit] = useState<boolean>(false);
+    const [loadingMessage, setLoadingMessage] = useState<string>("");
 
     useEffect(() => {
         const fetchLanguages = async () => {
@@ -47,10 +50,15 @@ const ChangeLanguage: React.FC<Props> = ({navigation}) => {
     const selectLanguage = async (
         languageId: number,
     ) => {
+        setIsSubmit(true);
+        setLoadingMessage("Please wait...");
         const userID = await AsyncStorage.getItem('userID');
         try {
             if (userID) {
+                console.log(languageId)
+                console.log(userID)
                 const result = await updateUserLanguage(userID, languageId);
+                console.log(result)
                 if (result.isSuccess) {
                     navigation.navigate('Dashboard')
                 } else {
@@ -60,6 +68,8 @@ const ChangeLanguage: React.FC<Props> = ({navigation}) => {
             }
         } catch (error) {
             console.error('Error during registration:', error);
+        }finally{
+            setIsSubmit(false);
         }
     };
 
@@ -88,7 +98,7 @@ const ChangeLanguage: React.FC<Props> = ({navigation}) => {
 
     if (loading) {
         return (
-            <Loader isVisible={loading} message='Logging In...' />
+            <Loader isVisible={loading} message='Please wait...' />
         );
     }
 
@@ -149,6 +159,7 @@ const ChangeLanguage: React.FC<Props> = ({navigation}) => {
                     </TouchableOpacity>
                 </Modal>
             )}
+            <LoaderModal isVisible={isSubmit} message={loadingMessage} />
         </SafeAreaView>
     );
 };

@@ -4,6 +4,7 @@ import { CoinBag } from './type';
 import { buyCoinBag, getCoinBags, getUserVCoin, paymongoRedirect } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
+import LoaderModal from '../components/LoaderModal';
 
 type CoinBagProps = {
   vCoin: number;
@@ -16,6 +17,8 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
   const [error, setError] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedBag, setSelectedBag] = useState<CoinBag | null>(null);
+  const [isBuying, setIsBuying] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>("");
 
 
   useEffect(() => {
@@ -51,6 +54,8 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
 
   const handleBuy = async () => {
     if (selectedBag) {
+      setIsBuying(true);
+      setLoadingMessage("Please wait...");
       const userID = await AsyncStorage.getItem('userID');
       if (userID) {
         try {
@@ -78,9 +83,20 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
         } catch (err) {
           setError('Payment failed');
         }
+        finally{
+          setIsBuying(false);
+        }
       }
     }
   };
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (error) {
+    return <Text>{error}</Text>;
+  }
 
   return (
     <View className="flex flex-row gap-16 items-center p-[66px] mb-24">
@@ -143,7 +159,7 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
           </View>
         </Modal>
       )}
-
+    <LoaderModal isVisible={isBuying} message={loadingMessage} />
     </View>
   );
 };

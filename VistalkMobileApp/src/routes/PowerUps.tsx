@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AddIcon from '../assets/svg/AddIcon';
 import MinusIcon from '../assets/svg/MinusIcon';
 import LinearGradient from 'react-native-linear-gradient';
+import LoaderModal from '../components/LoaderModal';
 
 type FileUrl = {
   id: number;
@@ -28,6 +29,8 @@ const PowerUps: React.FC<PowerUpsProps> = ({ vCoin, setVcoin, userPowerUps, setU
   const [selectedPowerUp, setSelectedPowerUp] = useState<PowerUp | null>(null);
   const [quantity, setQuantity] = useState<number>(0);
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [isBuying, setIsBuying] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>("");
 
   // Define gradient colors for different items
   const gradientColors = [
@@ -107,11 +110,14 @@ const PowerUps: React.FC<PowerUpsProps> = ({ vCoin, setVcoin, userPowerUps, setU
 
   const handleBuy = async () => {
     if (selectedPowerUp && quantity > 0 && totalPrice <= vCoin) {
-      const userID = await AsyncStorage.getItem('userID');
-      if (userID)
-        buyPowerUp(userID, selectedPowerUp.itemID, quantity).then(() => {
+      setIsBuying(true); // Start loading
+      setLoadingMessage("Please wait...");
+      try {
+        const userID = await AsyncStorage.getItem('userID');
+        if (userID) {
+          await buyPowerUp(userID, selectedPowerUp.itemID, quantity);
 
-          setVcoin(prev => prev - totalPrice);
+          setVcoin((prev) => prev - totalPrice);
 
           setUserPowerUp((prevUserPowerUps) => {
             const updatedPowerUps = [...prevUserPowerUps];
@@ -138,7 +144,12 @@ const PowerUps: React.FC<PowerUpsProps> = ({ vCoin, setVcoin, userPowerUps, setU
           });
 
           setModalVisible(false);
-        });
+        }
+      } catch (error) {
+        console.error('Error buying power-up:', error);
+      } finally {
+        setIsBuying(false);
+      }
     }
   };
 
@@ -234,6 +245,7 @@ const PowerUps: React.FC<PowerUpsProps> = ({ vCoin, setVcoin, userPowerUps, setU
           </View>
         </Modal>
       )}
+      <LoaderModal isVisible={isBuying} message={loadingMessage} />
     </View>
   );
 };
