@@ -3,12 +3,10 @@ import { SafeAreaView, Text, TouchableOpacity, View, Alert, Image, ScrollView, D
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getUserDetails, getUserImageUrl } from './repo';
+import { getUserDetails } from './repo';
 import { UserProfileDto } from './type';
-import { Path, Svg } from 'react-native-svg';
 import BackIcon from '../assets/svg/BackIcon';
 import LinearGradient from 'react-native-linear-gradient';
-import SettingIcon from '../assets/svg/SettingIcon';
 import Loader from '../components/Loader';
 import { LineChart } from 'react-native-chart-kit';
 import EditIcon from '../assets/svg/EditIcon';

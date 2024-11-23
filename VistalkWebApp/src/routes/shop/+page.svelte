@@ -99,20 +99,6 @@
             powerUp = p;
             fileUrl = powerUp.filePath;
             powerUp.file = new File([fileUrl], powerUp.filePath, { type: "image/png" });
-        } else if (b != null) {
-            backgroundMusic = b;
-            const fileBlob = await getItemFileByFileName(
-                b.filePath,
-                itemTypeID,
-            );
-            if (fileBlob != null) {
-                fileUrl = URL.createObjectURL(fileBlob);
-                backgroundMusic.file = new File(
-                    [fileBlob],
-                    backgroundMusic.filePath,
-                    { type: fileBlob.type },
-                );
-            }
         } else if (c != null) coinBag = c;
 
         isAdd = add;

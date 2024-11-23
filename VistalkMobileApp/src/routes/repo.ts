@@ -256,3 +256,11 @@ export async function pronunciationProgressList(userId: number, contentId: numbe
 export async function getPronunciationCount(userId: number) {
     return await getFromMainApi<CallResultDto<PronunciationType>>('getPronunciationCount', { userId });
 }
+
+export async function updateUserLanguage(userId: string, languageId:number) {
+    return await putToMainApi<CallResultDto<object>>('updateUserLanguage', { userId, languageId });
+}
+
+export async function poolSubscription(userId: number) {
+    return await getFromMainApi<CallResultDto<boolean>>('poolSubscription', { userId });
+}

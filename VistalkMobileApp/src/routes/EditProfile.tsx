@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View, Alert, Image, Modal, ImageBackground } from 'react-native';
+import { SafeAreaView, Text, TextInput, TouchableOpacity, View, Alert, Image, Modal } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getIsEmailUsed, getUserDetails, getUserImageUrl, sendCodetoEmail, verifyCode, editVistaProfile } from './repo'; // Ensure updateUserProfile is imported
-import { EditProfileVista, UserProfileDto } from './type';
+import { getIsEmailUsed, getUserDetails, sendCodetoEmail, verifyCode, editVistaProfile } from './repo'; // Ensure updateUserProfile is imported
+import {  UserProfileDto } from './type';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { Path, Svg } from 'react-native-svg';
 import BackIcon from '../assets/svg/BackIcon';
 import LinearGradient from 'react-native-linear-gradient';
 

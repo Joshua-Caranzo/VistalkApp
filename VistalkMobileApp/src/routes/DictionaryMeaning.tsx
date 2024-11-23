@@ -37,7 +37,7 @@ const DictionaryMeaning: React.FC<Props> = ({ route, navigation }) => {
         setContentById(contentResult.data);
 
         if (contentResult.data.audioPath) {
-          const newFileUrl = getContentPronunciation(contentResult.data.audioPath);
+          const newFileUrl = contentResult.data.audioPath;
           setFileUrl(newFileUrl);
         }
 
@@ -45,7 +45,7 @@ const DictionaryMeaning: React.FC<Props> = ({ route, navigation }) => {
         if (syllableResult.data)
           setContentSyllables(syllableResult.data);
 
-        const syllableUrls = syllableResult.data.map(syllable => getSyllablePronunciation(syllable.audioPath));
+        const syllableUrls = syllableResult.data.map(syllable => syllable.audioPath);
         if (syllableUrls)
           setSyllableFileUrls(syllableUrls);
 

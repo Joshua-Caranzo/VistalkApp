@@ -27,9 +27,7 @@
         if (userView.userPlayerId) {
           const response = await getUserDetails(userView.userPlayerId);
           userDetail = response.data;
-          const fileBlob = await getImageUrl(userDetail.imagePath || "");
-            const newFile = new Blob();
-            imageUrl = URL.createObjectURL(fileBlob || newFile);
+            imageUrl = userDetail.imagePath
 
           weeklyScores = [
             userDetail.weeklyScoreGraph["Monday"] || 0,

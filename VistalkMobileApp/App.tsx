@@ -3,9 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Home from './src/routes/Home';
-import LogIn from './src/routes/LogIn'; 
+import LogIn from './src/routes/LogIn';
 import Register from './src/routes/Register';
-import Languages from './src/routes/Languages'; 
+import Languages from './src/routes/Languages';
 import { RootStackParamList } from './types'; // Ensure this import path is correct
 import Dashboard from './src/routes/Dashboard';
 import Dictionary from './src/routes/Dictionary';
@@ -25,25 +25,26 @@ import { updateScore } from './src/routes/repo';
 import Leaderboard from './src/routes/Leaderboard';
 import AllTimeLeaderboard from './src/routes/AllTimeLeaderboard';
 import History from './src/routes/History';
+import ChangeLanguage from './src/routes/ChangeLanguage';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); 
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() =>   {
+  useEffect(() => {
     const checkLoginStatus = async () => {
       const token = await AsyncStorage.getItem('userToken');
       const userID = await AsyncStorage.getItem('userID');
-      if(userID)
-        await updateScore(userID,0);
+      if (userID)
+        await updateScore(userID, 0);
       setIsLoggedIn(token != null);
       setLoading(false);
     };
 
     checkLoginStatus();
-  }, []); 
+  }, []);
 
   if (loading) {
     return (
@@ -84,7 +85,7 @@ const App: React.FC = () => {
           component={SetNewPassword}
           options={{ headerShown: false }}
         />
-        
+
         <Stack.Screen
           name="Dashboard"
           component={Dashboard}
@@ -153,6 +154,11 @@ const App: React.FC = () => {
         <Stack.Screen
           name="History"
           component={History}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ChangeLanguage"
+          component={ChangeLanguage}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
