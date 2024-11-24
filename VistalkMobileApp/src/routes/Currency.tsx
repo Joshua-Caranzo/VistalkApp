@@ -61,6 +61,7 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
         try {
           const result = await paymongoRedirect(selectedBag.moneyPrice, selectedBag.coinBagName);
           if (result.url) {
+            Linking.openURL(result.url);
             setModalVisible(false);
             setLoading(true)
             setLoadingMessage("Please wait...")

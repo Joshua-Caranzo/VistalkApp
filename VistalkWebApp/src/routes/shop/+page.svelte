@@ -98,7 +98,9 @@
         if (p != null) {
             powerUp = p;
             fileUrl = powerUp.filePath;
-            powerUp.file = new File([fileUrl], powerUp.filePath, { type: "image/png" });
+            powerUp.file = new File([fileUrl], powerUp.filePath, {
+                type: "image/png",
+            });
         } else if (c != null) coinBag = c;
 
         isAdd = add;
@@ -190,13 +192,27 @@
     }
 
     async function itemSetInactive(id: number) {
-        await setItemInactive(id);
-        refresh();
+        const userConfirmed = confirm(
+            "Do you want to continue? You are about to delete this item. Yes or No?",
+        );
+        if (userConfirmed) {
+            await setItemInactive(id);
+            refresh();
+        } else {
+            console.log("cancelled");
+        }
     }
 
     async function coinBagInactiveSet(id: number) {
-        await coinBagInactive(id);
-        refresh();
+        const userConfirmed = confirm(
+            "Do you want to continue? You are about to delete this item. Yes or No?",
+        );
+        if (userConfirmed) {
+            await coinBagInactive(id);
+            refresh();
+        } else {
+            console.log("cancelled");
+        }
     }
 </script>
 

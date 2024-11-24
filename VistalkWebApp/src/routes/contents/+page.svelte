@@ -256,8 +256,15 @@
     }
 
     async function setInactive(id: number) {
-        await contentInactived(id);
-        refresh();
+        const userConfirmed = confirm(
+            "Do you want to continue? You are about to delete this item. Yes or No?",
+        );
+        if (userConfirmed) {
+            await contentInactived(id);
+            refresh();
+        } else {
+            console.log("Action canceled by the user.");
+        }
     }
 </script>
 
