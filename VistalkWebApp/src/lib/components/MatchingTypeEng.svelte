@@ -43,19 +43,37 @@
 
   async function saveContent() {
     isLoading = true;
-    mainQuestion.word1 = selectedChoices[0]?.contentID ?? 0;
-    mainQuestion.word2 = selectedChoices[1]?.contentID ?? 0;
-    mainQuestion.word3 = selectedChoices[2]?.contentID ?? 0;
-    mainQuestion.word4 = selectedChoices[3]?.contentID ?? 0;
-    mainQuestion.match1 = mainQuestion.word1;
-    mainQuestion.match2 = mainQuestion.word2;
-    mainQuestion.match3 = mainQuestion.word3;
-    mainQuestion.match4 = mainQuestion.word4;
-    isLoading = false;
-    await save_questionMatch(mainQuestion);
-    closeModal();
-  }
 
+    // Assign values, but don't default to 0
+    const word1 = selectedChoices[0]?.contentID ?? null;
+    const word2 = selectedChoices[1]?.contentID ?? null;
+    const word3 = selectedChoices[2]?.contentID ?? null;
+    const word4 = selectedChoices[3]?.contentID ?? null;
+
+    // Check if any value is null
+    if (word1 === null || word2 === null || word3 === null || word4 === null) {
+      alert("Please ensure all fields are filled before saving.");
+      isLoading = false;
+      return; // Exit function without saving
+    }
+
+    // Assign to mainQuestion only if validation passes
+    mainQuestion.word1 = word1;
+    mainQuestion.word2 = word2;
+    mainQuestion.word3 = word3;
+    mainQuestion.word4 = word4;
+    mainQuestion.match1 = word1;
+    mainQuestion.match2 = word2;
+    mainQuestion.match3 = word3;
+    mainQuestion.match4 = word4;
+
+    // Save and close modal
+    await save_questionMatch(mainQuestion);
+    await closeModal();
+
+    isLoading = false;
+  }
+  
   function handleInputChange(index: number, side: 'left' | 'right', event: Event) {
     const target = event.target as HTMLInputElement;
     if (side === 'left') {

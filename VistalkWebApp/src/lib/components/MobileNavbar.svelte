@@ -89,6 +89,10 @@
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Feedback</span>
                 </a>
+                <a class="nav-link {activePage === '/userRecording' ? 'active' : ''}"  on:click={() => goto('/userRecording')}>
+                    <i class="fas fa-microphone"></i>
+                    <span class="nav-text">FeeRecordingsdback</span>
+                </a>
                 <a class="button is-light mobile-logout-button" on:click={handleLogout}>
                     <i class="fas fa-sign-out-alt"></i>
                     <span class="nav-text">Logout</span>
