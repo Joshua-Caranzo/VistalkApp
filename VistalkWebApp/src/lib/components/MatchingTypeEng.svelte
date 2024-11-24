@@ -229,7 +229,7 @@
             <button
               on:click={saveContent}
               type="button"
-              disabled={isLoading}
+              disabled={isLoading || (mainQuestion.questionText == null && mainQuestion.word1 == null && mainQuestion.word2 == null && mainQuestion.word3 == null && mainQuestion.word4 == null)}
               style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
               class={"border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50"}
             >

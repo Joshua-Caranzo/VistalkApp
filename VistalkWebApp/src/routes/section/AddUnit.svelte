@@ -91,7 +91,7 @@
             </div>
             
             <div class="flex justify-end mt-6">
-              <button on:click={addUnit} type="button" disabled={isLoading}  style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
+              <button on:click={addUnit} type="button" disabled={isLoading || (unit.unitNumber == 0 && unit.description == null && unit.title == null)}  style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
               class={'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50'} 
               >
                 {isLoading ? "Saving..." : "Save Section"}
