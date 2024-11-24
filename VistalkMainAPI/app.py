@@ -216,6 +216,10 @@ def updateUserLanguage():
 def poolSubscription():
     return payment.poolSubscription()
 
+@app.route('/poolCoinBag', methods=['GET'])
+def poolCoinBag():
+    return payment.poolCoinBag()
+
 if __name__ == "__main__":
     from threading import Thread
     thread = Thread(target=start_background_service)
