@@ -95,11 +95,33 @@
 
   async function saveContent() {
     isLoading = true;
+
     if (selectedChoices) {
-      mainQuestion.choice1 = selectedChoices[0]?.contentID ?? 0;
-      mainQuestion.choice2 = selectedChoices[1]?.contentID ?? 0;
-      mainQuestion.choice3 = selectedChoices[2]?.contentID ?? 0;
-      mainQuestion.choice4 = selectedChoices[3]?.contentID ?? 0;
+      const word1 = selectedChoices[0]?.contentID ?? null;
+      const word2 = selectedChoices[1]?.contentID ?? null;
+      const word3 = selectedChoices[2]?.contentID ?? null;
+      const word4 = selectedChoices[3]?.contentID ?? null;
+
+      // Check if any value is null
+      if (
+        word1 === null ||
+        word2 === null ||
+        word3 === null ||
+        word4 === null ||
+        word1 == 0 ||
+        word2 == 0 ||
+        word3 == 0 ||
+        word4 == 0
+      ) {
+        alert("Please ensure all fields are filled before saving.");
+        isLoading = false;
+        return; // Exit function without saving
+      }
+
+      mainQuestion.choice1 = word1;
+      mainQuestion.choice2 = word2;
+      mainQuestion.choice3 = word3;
+      mainQuestion.choice4 = word4;
       switch (mainQuestion.correctChoice) {
         case 2:
           mainQuestion.correctChoice = mainQuestion.choice2;
@@ -132,7 +154,7 @@
       ) {
         await saveQuestionMultipleChoice(mainQuestion);
         closeModal();
-      } else{
+      } else {
         alert(
           "Please Add contents that are added in the dictionary, and select a correct choice!",
         );
