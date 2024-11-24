@@ -115,7 +115,7 @@
         </div> 
     </div>
 </div>
-<div class="flex flex-wrap gap-6 mt-6 justify-center">
+<div class="flex flex-col gap-6 mt-6 justify-center">
     {#each sections as section}
     <button on:click={() => toggleButton(section.sectionId)} class="bg-white rounded-xl py-4 px-4 flex-grow  transform hover:scale-95 transition-transform duration-300 shadow-lg">
         <!-- svelte-ignore a11y-click-events-have-key-events -->

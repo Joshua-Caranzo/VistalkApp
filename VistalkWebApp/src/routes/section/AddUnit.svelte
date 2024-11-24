@@ -77,14 +77,14 @@
 
               <div class="mt-4">
                 <label for="username" class="block text-sm text-gray-700 capitalize text-black">Title</label>
-              <input bind:value={unit.title} id="username" placeholder="Section Title" type="text" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
+              <input bind:value={unit.title} id="username" placeholder="Unit Title" type="text" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
             </div>
   
             <div class="mt-4">
               <label for="email" class="block text-sm text-gray-700 capitalize text-black">Description</label>
               <textarea 
                 id="email" 
-                placeholder="This section is for..." 
+                placeholder="This unit is for..." 
                 bind:value={unit.description} 
                 class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40"
             ></textarea>
@@ -94,7 +94,7 @@
               <button on:click={addUnit} type="button" disabled={isLoading}  style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
               class={'border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50'} 
               >
-                {isLoading ? "Saving..." : "Save Section"}
+                {isLoading ? "Saving..." : "Save Unit"}
               </button>
             </div>
           </form>
