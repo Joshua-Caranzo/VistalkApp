@@ -42,6 +42,9 @@
   async function handleLogin(user: LoggedInUser) {
     loggedInUser.set(user);
   }
+  function home() {
+    goto("/");
+  }
 </script>
 
 <svelte:head>
@@ -49,6 +52,29 @@
 </svelte:head>
 
 <div class="gradient-bg min-h-screen flex items-center justify-center">
+  <button
+    on:click={home}
+    class="absolute top-5 left-5 bg-white rounded-full py-2 px-4 overflow-hidden group"
+  >
+    <div class="flex items-center justify-center gap-x-2">
+      <div class="group">
+        <svg
+        class="transition duration-300 ease-in-out fill-black group-hover:fill-[#6addd0]"
+          xmlns="http://www.w3.org/2000/svg"
+          width="1.2em"
+          height="1.2em"
+          viewBox="0 0 24 24"
+          ><path
+            d="M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8z"
+          /></svg
+        >
+      </div>
+      <span
+        class="text-black text-lg transition duration-300 ease-in-out group-hover:text-transparent bg-clip-text bg-gradient-to-r from-[#6addd0] to-[#f7c188]"
+        >Home</span
+      >
+    </div>
+  </button>
   <div class="flex flex-col items-center gap-4">
     <img class="w-48 h-auto" src="FinalLogo.png" alt="Logo" />
     <h2

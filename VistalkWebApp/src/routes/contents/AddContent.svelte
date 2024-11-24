@@ -310,7 +310,10 @@
 
                             <!-- Play/Pause Button -->
                             {#if content.content.audio != null}
-                              <div class="flex items-center gap-4">
+                              <div class="flex flex-col gap-4">
+                                  <div class="text-sm text-gray-700">
+                                      {content.content.audioPath}
+                                  </div>
                                   <button 
                                       on:click={togglePlayPause} 
                                       class="text-gray-600 focus:outline-none hover:text-gray-700">
@@ -325,11 +328,8 @@
                                           </svg>
                                       {/if}
                                   </button>
-                                  <div class="text-sm text-gray-700">
-                                      {content.content.audioPath}
-                                  </div>
                                   <div class="inline-flex items-center gap-2">
-                                      <label for="file" class="flex items-center bg-[#f7c188] text-black text-sm p-2 rounded-md cursor-pointer ml-4">
+                                      <label for="file" class="flex items-center bg-[#f7c188] text-black text-sm p-2 rounded-md cursor-pointer">
                                           Upload
                                           <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24" class="ml-1">
                                               <path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/>

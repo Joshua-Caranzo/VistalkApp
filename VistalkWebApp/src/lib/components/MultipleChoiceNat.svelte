@@ -149,7 +149,10 @@
         mainQuestion.choice2 != null &&
         mainQuestion.choice3 != null &&
         mainQuestion.choice4 != null &&
-        mainQuestion.correctChoice != null
+        mainQuestion.correctChoice != word1 === null || 0 &&
+        mainQuestion.correctChoice != word2 === null || 0 &&
+        mainQuestion.correctChoice != word3 === null || 0 &&
+        mainQuestion.correctChoice != word4 === null || 0
       ) {
         await saveQuestionMultipleChoice(mainQuestion);
         closeModal();
