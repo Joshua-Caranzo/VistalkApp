@@ -229,7 +229,7 @@
           style="opacity: {modelOpen ? 1 : 0}; transform: {modelOpen ? 'translateY(0)' : 'translateY(4rem)'};"
       >
           <div class="flex items-center justify-between space-x-4">
-              <h1 class="text-xl font-medium text-gray-800">{isAdd ? "Create Unit" : "Edit Unit"}</h1>
+              <h1 class="text-xl font-medium text-gray-800">{isAdd ? "Create content" : "Edit content"}</h1>
 
               <button 
                   on:click={closeModal}
