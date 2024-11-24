@@ -364,8 +364,15 @@
     }
 
     async function setInactive(questionID: number, unitID: number) {
-        await questionInactive(questionID, unitID);
-        refresh();
+        const userConfirmed = confirm(
+            "Do you want to continue? You are about to delete this item. Yes or No?",
+        );
+        if (userConfirmed) {
+            await questionInactive(questionID, unitID);
+            refresh();
+        } else {
+            console.log("cancelled");
+        }
     }
 </script>
 
