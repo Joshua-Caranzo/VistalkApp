@@ -132,7 +132,7 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
 
                                             <View className="flex-row items-center gap-x-2">
                                                 <CircleIcon className="h-4 w-4" color={boxColor} />
-                                                <Text style={{ color: boxColor }} className="font-bold text-lg">{unit.totalItems >= 15 ? unit.totalItems : 15}</Text>
+                                                <Text style={{ color: boxColor }} className="font-bold text-lg">{unit.totalItems <= 15 ? unit.totalItems : 15}</Text>
                                                 <Text className="text-black text-xl font-bold ml-4">Questions</Text>
                                             </View>
                                             <View className="flex-grow flex items-center mt-4">

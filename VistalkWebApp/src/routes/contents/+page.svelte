@@ -60,7 +60,7 @@
         languages = languageCallResult.data;
         const contentTypeCallResult = await getContentTypes();
         contentTypes = contentTypeCallResult.data;
-        refresh();
+        await refresh();
     });
 
     function openAddSection() {
@@ -379,7 +379,7 @@
             {#if isloading}
                 <Loader isVisible={isloading} message={"Loading..."} colspan={4}
                 ></Loader>
-            {:else if contents && contents.length >= 1}
+            {:else if contents.length >= 1}
                 {#each contents as c}
                     <tr class="border-t-2 mx-4">
                         <td class="py-3 px-4">{c.contentText}</td>

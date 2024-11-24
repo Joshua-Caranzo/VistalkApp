@@ -123,9 +123,24 @@
         mainQuestion.audioPath = mainQuestion.file.name;
         mainQuestion.imagePath = null;
       }
+      if (
+        mainQuestion.choice1 != null &&
+        mainQuestion.choice2 != null &&
+        mainQuestion.choice3 != null &&
+        mainQuestion.choice4 != null &&
+        mainQuestion.correctChoice != null
+      ) {
+        await saveQuestionMultipleChoice(mainQuestion);
+        closeModal();
+      }
+      else{
+        alert(
+          "Please Add contents that are added in the dictionary, and select a correct choice!",
+        );
+        return;
+      }
+
       isLoading = false;
-      await saveQuestionMultipleChoice(mainQuestion);
-      closeModal();
     }
   }
   function handleInputChange(index: number) {
