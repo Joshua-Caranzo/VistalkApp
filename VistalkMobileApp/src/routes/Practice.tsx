@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoaderModal from '../components/LoaderModal';
 import { StackScreenProps } from '@react-navigation/stack';
 import ArrowIcon from '../assets/svg/ArrowIcon';
+import IncorrectIcon from '../assets/svg/IncorrectIcon';
 
 type Props = StackScreenProps<RootStackParamList, 'Practice'>;
 
@@ -47,15 +48,13 @@ const Practice: React.FC<Props> = ({ navigation }) => {
   const [correct, setCorrect] = useState<boolean | null>(null);
   const [userID, setUserId] = useState<string | null>(null);
   const [isSearch, setSearch] = useState<boolean | null>(null);
+  const [searchLoading, setSearchLoading] = useState<boolean>(false);
 
   const fetchContents = async (reset = false) => {
-    setLoading(true);
-    setLoadingMessage("Loading...")
+    setSearchLoading(true);
     try {
       const userIdString = await AsyncStorage.getItem('userID');
-      setUserId(userIdString)
-      const result1 = await getUserLanguage(Number(userID));
-      setLanguageDetails(result1.data);
+      const result1 = await getUserLanguage(Number(userIdString));
       const result = await getPronunciations(result1.data.languageID, searchText, offset, 10);
       const newContents = result.data;
       if (reset) {
@@ -66,11 +65,10 @@ const Practice: React.FC<Props> = ({ navigation }) => {
       }
       if (newContents.length < 10) setHasMore(false);
       if (hasMore) setOffset((prevOffset) => prevOffset + 10);
-      stopAndReleaseSound();
     } catch (error) {
       setError('Failed to fetch contents');
     } finally {
-      setLoading(false);
+      setSearchLoading(false);
     }
   };
 
@@ -147,14 +145,22 @@ const Practice: React.FC<Props> = ({ navigation }) => {
 
     const syllableUrls = syllableResult.data.map(syllable => syllable.audioPath);
     setSyllableFileUrls(syllableUrls);
-
-    setSearch(false);
   }
 
-  async function searchContent(text: string) {
+  const searchContent = async (text: string) => {
     setSearchText(text);
-    fetchContents();
-  }
+    setSearchLoading(true); // Start search-specific loading
+    try {
+      const result1 = await getUserLanguage(Number(await AsyncStorage.getItem('userID')));
+      const result = await getPronunciations(result1.data.languageID, text, 0, 10);
+      setContents(result.data);
+      setHasMore(result.data.length >= 10);
+    } catch (error) {
+      setError('Failed to search content');
+    } finally {
+      setSearchLoading(false); // Stop search-specific loading
+    }
+  };
 
   useEffect(() => {
     if (contents.length > 0) {
@@ -440,63 +446,71 @@ const Practice: React.FC<Props> = ({ navigation }) => {
 
       <Modal
         transparent={true}
-        visible={isSearch == true}
+        visible={isSearch === true}
         animationType="fade"
-        onRequestClose={closeModalSearch}
+        onRequestClose={() => setSearch(false)} // Close modal on back button
       >
-        <TouchableOpacity
+        <View
           className="flex-1 bg-black bg-opacity-50 justify-center items-center"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
-          onPress={closeModalSearch}
         >
-          <View className="bg-white rounded-2xl p-5 shadow-lg">
+          <View
+            className="bg-white rounded-2xl p-5 shadow-lg"
+            onStartShouldSetResponder={() => true} // Allow interaction within the modal
+          >
+            <View className="flex items-end mb-4">
+              <TouchableOpacity onPress={closeModalSearch}>
+                <IncorrectIcon className="text-gray-300 h-5 w-5" /> 
+              </TouchableOpacity>
+            </View>
+            {/* Search input */}
             <View className={`flex flex-row items-center bg-white px-4 mb-2 h-10 rounded-lg border border-gray-300`}>
               <TextInput
                 className="flex-1 text-gray-600"
                 placeholder="Search for a word"
                 placeholderTextColor="#999"
                 value={searchText}
-                onChangeText={(text) => searchContent(text)}
+                onChangeText={(text) => searchContent(text)} // Trigger search
               />
-              <SearchIcon className="w-6 h-6 text-gray-400" />
+              <SearchIcon className="w-6 h-6 text-gray-300" />
             </View>
+
+            {/* Scrollable content */}
             <ScrollView
               contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
               showsVerticalScrollIndicator={false}
-              onScroll={({ nativeEvent }) => {
-                const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
-                if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 50) {
-                  if (!loading && hasMore) fetchContents();
-                }
-              }}
-              scrollEventThrottle={16}
               style={{ maxWidth: 300, maxHeight: 400 }}
             >
-              {loading && offset === 0 ? (
-                <ActivityIndicator size="large" />
+              {searchLoading ? ( // Show spinner during search
+                <ActivityIndicator size="large" className="px-[100px]" />
               ) : contents.length > 0 ? (
                 contents.map((c, index) => (
-                  <TouchableOpacity key={index} onPress={() => selectContent(c.contentID)}>
-                    <View
-                      className="rounded-lg py-3 px-5 mb-3 border-b border-gray-300"
-                    >
+                  <TouchableOpacity
+                    key={index}
+                    onPress={async () => {
+                      await selectContent(c.contentID); // Select content
+                      closeModalSearch(); // Close modal only after selecting
+                    }}
+                  >
+                    <View className="rounded-lg py-3 px-5 mb-3 border-b border-gray-300">
                       <View className="flex flex-row items-center gap-x-4">
-                        <Text className="text-xl text-center text-black w-[30%] font-bold">{c.contentText}</Text>
+                        <Text className="text-xl text-center text-black w-[30%] font-bold">
+                          {c.contentText}
+                        </Text>
                         <ArrowIcon className="w-8 h-8 text-black" />
-                        <Text className="text-xl text-center text-black w-[30%] font-bold italic">{c.englishTranslation}</Text>
+                        <Text className="text-xl text-center text-black w-[30%] font-bold italic">
+                          {c.englishTranslation}
+                        </Text>
                       </View>
                     </View>
                   </TouchableOpacity>
                 ))
               ) : (
-                <Text className="text-gray-500 text-lg text-center">No words found</Text>
-              )}
-              {loading && offset > 0 && (
-                <ActivityIndicator size="large" className="mt-4" />
+                <Text className="text-gray-500 text-lg text-center px-16">No words found</Text>
               )}
             </ScrollView>
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
     </SafeAreaView>
   );
