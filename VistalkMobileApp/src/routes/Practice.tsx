@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, Modal, ActivityIndicator } from 'react-native';
 import Menu from '../components/Menu';
 import HistoryIcon from '../assets/svg/HistoryIcon';
 import SearchIcon from '../assets/svg/SearchIcon';
@@ -17,6 +17,7 @@ import { Keyboard } from 'react-native';  // Import the Keyboard module
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoaderModal from '../components/LoaderModal';
 import { StackScreenProps } from '@react-navigation/stack';
+import ArrowIcon from '../assets/svg/ArrowIcon';
 
 type Props = StackScreenProps<RootStackParamList, 'Practice'>;
 
@@ -45,6 +46,7 @@ const Practice: React.FC<Props> = ({ navigation }) => {
   const [languageDetails, setLanguageDetails] = useState<Languages>();
   const [correct, setCorrect] = useState<boolean | null>(null);
   const [userID, setUserId] = useState<string | null>(null);
+  const [isSearch, setSearch] = useState<boolean | null>(null);
 
   const fetchContents = async (reset = false) => {
     setLoading(true);
@@ -145,6 +147,8 @@ const Practice: React.FC<Props> = ({ navigation }) => {
 
     const syllableUrls = syllableResult.data.map(syllable => syllable.audioPath);
     setSyllableFileUrls(syllableUrls);
+
+    setSearch(false);
   }
 
   async function searchContent(text: string) {
@@ -161,7 +165,7 @@ const Practice: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     if (contents.length > 0) {
       random();
-   }
+    }
   }, [contents]);
 
   async function getcount() {
@@ -287,8 +291,16 @@ const Practice: React.FC<Props> = ({ navigation }) => {
     navigation.navigate('History', { contentId });
   };
 
+  function showModal() {
+    setSearch(true)
+  }
+
   function closeModal() {
     setShowCountMessage(null)
+  }
+
+  function closeModalSearch() {
+    setSearch(false)
   }
 
   function navigateToSubscription() {
@@ -298,42 +310,17 @@ const Practice: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaView className="flex-1">
       <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
-      <Text className="absolute top-4 left-4 text-lg font-black text-white">Credits: {count === null ? '∞' : count}</Text>
-      <TouchableOpacity className="absolute top-4 right-4" disabled={!currentContent} onPress={() => navigateToHistory(currentContent?.contentID ?? 0)}>
+        <Text className="absolute top-4 left-4 text-lg font-black text-white">Credits: {count === null ? '∞' : count}</Text>
+        <TouchableOpacity className="absolute top-4 right-4" disabled={!currentContent} onPress={() => navigateToHistory(currentContent?.contentID ?? 0)}>
           <HistoryIcon className="h-8 w-8 text-white" />
         </TouchableOpacity>
         <View className="items-center mt-20 mb-3">
           <Text className="text-4xl font-black text-white">Pronounce</Text>
         </View>
-        <View className="relative w-4/5">
-          <View className={`flex flex-row items-center bg-white px-4 mb-2 h-10 ${showDropdown ? 'rounded-t-lg' : 'rounded-lg'}`}>
-            <TextInput
-              className="flex-1 text-gray-600"
-              placeholder="Search for a word"
-              placeholderTextColor="#999"
-              value={searchText}
-              onFocus={() => setShowDropdown(true)}
-              onBlur={() => setShowDropdown(false)}
-              onChangeText={(text) => searchContent(text)}
-            />
-            <SearchIcon className="w-6 h-6 text-gray-400" />
-          </View>
-          {showDropdown && contents.length > 0 && (
-            <View className="absolute top-10 left-0 right-0 bg-white shadow-lg rounded-b-lg z-10">
-              {contents.map((content, index) => (
-                <TouchableOpacity
-                  key={index}
-                  className="px-4 py-2 border-b border-gray-200"
-                  onPress={() => selectContent(content.contentID)}
-                >
-                  <Text className="text-gray-800">{content.contentText}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
-
-        <TouchableOpacity className="items-center mb-4 mt-4" onPress={random}>
+        <TouchableOpacity className="items-center mb-2 mt-2" onPress={showModal}>
+          <Text className="rounded-xl p-2 text-base font-black text-white bg-white/40">Search</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className="items-center mb-4" onPress={random}>
           <Text className="rounded-xl p-2 text-base font-black text-white bg-white/40">
             Select Randomly
           </Text>
@@ -450,8 +437,68 @@ const Practice: React.FC<Props> = ({ navigation }) => {
           </View>
         </TouchableOpacity>
       </Modal>
-    </SafeAreaView>
 
+      <Modal
+        transparent={true}
+        visible={isSearch == true}
+        animationType="fade"
+        onRequestClose={closeModalSearch}
+      >
+        <TouchableOpacity
+          className="flex-1 bg-black bg-opacity-50 justify-center items-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+          onPress={closeModalSearch}
+        >
+          <View className="bg-white rounded-2xl p-5 shadow-lg">
+            <View className={`flex flex-row items-center bg-white px-4 mb-2 h-10 rounded-lg border border-gray-300`}>
+              <TextInput
+                className="flex-1 text-gray-600"
+                placeholder="Search for a word"
+                placeholderTextColor="#999"
+                value={searchText}
+                onChangeText={(text) => searchContent(text)}
+              />
+              <SearchIcon className="w-6 h-6 text-gray-400" />
+            </View>
+            <ScrollView
+              contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
+              showsVerticalScrollIndicator={false}
+              onScroll={({ nativeEvent }) => {
+                const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+                if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 50) {
+                  if (!loading && hasMore) fetchContents();
+                }
+              }}
+              scrollEventThrottle={16}
+              style={{ maxWidth: 300, maxHeight: 400 }}
+            >
+              {loading && offset === 0 ? (
+                <ActivityIndicator size="large" />
+              ) : contents.length > 0 ? (
+                contents.map((c, index) => (
+                  <TouchableOpacity key={index} onPress={() => selectContent(c.contentID)}>
+                    <View
+                      className="rounded-lg py-3 px-5 mb-3 border-b border-gray-300"
+                    >
+                      <View className="flex flex-row items-center gap-x-4">
+                        <Text className="text-xl text-center text-black w-[30%] font-bold">{c.contentText}</Text>
+                        <ArrowIcon className="w-8 h-8 text-black" />
+                        <Text className="text-xl text-center text-black w-[30%] font-bold italic">{c.englishTranslation}</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text className="text-gray-500 text-lg text-center">No words found</Text>
+              )}
+              {loading && offset > 0 && (
+                <ActivityIndicator size="large" className="mt-4" />
+              )}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </SafeAreaView>
   );
 };
 
