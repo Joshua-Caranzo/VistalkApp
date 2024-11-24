@@ -95,7 +95,7 @@
       class="flex items-center border border-white rounded-lg px-4 py-2 gap-2 w-full"
     >
       <input
-        class="bg-transparent outline-none text-black placeholder-white placeholder-opacity-100 pr-2 w-full"
+        class="bg-transparent outline-none text-white placeholder-white placeholder-opacity-100 pr-2 w-full"
         type="text"
         placeholder="Enter Username"
         bind:value={userName}
@@ -106,7 +106,7 @@
       class="flex items-center border border-white rounded-lg px-4 py-2 gap-2 w-full"
     >
       <input
-        class="bg-transparent outline-none text-black placeholder-white placeholder-opacity-100 pr-2 w-full"
+        class="bg-transparent outline-none text-white placeholder-white placeholder-opacity-100 pr-2 w-full"
         type="password"
         placeholder="Enter Password"
         bind:value={password}

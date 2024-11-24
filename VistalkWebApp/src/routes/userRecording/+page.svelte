@@ -51,7 +51,7 @@
         contentList = contentsCallResult.data;
 
         for (const c of contentList) {
-            if (c.fileName && c.fileName.toLowerCase().endsWith(".wav")) {
+            if (c.fileName) {
                 const url = c.filePath;
                 c.audio = new Audio(url);
 

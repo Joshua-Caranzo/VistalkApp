@@ -111,10 +111,12 @@
         word1 == 0 ||
         word2 == 0 ||
         word3 == 0 ||
-        word4 == 0
+        word4 == 0 ||
+        mainQuestion.correctChoice == null ||
+        mainQuestion.correctChoice == 0
       ) {
-        alert("Please ensure all fields are filled before saving.");
         isLoading = false;
+        alert("Please ensure all fields are filled before saving.");
         return; // Exit function without saving
       }
 
@@ -150,10 +152,8 @@
         mainQuestion.choice2 != null &&
         mainQuestion.choice3 != null &&
         mainQuestion.choice4 != null &&
-        mainQuestion.correctChoice != word1 === null || 0 &&
-        mainQuestion.correctChoice != word2 === null || 0 &&
-        mainQuestion.correctChoice != word3 === null || 0 &&
-        mainQuestion.correctChoice != word4 === null || 0
+        mainQuestion.correctChoice != null
+
       ) {
         await saveQuestionMultipleChoice(mainQuestion);
         closeModal();
@@ -413,7 +413,7 @@
             <button
               on:click={saveContent}
               type="button"
-              disabled={isLoading || (mainQuestion.questionText == null && mainQuestion.correctChoice == null && mainQuestion.choice1 == null && mainQuestion.choice2 == null && mainQuestion.choice3 == null && mainQuestion.choice4 == null)}
+              disabled={isLoading}
               style="border-image: linear-gradient(to right, #6addd0, #f7c188) 1; border-width: 2px;"
               class={"border-transparent bg-white text-black hover:bg-gradient-to-r from-[#6addd0] to-[#f7c188] hover:text-white px-4 py-2 text-sm tracking-wide capitalize transition-colors duration-200 transform rounded-md focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-50"}
             >
