@@ -264,3 +264,7 @@ export async function updateUserLanguage(userId: string, languageId:number) {
 export async function poolSubscription(userId: number) {
     return await getFromMainApi<CallResultDto<boolean>>('poolSubscription', { userId });
 }
+
+export async function poolCoinBag(userId: number, vCoin:number) {
+    return await getFromMainApi<CallResultDto<boolean>>('poolCoinBag', { userId, vCoin });
+}

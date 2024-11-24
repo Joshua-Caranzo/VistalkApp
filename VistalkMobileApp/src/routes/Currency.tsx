@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Modal, Linking, Alert } from 'react-native';
 import { CoinBag } from './type';
-import { buyCoinBag, getCoinBags, getUserVCoin, paymongoRedirect } from './repo';
+import { buyCoinBag, getCoinBags, getUserVCoin, paymongoRedirect, poolCoinBag } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import LoaderModal from '../components/LoaderModal';
@@ -61,22 +61,29 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
         try {
           const result = await paymongoRedirect(selectedBag.moneyPrice, selectedBag.coinBagName);
           if (result.url) {
-            Linking.openURL(result.url);
-
             setModalVisible(false);
-            setTimeout(async () => {
-              const paymentSuccess = true;
-              if (paymentSuccess) {
-                await buyCoinBag(userID, selectedBag.coinBagId).then(() => {
-                  setVcoin(prev => prev + selectedBag.quantity);
-                  setModalVisible(false);
+            setLoading(true)
+            setLoadingMessage("Please wait...")
+            const maxPollingTime = setTimeout(() => {
+              clearInterval(pollInterval);
+              setError('Polling timed out. Please try again.');
+            }, 100000);
 
-                });
-                Alert.alert("Payment Success", "Your payment was successful!");
-              } else {
-                Alert.alert("Payment Failed", "There was a problem with your payment. Please try again.");
+
+            const pollInterval = setInterval(async () => {
+              const poolResult = await poolCoinBag(Number(userID), vCoin);
+
+              if (poolResult.data === true) {
+                clearInterval(pollInterval);
+                clearTimeout(maxPollingTime);
+                setVcoin((prev) => prev + selectedBag.quantity);
+                Alert.alert(
+                  "Congratulations",
+                  "Purchase Succesful!",
+                  [{ text: "OK" }]
+                );
               }
-            }, 10000);
+            }, 1000);
           } else {
             setError('Failed to initiate payment');
           }
