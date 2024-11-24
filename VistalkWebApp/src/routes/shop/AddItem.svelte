@@ -131,7 +131,7 @@
 
               <div class="mt-2">
                 <label for="username" class="block text-sm text-black capitalize dark:text-black">VCoin Price</label>
-              <input autocomplete="off" bind:value={powerUp.vcoinPrice}  placeholder="Powerup Price" type="number" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
+              <input autocomplete="off" bind:value={powerUp.vcoinPrice} min="1"  placeholder="Powerup Price" type="number" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
             </div>
             
             <div class="mt-2">  
@@ -175,7 +175,7 @@
 
             <div class="mt-2">
               <label for="username" class="block text-sm text-black capitalize dark:text-black">Music Price</label>
-            <input bind:value={backgroundMusic.vcoinPrice} placeholder="Music Price" type="text" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
+            <input bind:value={backgroundMusic.vcoinPrice} min="1" placeholder="Music Price" type="text" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
           </div>
 
           <div class="mt-2">  
@@ -222,7 +222,7 @@
 
             <div class="mt-2">
                 <label for="username" class="block text-sm text-black capitalize dark:text-black">Price</label>
-            <input bind:value={coinBag.moneyPrice} placeholder="Coinbag Price" type="number" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
+            <input bind:value={coinBag.moneyPrice} min="1" placeholder="Coinbag Price" type="number" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
             </div>
         {/if}
             <div class="flex justify-end mt-6">

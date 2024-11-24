@@ -147,9 +147,9 @@
                 <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Action</th>
             </tr>
         </thead>
-        <tbody class="text-center text-sm">
+        <tbody class="text-center text-sm hover:cursor-pointer">
             {#if isloading}
-            <Loader isVisible={isloading} message= {"Loading..."} colspan = {4}></Loader> 
+            <Loader isVisible={isloading} message= {"Loading..."} colspan = {5}></Loader> 
             {:else if unitCallResult.totalCount != null && unitCallResult.totalCount > 0}
                 {#each units as u}
                 <tr class="border-t-2 mx-4" on:click={() => openQuestionList(u.unitID)}>
