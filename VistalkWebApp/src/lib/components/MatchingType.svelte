@@ -55,7 +55,16 @@
     const word4 = selectedChoices[3]?.contentID ?? null;
 
     // Check if any value is null
-    if (word1 === null || word2 === null || word3 === null || word4 === null) {
+    if (
+      word1 === null ||
+      word2 === null ||
+      word3 === null ||
+      word4 === null ||
+      word1 == 0 ||
+      word2 == 0 ||
+      word3 == 0 ||
+      word4 == 0
+    ) {
       alert("Please ensure all fields are filled before saving.");
       isLoading = false;
       return; // Exit function without saving
