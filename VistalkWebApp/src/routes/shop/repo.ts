@@ -19,7 +19,7 @@ export async function savePowerup(powerUp: PowerUp) {
     formData.append('vcoinPrice', powerUp.vcoinPrice.toString());
     formData.append('name', powerUp.name);
     formData.append('description', powerUp.description);
-
+    formData.append('filePath', powerUp.filePath);
     if (powerUp.file) {
         const file = new File([powerUp.file], 'image.png', { type: 'image/png' });
         formData.append('itemImageFile', file);
