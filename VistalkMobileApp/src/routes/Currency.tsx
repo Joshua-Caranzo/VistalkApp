@@ -68,7 +68,7 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
             const maxPollingTime = setTimeout(() => {
               clearInterval(pollInterval);
               setError('Polling timed out. Please try again.');
-            }, 100000);
+            }, 180000);
 
 
             const pollInterval = setInterval(async () => {

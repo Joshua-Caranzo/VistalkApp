@@ -381,7 +381,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                             </View>
 
                             <TouchableOpacity
-                              disabled={!task.isCompleted}
+                              disabled={!task.isCompleted || isBuying}
                               onPress={() => claimRewardDashboard(task.taskID)}
                               className={`px-2 py-1 rounded-full ml-6 ${task.isCompleted ? 'bg-[#E8C58F]' : 'bg-gray-400'
                                 }`}
