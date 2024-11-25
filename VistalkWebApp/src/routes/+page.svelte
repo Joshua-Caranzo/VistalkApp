@@ -164,7 +164,7 @@
         <div
             class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center h-full gap-2"
         >
-        <a href="https://drive.google.com/file/d/1iLa4spCnOLmgV74eKT3gPJ3pgvKa4GtM/view?usp=drive_link" download target="_blank">
+        <a href="https://drive.google.com/file/d/1G_rXW7Re2Aj34RN_v4tQvE-5WNqkYZIP/view?usp=sharing" download target="_blank">
             <button class="bg-white font-bold py-2 px-4 rounded-full mt-4 flex items-center justify-center relative overflow-hidden group">
                 <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 512 512" class="mr-2">
                     <path fill="none" class="stroke-black transition duration-300 ease-in-out group-hover:stroke-[#99BC85]" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M336 176h40a40 40 0 0 1 40 40v208a40 40 0 0 1-40 40H136a40 40 0 0 1-40-40V216a40 40 0 0 1 40-40h40"/>

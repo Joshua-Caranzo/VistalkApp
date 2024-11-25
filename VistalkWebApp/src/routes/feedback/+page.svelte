@@ -6,7 +6,6 @@
     import type { CallResultDto } from '../../types/types';
     import Pagination from '$lib/components/Pagination.svelte';
     import Loader from '$lib/components/Loader.svelte';
-    import { EDITOR } from '$env/static/private';
 
     let feedbackList: FeedbackDto[] = [];
     let pageNo: number = 1;
@@ -34,8 +33,9 @@
         // Convert dates to 'YYYY-MM-DD' format
         startDate = oneWeekAgo.toISOString().slice(0, 10);
         endDate = currentDate.toISOString().slice(0, 10);
+
         await redirectIfLoggedIn('');
-        await refresh();
+        refresh();
     });
 
     function handlePageChange(event: CustomEvent) {
