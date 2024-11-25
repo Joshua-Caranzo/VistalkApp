@@ -42,7 +42,7 @@ const Practice: React.FC<Props> = ({ navigation }) => {
   const [pronunciationResult, setPronunciationResult] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
-  const [count, setCount] = useState<number | null>(null)
+  const [count, setCount] = useState<number | null>(0)
   const [countMessage, setShowCountMessage] = useState<string | null>(null);
   const [languageDetails, setLanguageDetails] = useState<Languages>();
   const [correct, setCorrect] = useState<boolean | null>(null);
@@ -65,6 +65,7 @@ const Practice: React.FC<Props> = ({ navigation }) => {
       }
       if (newContents.length < 10) setHasMore(false);
       if (hasMore) setOffset((prevOffset) => prevOffset + 10);
+      await getcount();
     } catch (error) {
       setError('Failed to fetch contents');
     } finally {
@@ -175,13 +176,26 @@ const Practice: React.FC<Props> = ({ navigation }) => {
   }, [contents]);
 
   async function getcount() {
-    if (userID) {
-      const countResult = await getPronunciationCount(parseInt(userID))
-      setCount(countResult.data.numberPronounced)
-      console.log(countResult.data.numberPronounced)
+    const storedUserID = await AsyncStorage.getItem('userID');
+    if (!storedUserID) {
+      console.error('User ID is not set.');
+      return;
+    }
+  
+    try {
+      const countResult = await getPronunciationCount(parseInt(storedUserID));
+      if (countResult?.data?.numberPronounced !== undefined) {
+        setCount(countResult.data.numberPronounced);
+      } else {
+        console.error('Unexpected count result:', countResult);
+        setCount(0); // Default to 0 if API response is unexpected
+      }
+    } catch (error) {
+      console.error('Failed to fetch count:', error);
+      setCount(0); // Default value to avoid null
     }
   }
-
+  
 
   async function random() {
     if (contents.length > 0) {
@@ -226,7 +240,7 @@ const Practice: React.FC<Props> = ({ navigation }) => {
         setCorrect(false)
         setPronunciationResult("You're doing great! Please try again.")
       }
-      getcount();
+      await getcount();
       setAudioFile(null);
       setLoading(false);
 

@@ -177,7 +177,7 @@
                           index === 2 ? 'bg-gradient-to-r from-[#F9931F] to-[#AE5129]' : 
                           'bg-white'}`}>
                         <span class="font-semibold text-black">{index + 1}. {user.name}</span>
-                        <span class="text-white font-bold">{user.totalScore || 0}</span>
+                        <span class="text-black font-bold">{user.totalScore || 0}</span>
                     </li>
                 {/each}
             </ul>
