@@ -118,7 +118,7 @@
               <p class="text-gray-500 text-xs font-bold">Units Unlocked</p>
             </div>
             <div class="text-center">
-              <p class="text-[#f7c188] font-bold text-2xl">{userDetail.totalScoreWeekly || 0}</p>
+              <p class="text-[#f7c188] font-bold text-2xl">{userDetail.totalWeeklyScore || 0}</p>
               <p class="text-gray-500 text-xs font-bold">Total Weekly Score</p>
             </div>
             <div class="text-center">

@@ -25,7 +25,7 @@ export type UserProfileDto = {
   imagePath: string | null;
   vCoin: number;
   currentLanguageId: string;
-  totalScoreWeekly: number;
+  totalWeeklyScore: number;
   vcoin: number;
   unitsUnlocked: number | null;
   highestScore: number | null;

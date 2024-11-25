@@ -18,6 +18,7 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [confirmationCode, setConfirmationCode] = useState('');
+  const [confirmationCodePlaceHolder, setConfirmationCodePlaceHolder] = useState('');
 
   const fetchUserData = async () => {
     try {
@@ -182,29 +183,46 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
         </View>
 
         {/* Modal for email verification */}
+
         <Modal
           transparent={true}
           visible={isModalVisible}
           animationType="slide"
           onRequestClose={() => setIsModalVisible(false)}
         >
-          <View className="flex-1 justify-center items-center bg-gray-800 bg-opacity-50">
-            <View className="w-4/5 bg-white p-4 rounded-lg items-center">
-              <Text className="text-xl font-bold mb-4">Enter Confirmation Code</Text>
+          
+          <View className="flex-1 justify-center items-center bg-[#00000080]">
+            <View className="w-4/5 p-5 rounded-xl items-center bg-white">
+              <Text className="text-xl font-black mb-4 text-black">Enter Confirmation Code</Text>
+
               <TextInput
-                className="bg-gray-200 text-gray-900 p-3 mb-4 rounded-lg"
+                className="w-full h-12 border border-gray-500 border-2 mb-4 px-2 rounded-md bg-transparent text-black"
                 placeholder="Confirmation Code"
-                placeholderTextColor="#999"
+                placeholderTextColor="white"
                 onChangeText={setConfirmationCode}
                 value={confirmationCode}
                 keyboardType="numeric"
+                onFocus={() => setConfirmationCodePlaceHolder('')}
+                onBlur={() => setConfirmationCodePlaceHolder('Confirmation Code')}
               />
-              <TouchableOpacity className="bg-blue-500 p-3 rounded-lg w-full mb-4" onPress={handleConfirmCode}>
-                <Text className="text-white text-lg">Confirm</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-                <Text className="text-gray-600 text-lg">Cancel</Text>
-              </TouchableOpacity>
+
+              <View className="flex-row items-center justify-center w-[100%] gap-2">
+                <TouchableOpacity onPress={handleConfirmCode}>
+                  <LinearGradient className="flex py-2 px-4 rounded-xl items-center" colors={['#6addd0', '#f7c188']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                        <Text className="text-base text-white">Confirm</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                  <LinearGradient className="flex py-2 px-4 rounded-xl items-center" colors={['#DD816A', '#FF1F1F']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}>
+                      <Text className="text-base text-white">Cancel</Text>
+                  </LinearGradient>  
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

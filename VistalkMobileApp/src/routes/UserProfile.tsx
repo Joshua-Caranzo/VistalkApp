@@ -154,7 +154,7 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
             </View>
 
             <View className=" items-center bg-gray-300 p-2 rounded-xl">
-            <Text className="text-[#f7c188] text-center font-bold text-2xl">{userDetails.totalScoreWeekly || 0}</Text>
+            <Text className="text-[#f7c188] text-center font-bold text-2xl">{userDetails.totalWeeklyScore || 0}</Text>
             <Text className="text-gray-500 text-xs font-bold w-4/5 text-center">Total Weekly Score</Text>
             </View>
 

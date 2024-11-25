@@ -91,7 +91,7 @@ def createVista():
 
     try:
         query = """
-        INSERT INTO user (name, email, encryptedPassword, isActive, isAdmin, isPlayer, isAccountLocked, failedLogins) 
+        INSERT INTO user (name, email, encryptedPassword, isActive, isAdmin, isPlayer, isAccountLocked, failedLoginsW) 
         VALUES (%s, %s, %s, %s, %s, %s, %s , %s)
         """
         cursor.execute(query, (name, email, hash_password(password), 1, 0, 1, 0, 0))
@@ -638,10 +638,11 @@ def getUserDetails():
         day_name = record['dateDaily'].strftime("%A")  
         week_scores[day_name] = record['score']
         total_weekly_score += record['score'] 
+    print(total_weekly_score)
 
     userProfile['weeklyScoreGraph'] = week_scores
     userProfile['totalWeeklyScore'] = total_weekly_score
-
+    print( userProfile['totalWeeklyScore'])
     return jsonify({
         'isSuccess': True,
         'message': 'Successfully Retrieved',
