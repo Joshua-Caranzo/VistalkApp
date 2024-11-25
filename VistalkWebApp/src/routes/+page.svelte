@@ -197,7 +197,7 @@
                 <span
                     class="text-black transition duration-300 ease-in-out hover:text-transparent bg-clip-text bg-gradient-to-r from-[#99BC85] to-[#f7c188]"
                 >
-                    Donate Voice Now
+                    Speak for Vista
                 </span>
             </button>
         </div>

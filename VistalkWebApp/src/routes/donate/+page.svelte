@@ -258,8 +258,6 @@
       {/if}
     </div>
 
-    <p class="text-lg font-bold text-white mb-6">Speak Donate Your Voice</p>
-
     <div class="relative flex flex-col items-center justify-center">
       <button
         disabled={randomContent == undefined}
