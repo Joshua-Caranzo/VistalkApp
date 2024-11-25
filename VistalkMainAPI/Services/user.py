@@ -224,7 +224,7 @@ def saveGamePlay():
         cursor.execute(query_select2, (unitId, ))
         totalItems = cursor.fetchone()[0]
 
-        totalPercentage = (totalCorrectAnswer / totalItems) * 100
+        totalPercentage = (totalCorrectAnswer / 15) * 100
 
         if totalPercentage <= 70:
             vCoin = np.random.randint(10, 20)

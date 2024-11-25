@@ -30,6 +30,7 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
   const [isModalVisible, setModalVisible] = useState<boolean>(false);
   const [showError, setShowError] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); 
+  const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -57,7 +58,10 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
     const updatedUserDto: UserDto = {...userDto, languageId};
 
     try {
+      setMessage("Creating User...")
+      setLoading(true);
       const result = await register(updatedUserDto);
+      setLoading(false);
       if (result.isSuccess) {
         handleLogin();
       } else {
@@ -97,6 +101,8 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
 
   const handleLogin = async () => {
         if(userDto){
+          setMessage("Logging In...")
+
           setLoading(true);
         const response = await loginUser(userDto?.email, userDto.password);
 
@@ -127,7 +133,7 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
 
   if (loading) {
     return (
-      <Loader isVisible={loading} message='Logging In...' />
+      <Loader isVisible={loading} message={message} />
     );
   }
 
