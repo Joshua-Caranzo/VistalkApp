@@ -219,8 +219,8 @@ def loginVista():
     
     try:
         cursor.execute("""
-            SELECT userID as id, name, encryptedpassword, failedlogins, isAccountLocked, logInTimeLockOut, isActive
-            FROM user
+            SELECT userID as id, name, encryptedpassword, failedlogins, isAccountLocked, logInTimeLockOut, isActive, v.currentLanguageId as languageId
+            FROM user inner join vista v on v.userPlayerId = user.userID
             WHERE email = %s AND isPlayer = true
         """, (email,))
         user = cursor.fetchone()
@@ -275,7 +275,8 @@ def loginVista():
                 'data': {
                     'name': user['name'],
                     'token': token,
-                    'id': str(user['id'])
+                    'id': str(user['id']),
+                    'languageId': str(user['languageId'])
                 },
                 'data2': None,
                 'totalCount': None 

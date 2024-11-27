@@ -9,6 +9,7 @@ import { Content, Languages, UserProfileDto } from './type';
 import { getContent, getUserLanguage } from './repo';
 import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Animatable from 'react-native-animatable';
 
 const Dictionary: React.FC = () => {
   const [searchString, setSearchText] = useState('');
@@ -22,12 +23,23 @@ const Dictionary: React.FC = () => {
   const [languageDetails, setLanguageDetails] = useState<Languages>();
   const [userDetails, setUserDetails] = useState<UserProfileDto>();
   const [userId, setUserID] = useState<string>("");
+  const [dictWord, setDictWord] = useState<string>("");
+  const [showDictionary, setShowDictionary] = useState<boolean>(true);
 
   const fetchContents = async (reset = false) => {
     setLoading(true);
     try {
       const userID = await AsyncStorage.getItem('userID');
-
+      const languageID = await AsyncStorage.getItem('languageId');
+      console.log(languageID)
+      switch (languageID) {
+        case "1": setDictWord("Diksyonaryo"); break;
+        case "2": setDictWord("Diksyonaryo"); break;
+        case "3": setDictWord("Diksyonaryu"); break;
+        default:
+          setDictWord("DICTIONARY");
+          break;
+      }
       setUserID(userID ?? "");
       const result1 = await getUserLanguage(Number(userID));
       setLanguageDetails(result1.data);
@@ -57,6 +69,19 @@ const Dictionary: React.FC = () => {
   };
 
   useEffect(() => {
+    fetchContents();
+
+    // Toggle between 'Dictionary' and 'dictWord' every 3 seconds
+    const interval = setInterval(() => {
+      setShowDictionary((prev) => !prev);
+    }, 3000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, []);
+
+
+  useEffect(() => {
     setOffset(0);
     setHasMore(true);
     fetchContents(true);
@@ -75,7 +100,14 @@ const Dictionary: React.FC = () => {
   return (
     <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center resize-cover">
       <View className="items-center mb-3 mt-8">
-        <Text className="text-4xl font-black text-white">Dictionary</Text>
+      <Animatable.Text
+        animation="slideInDown" // Slide in from above
+        duration={500}         // Animation duration (500ms)
+        key={showDictionary ? 'Dictionary' : 'dictWord'} // Key ensures animation reruns on text change
+        className="text-4xl font-black text-white"
+      >
+        {showDictionary ? 'Dictionary' : dictWord}
+      </Animatable.Text>
       </View>
       <View className="flex flex-row items-center justify-start bg-white rounded-lg px-4 mb-5 w-4/5 h-10">
         <TextInput
@@ -111,17 +143,17 @@ const Dictionary: React.FC = () => {
         ) : contents.length > 0 ? (
           contents.map((c, index) => (
             <TouchableOpacity key={index} onPress={() => navigateToMeaning(c.contentID)}>
-                <LinearGradient colors={['#f7c188', '#6addd0']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }} // Left to right gradient
-                  className="rounded-lg py-3 px-5 mb-3 border border-[#FAF9F6]"
-                >
-                  <View className="flex flex-row items-center gap-x-4">
-                    <Text className="text-xl text-center text-white w-[30%] font-bold">{c.contentText}</Text>
-                    <ArrowIcon className="w-8 h-8 text-white" />
-                    <Text className="text-xl text-center text-white w-[30%] font-bold italic">{c.englishTranslation}</Text>
-                  </View>
-                </LinearGradient>
+              <LinearGradient colors={['#f7c188', '#6addd0']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }} // Left to right gradient
+                className="rounded-lg py-3 px-5 mb-3 border border-[#FAF9F6]"
+              >
+                <View className="flex flex-row items-center gap-x-4">
+                  <Text className="text-xl text-center text-white w-[30%] font-bold">{c.contentText}</Text>
+                  <ArrowIcon className="w-8 h-8 text-white" />
+                  <Text className="text-xl text-center text-white w-[30%] font-bold italic">{c.englishTranslation}</Text>
+                </View>
+              </LinearGradient>
             </TouchableOpacity>
           ))
         ) : (

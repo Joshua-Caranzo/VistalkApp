@@ -19,6 +19,7 @@ import LoaderModal from '../components/LoaderModal';
 import { StackScreenProps } from '@react-navigation/stack';
 import ArrowIcon from '../assets/svg/ArrowIcon';
 import IncorrectIcon from '../assets/svg/IncorrectIcon';
+import * as Animatable from 'react-native-animatable';
 
 type Props = StackScreenProps<RootStackParamList, 'Practice'>;
 
@@ -49,11 +50,23 @@ const Practice: React.FC<Props> = ({ navigation }) => {
   const [userID, setUserId] = useState<string | null>(null);
   const [isSearch, setSearch] = useState<boolean | null>(null);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
+  const [dictWord, setDictWord] = useState<string>("");
+  const [showPractice, setShowPractice] = useState<boolean>(true);
 
   const fetchContents = async (reset = false) => {
     setSearchLoading(true);
     try {
       const userIdString = await AsyncStorage.getItem('userID');
+      const languageID = await AsyncStorage.getItem('languageId');
+      console.log(languageID)
+      switch (languageID) {
+        case "1": setDictWord("Pag-litok"); break;
+        case "2": setDictWord("Pagluwas"); break;
+        case "3": setDictWord("Magmitlang"); break;
+        default:
+          setDictWord("PRONOUNCE");
+          break;
+      }
       const result1 = await getUserLanguage(Number(userIdString));
       const result = await getPronunciations(result1.data.languageID, searchText, offset, 10);
       const newContents = result.data;
@@ -71,6 +84,18 @@ const Practice: React.FC<Props> = ({ navigation }) => {
       setSearchLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchContents();
+
+    // Toggle between 'Dictionary' and 'dictWord' every 3 seconds
+    const interval = setInterval(() => {
+      setShowPractice((prev) => !prev);
+    }, 3000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     getcount();
@@ -321,7 +346,14 @@ const Practice: React.FC<Props> = ({ navigation }) => {
           <HistoryIcon className="h-8 w-8 text-white" />
         </TouchableOpacity>
         <View className="items-center mt-20 mb-3">
-          <Text className="text-4xl font-black text-white">Pronounce</Text>
+          <Animatable.Text
+            animation="slideInDown" // Slide in from above
+            duration={500}         // Animation duration (500ms)
+            key={showPractice ? 'Pronounce' : 'dictWord'} // Key ensures animation reruns on text change
+            className="text-4xl font-black text-white"
+          >
+            {showPractice ? 'Pronounce' : dictWord}
+          </Animatable.Text>
         </View>
         <TouchableOpacity className="items-center mb-2 mt-2" onPress={showModal}>
           <Text className="rounded-xl p-2 text-base font-black text-white bg-white/40">Search</Text>
@@ -460,7 +492,7 @@ const Practice: React.FC<Props> = ({ navigation }) => {
           >
             <View className="flex items-end mb-4">
               <TouchableOpacity onPress={closeModalSearch}>
-                <IncorrectIcon className="text-gray-300 h-5 w-5" /> 
+                <IncorrectIcon className="text-gray-300 h-5 w-5" />
               </TouchableOpacity>
             </View>
             {/* Search input */}

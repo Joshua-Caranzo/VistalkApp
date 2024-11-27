@@ -15,6 +15,7 @@ import PotionIcon from '../assets/svg/PotionIcon';
 import SubscriptionIcon from '../assets/svg/SubscriptionIcon';
 import CurrencyIcon from '../assets/svg/CurrencyIcon';
 import { QuestionDetails, UserPowerUp } from './type';
+import * as Animatable from 'react-native-animatable';
 
 type Props = StackScreenProps<RootStackParamList, 'Shop'>;
 
@@ -40,29 +41,53 @@ const Shop: React.FC<Props> = ({ route }) => {
   const [error, setError] = useState<string | null>(null);
   const [powerUps, setPowerUps] = useState<UserPowerUp[]>([]);
   const [powerUpUrls, setPowerUpUrl] = useState<PowerUpURL[]>([]);
+  const [dictWord, setDictWord] = useState<string>("");
+  const [showShop, setShop] = useState<boolean>(true);
+
+  const fetchData = async () => {
+    try {
+      const userID = await AsyncStorage.getItem('userID');
+      const languageID = await AsyncStorage.getItem('languageId');
+      console.log(languageID);
+      switch (languageID) {
+        case "1": setDictWord("Tindahan"); break;
+        case "2": setDictWord("Tindahan"); break;
+        case "3": setDictWord("Tindahan"); break;
+        default:
+          setDictWord("Shop");
+          break;
+      }
+      if (userID) {
+        const result = await getUserVCoin(userID);
+        if (result.isSuccess) {
+          setVcoin(result.data);
+        } else {
+          setError('Failed to fetch vCoin');
+        }
+      } else {
+        setError('No userID found');
+      }
+    } catch (err) {
+      setError('Failed to fetch data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userID = await AsyncStorage.getItem('userID');
-        if (userID) {
-          const result = await getUserVCoin(userID);
-          if (result.isSuccess) {
-            setVcoin(result.data);
-          } else {
-            setError('Failed to fetch vCoin');
-          }
-        } else {
-          setError('No userID found');
-        }
-      } catch (err) {
-        setError('Failed to fetch data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+
+    // Toggle between 'Dictionary' and 'dictWord' every 3 seconds
+    const interval = setInterval(() => {
+      setShop((prev) => !prev);
+    }, 3000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -82,7 +107,7 @@ const Shop: React.FC<Props> = ({ route }) => {
                 return null;
               })
             );
-  
+
             setPowerUpUrl(imageUrls.filter((url) => url !== null));
           } else {
             setError('Failed to fetch PowerUps');
@@ -96,14 +121,14 @@ const Shop: React.FC<Props> = ({ route }) => {
         setLoading(false);
       }
     };
-  
+
     fetchPowerUps();
   }, []);
 
   const renderContent = () => {
     switch (selectedItem) {
       case 'Power Ups':
-        return <PowerUps vCoin={vCoin} setVcoin={setVcoin} userPowerUps = {powerUps} setUserPowerUp = {setPowerUps}/>;
+        return <PowerUps vCoin={vCoin} setVcoin={setVcoin} userPowerUps={powerUps} setUserPowerUp={setPowerUps} />;
       case 'Subscription':
         return <Subscription vCoin={vCoin} setVcoin={setVcoin} />;
       case 'Currency':
@@ -127,7 +152,14 @@ const Shop: React.FC<Props> = ({ route }) => {
         </View>
       </View>
       <View className="items-center mt-20 mb-3">
-        <Text className="text-4xl font-black text-white">Shop</Text>
+      <Animatable.Text
+        animation="slideInDown" // Slide in from above
+        duration={500}         // Animation duration (500ms)
+        key={showShop ? 'Shop' : 'dictWord'} // Key ensures animation reruns on text change
+        className="text-4xl font-black text-white"
+      >
+        {showShop ? 'Shop' : dictWord}
+      </Animatable.Text>
       </View>
       <View>
         <View className="flex flex-row gap-x-2 items-center flex-wrap w-full">
@@ -158,7 +190,7 @@ const Shop: React.FC<Props> = ({ route }) => {
       <View className="absolute bottom-[10%] rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
         <View className="flex-row justify-center gap-2 w-[100%]">
           {powerUps.map((powerUp, index) => {
-            const imageUrl =powerUp.filePath;
+            const imageUrl = powerUp.filePath;
 
             return (
               <View className="py-2 px-1 items-center relative" key={index}>
