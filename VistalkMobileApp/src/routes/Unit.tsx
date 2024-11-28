@@ -18,6 +18,7 @@ import useBackButtonHandler from '../utilities/useBackButtonHandler';
 import CircleIcon from '../assets/svg/CircleIcon';
 import Svg from 'react-native-svg';
 import LockIcon from '../assets/svg/LockIcon';
+import * as Animatable from 'react-native-animatable';
 
 type Props = StackScreenProps<RootStackParamList, 'Unit'>;
 
@@ -30,11 +31,32 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [currentUnit, setCurrentUnit] = useState<UnitDetails | null>(null);
     const navigate = useNavigation<UnitContentScreenNavigationProp>();
-
+    const [dictWord, setDictWord] = useState<string>("");
+    const [startWord, setStartWord] = useState<string>("");
+    const [showSection, setShowSection] = useState<boolean>(true);
+    const [showStart, setShowStart] = useState<boolean>(true);
     useEffect(() => {
         const fetchUnits = async () => {
             try {
                 const userID = await AsyncStorage.getItem('userID');
+                const languageID = await AsyncStorage.getItem('languageId');
+                console.log(languageID)
+                switch (languageID) {
+                    case "1": setDictWord("Seksyon"); break;
+                    case "2": setDictWord("Seksyon"); break;
+                    case "3": setDictWord("Seksyon"); break;
+                    default:
+                        setDictWord("Section");
+                        break;
+                }
+                switch (languageID) {
+                    case "1": setStartWord("Sugod"); break;
+                    case "2": setStartWord("Sugod"); break;
+                    case "3": setStartWord("Tikang"); break;
+                    default:
+                        setStartWord("Start");
+                        break;
+                }
                 const result = await getUnits(sectionId, userID);
                 setUnits(result.data);
             } catch (error) {
@@ -51,6 +73,17 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
             unsubscribe();
         };
     }, [navigation, sectionId]);
+
+    useEffect(() => {
+        // Toggle between 'Dictionary' and 'dictWord' every 3 seconds
+        const interval = setInterval(() => {
+            setShowSection((prev) => !prev);
+            setShowStart((prev) => !prev);
+        }, 3000);
+
+        // Cleanup interval on unmount
+        return () => clearInterval(interval);
+    }, []);
 
     const navigateToUnitContent = () => {
         if (currentUnit) {
@@ -86,7 +119,14 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                     </TouchableOpacity>
                 </View>
                 <View className="items-center mb-3 mt-8">
-                    <Text className="text-4xl font-black text-white">Section {sectionName}</Text>
+                    <Animatable.Text
+                        animation="slideInDown" // Slide in from above
+                        duration={500}         // Animation duration (500ms)
+                        key={showSection ? 'Section' : 'dictWord'} // Key ensures animation reruns on text change
+                        className="text-4xl font-black text-white"
+                    >
+                        {showSection ? 'Section' : dictWord} {sectionName}
+                    </Animatable.Text>
                 </View>
                 <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
                     <View className="justify-around mt-2">
@@ -180,8 +220,15 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                                                 onPress={() => navigateToUnitContent()}
                                             >
                                                 <LinearGradient colors={['#6addd0', '#f7c188']} start={{ x: 0, y: 0 }}
-                                                    end={{ x: 1, y: 0 }} className="bg-gray-600 py-2 px-14 rounded-2xl self-center">
-                                                    <Text className="text-lg text-white font-bold">Start Unit</Text>
+                                                    end={{ x: 1, y: 0 }} className="bg-gray-600 py-2 px-16 rounded-2xl self-center">
+                                                    <Animatable.Text
+                                                        animation="slideInDown" // Slide in from above
+                                                        duration={500}         // Animation duration (500ms)
+                                                        key={showStart ? 'Start' : 'dictWord'} // Key ensures animation reruns on text change
+                                                        className="text-lg text-white font-bold"
+                                                    >
+                                                        {showStart ? 'Start' : startWord}
+                                                    </Animatable.Text>
                                                 </LinearGradient>
                                             </TouchableOpacity>
                                         </View>

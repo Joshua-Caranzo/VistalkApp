@@ -109,6 +109,7 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
         if (response.isSuccess === true) {
           await AsyncStorage.setItem('userToken', response.data.token);
           await AsyncStorage.setItem('userID', response.data.id);
+          await AsyncStorage.setItem('languageId', response.data.languageId);
           checkLoginStatus();
           navigation.navigate('Dashboard')
         } else {

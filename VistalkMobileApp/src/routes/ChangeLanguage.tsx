@@ -58,7 +58,7 @@ const ChangeLanguage: React.FC<Props> = ({navigation}) => {
                 console.log(languageId)
                 console.log(userID)
                 const result = await updateUserLanguage(userID, languageId);
-                console.log(result)
+                await AsyncStorage.setItem('languageId', languageId.toString());
                 if (result.isSuccess) {
                     navigation.navigate('Dashboard')
                 } else {

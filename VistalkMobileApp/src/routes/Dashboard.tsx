@@ -17,6 +17,7 @@ import ProfileIcon from '../assets/svg/ProfileIcon';
 import LockIcon from '../assets/svg/LockIcon';
 import CheckIcon from '../assets/svg/CheckIcon';
 import LoaderModal from '../components/LoaderModal';
+import * as Animatable from 'react-native-animatable';
 
 type Props = StackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -39,7 +40,14 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   const [userId, setUserID] = useState<string>("");
   const [isBuying, setIsBuying] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
-
+  const [secWord, setSecWord] = useState<string>("");
+  const [notifWord, setNotifWord] = useState<string>("");
+  const [taskWord, setTaskWord] = useState<string>("");
+  const [letWord, setLetWord] = useState<string>("");
+  const [showSection, setShowSection] = useState<boolean>(true);
+  const [showNotif, setShowNotif] = useState<boolean>(true);
+  const [showTask, setShowTask] = useState<boolean>(true);
+  const [showLet, setShowLet] = useState<boolean>(true);
   const toggleDescription = (taskID: number) => {
     setExpandedTasks((prev) => ({
       ...prev,
@@ -63,6 +71,40 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   const fetchUserData = async () => {
     try {
       const userID = await AsyncStorage.getItem('userID');
+      const languageID = await AsyncStorage.getItem('languageId');
+      console.log(languageID)
+      switch (languageID) {
+        case "1": setSecWord("Seksyon"); break;
+        case "2": setSecWord("Seksyon"); break;
+        case "3": setSecWord("Seksyon"); break;
+        default:
+          setSecWord("Section");
+          break;
+      }
+      switch (languageID) {
+        case "1": setNotifWord("Mga Pahibalo"); break;
+        case "2": setNotifWord("Abiso"); break;
+        case "3": setNotifWord("Mga Pahibaro"); break;
+        default:
+          setNotifWord("Notification");
+          break;
+      }
+      switch (languageID) {
+        case "1": setTaskWord("Buluhaton Sa Adlaw"); break;
+        case "2": setTaskWord("Buluhaton Sa Adlaw"); break;
+        case "3": setTaskWord("Buruhaton Sa Adlaw"); break;
+        default:
+          setTaskWord("Daily Task");
+          break;
+      }
+      switch (languageID) {
+        case "1": setLetWord("Sugdan Nato"); break;
+        case "2": setLetWord("Magsugod Kita"); break;
+        case "3": setLetWord("Magtikang Kita"); break;
+        default:
+          setLetWord("Let's Begin");
+          break;
+      }
       setUserID(userID ?? "");
       const result = await getUserLanguage(Number(userID));
       setLanguageDetails(result.data);
@@ -86,6 +128,21 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
       console.error('Error retrieving user data:', error);
     }
   };
+
+  useEffect(() => {
+    fetchUserData();
+
+    // Toggle between 'Dictionary' and 'dictWord' every 3 seconds
+    const interval = setInterval(() => {
+      setShowSection((prev) => !prev);
+      setShowNotif((prev) => !prev);
+      setShowTask((prev) => !prev);
+      setShowLet((prev) => !prev);
+    }, 3000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     fetchUserData();
@@ -226,9 +283,14 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
               }}
             >
               <View className="flex-col gap-y-2 max-w-[70%]">
-                <Text className="text-lg text-white font-bold">
-                  Section {section.sectionNumber}
-                </Text>
+                <Animatable.Text
+                        animation="slideInDown" // Slide in from above
+                        duration={500}         // Animation duration (500ms)
+                        key={showSection ? 'Section' : 'secWord'} // Key ensures animation reruns on text change
+                        className="text-lg text-white font-bold"
+                      >
+                        {showSection ? 'Section' : secWord} {section.sectionNumber}
+                      </Animatable.Text>
                 <Text
                   className={`font-black text-white ${getTextSizeClass(section.title)} truncate`}
                 >
@@ -307,7 +369,14 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
                   <TouchableOpacity onPress={() => { closeModal(); navigateToUnit() }}>
                     <LinearGradient colors={['#6addd0', '#f7c188']} start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }} className="bg-gray-600 py-2 px-14 rounded-2xl self-center">
-                      <Text className="text-lg text-white font-bold">Let's Begin</Text>
+                      <Animatable.Text
+                        animation="slideInDown" // Slide in from above
+                        duration={500}         // Animation duration (500ms)
+                        key={showLet ? 'Daily Task' : 'letWord'} // Key ensures animation reruns on text change
+                        className="text-lg text-white text-center font-bold"
+                      >
+                        {showLet ? 'Let\'s Begin' : letWord}
+                      </Animatable.Text>
                     </LinearGradient>
 
                   </TouchableOpacity>
@@ -333,8 +402,14 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
             <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-xl">
 
               <View className="bg-white rounded-2xl py-3 px-6 shadow-lg" style={{ maxHeight: 360 }}>
-                <Text className="text-2xl font-black mt-2 mb-4 text-black text-center">Daily Tasks</Text>
-
+                <Animatable.Text
+                  animation="slideInDown" // Slide in from above
+                  duration={500}         // Animation duration (500ms)
+                  key={showTask ? 'Daily Task' : 'taskWord'} // Key ensures animation reruns on text change
+                  className="text-xl font-bold mt-2 mb-4 text-black text-center"
+                >
+                  {showTask ? 'Daily Task' : taskWord}
+                </Animatable.Text>
                 <ScrollView showsVerticalScrollIndicator={false}>
                   <TouchableWithoutFeedback>
                     <View>
@@ -423,7 +498,14 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
             <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-xl ">
 
               <View className="bg-white rounded-2xl py-3 px-6 shadow-lg" style={{ maxHeight: 360 }}>
-                <Text className="text-2xl font-black mb-4 text-black text-center">Notifications</Text>
+                <Animatable.Text
+                  animation="slideInDown" // Slide in from above
+                  duration={500}         // Animation duration (500ms)
+                  key={showNotif ? 'Notification' : 'notifWord'} // Key ensures animation reruns on text change
+                  className="text-xl font-bold mb-4 text-black text-center"
+                >
+                  {showNotif ? 'Notification' : notifWord}
+                </Animatable.Text>
                 <ScrollView contentContainerStyle={{ maxHeight: 400 }}>
                   {notifications.length > 0 ? (
                     notifications.map((notif) => (

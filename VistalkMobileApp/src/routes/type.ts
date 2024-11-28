@@ -2,6 +2,7 @@ export interface LoggedInUser {
     id:string;
 	name: string;
 	token: string;
+    languageId:string;
 }
 
 export type CallResultDto<T> = {

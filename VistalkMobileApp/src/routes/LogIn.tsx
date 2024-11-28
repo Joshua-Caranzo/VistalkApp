@@ -28,6 +28,7 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
       if (response.isSuccess === true) {
         await AsyncStorage.setItem('userToken', response.data.token);
         await AsyncStorage.setItem('userID', response.data.id);
+        await AsyncStorage.setItem('languageId', response.data.languageId);
 
         navigation.navigate('Dashboard')
       } else {
